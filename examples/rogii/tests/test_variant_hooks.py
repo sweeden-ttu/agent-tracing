@@ -18,8 +18,23 @@ if str(SHARED) not in sys.path:
 
 from pipeline.formation_spatial import add_formation_spatial_features  # noqa: E402
 from pipeline.leakage_masks import detect_ps_per_well, post_ps_mask  # noqa: E402
+from pipeline.parallel_loader import parallel_read_multiwell_csvs  # noqa: E402
 from pipeline.typewell_alignment import add_typewell_alignment_features, beam_search_path  # noqa: E402
 from variant_hooks import load_hooks  # noqa: E402
+
+
+def test_parallel_read_multiwell_csvs_preserves_path_order(tmp_path):
+    for name in ("well_b__horizontal.csv", "well_a__horizontal.csv", "well_c__horizontal.csv"):
+        (tmp_path / name).write_text(f"well_id,MD\n{name.split('_')[1]},100\n", encoding="utf-8")
+
+    seq_frames, seq_meta = parallel_read_multiwell_csvs(tmp_path, n_workers=1)
+    par_frames, par_meta = parallel_read_multiwell_csvs(tmp_path, n_workers=4)
+
+    expected_paths = sorted(str(p) for p in tmp_path.glob("*__horizontal.csv"))
+    assert seq_meta["paths"] == expected_paths
+    assert par_meta["paths"] == expected_paths
+    assert [f.iloc[0, 0] for f in seq_frames] == ["a", "b", "c"]
+    assert [f.iloc[0, 0] for f in par_frames] == ["a", "b", "c"]
 
 
 def test_beam_search_path_returns_finite_tvt():

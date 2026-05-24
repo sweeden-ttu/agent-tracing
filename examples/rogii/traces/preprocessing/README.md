@@ -2,6 +2,8 @@
 
 Six ablation branches under `examples/rogii/traces/preprocessing/`. **Baseline merges first** — others extend the shared CV → train → submit tail.
 
+**Documentation:** [`../../docs/README.md`](../../docs/README.md) · [`../../docs/GLOSSARY.md`](../../docs/GLOSSARY.md) · [`../../docs/VARIANTS.md`](../../docs/VARIANTS.md)
+
 | Variant | Branch | Status in this worktree |
 |---------|--------|-------------------------|
 | `baseline_column_transformer` | `trace/baseline-column-transformer` | Phases 01–02 committed; 03–06 scaffolded |
