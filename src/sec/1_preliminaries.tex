@@ -1,0 +1,20 @@
+\section{Preliminaries: Automata, Traces, and Languages}
+\label{sec:prelim}
+
+\subsection{Observation and action grammars; traces}
+
+Fix \textbf{finite grammars} for observations and for actions (terminal-only forms realized at runtime). Let $\Sigma_{\mathrm{obs}}$ and $\Gamma_{\mathrm{act}}$ denote the \textbf{finite sets of observation terminals} and \textbf{atomic action terminals}, respectively (concrete encodings of discretized UI events, API codes, tool names with bounded argument tags). A \emph{step} is a pair $(o,a)$ with $o \in \Sigma_{\mathrm{obs}}$ and $a \in \Gamma_{\mathrm{act}}^\ast$ (a finite sequence of atomic actions; $\varepsilon$ denotes the empty sequence).
+
+A \emph{trace} of length $n$ is a sequence
+\[
+\tau = (o_1,a_1)(o_2,a_2)\cdots(o_n,a_n),
+\]
+where each $(o_i,a_i)$ is a step. The set of all finite traces is $\mathcal{T} = (\Sigma_{\mathrm{obs}} \times \Gamma_{\mathrm{act}}^\ast)^\ast$. A \emph{trace language} is any subset $L \subseteq \mathcal{T}$.
+
+\subsection{Chomsky hierarchy (recognition view)}
+
+For reference: a language $L \subseteq \Sigma^\ast$ of strings over finite $\Sigma$ is Type~3 (regular) iff some finite automaton recognizes it; Type~2 iff some nondeterministic pushdown automaton (NPDA) recognizes it; Type~1 iff some linear-bounded automaton (LBA) recognizes it; Type~0 iff some Turing machine recognizes it \citep{hopcroft2006automata}.
+
+\subsection{Remark on morphisms}
+
+Traces are not raw strings until we fix an injective encoding $\mathrm{enc} : \mathcal{T} \to \Sigma^\ast$ into some \textbf{string language} over a finite symbol set (classical formal-language machinery). All hierarchy claims below are stated modulo such an encoding that is injective on the trace set under study. In implementation-facing documents, prefer speaking of \textbf{grammars}, \textbf{terminals}, \textbf{states}, \textbf{memory}, and \textbf{context} rather than informal ``alphabet'' talk for agent layers.
