@@ -1,0 +1,14 @@
+{
+  "base_paper_title": "Robust Statistics: The Approach Based on Influence Functions",
+  "claims": [
+    "Robust location/scale estimators reduce outlier sensitivity vs ordinary standardization.",
+    "log1p target transform stabilizes skewed well-log regression residuals.",
+    "Inverse transform at predict time is an ablatable factor coupling train and inference stacks."
+  ],
+  "ablation_sections": [
+    "Ch. 2 influence functions",
+    "Ch. 5 M-estimators"
+  ],
+  "trace_csv": "traces/preprocessing/robust_scale_log1p/trace_language.csv",
+  "hypothesis": "RobustScaler + log1p target improves competition RMSE (post-PS) vs shared baseline under nested GroupKFold, as motivated by Hampel, Ronchetti, Rousseuw, Stahel (1986)."
+}

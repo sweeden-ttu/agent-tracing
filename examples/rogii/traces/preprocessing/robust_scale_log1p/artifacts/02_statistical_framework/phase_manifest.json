@@ -1,0 +1,14 @@
+{
+  "variant": "robust_scale_log1p",
+  "phase": "02_statistical_framework",
+  "completed_at": "2026-05-24T10:24:18Z",
+  "prior_phase": "01_data_analysis",
+  "outputs": {
+    "statistical_framework": "artifacts/02_statistical_framework/statistical_framework.json",
+    "ablation_grid": "artifacts/02_statistical_framework/ablation_grid.json",
+    "training_plan": "artifacts/02_statistical_framework/training_plan.json",
+    "paper_citations": "artifacts/02_statistical_framework/paper_citations.json",
+    "initial_adr": "artifacts/02_statistical_framework/initial_adr.md"
+  },
+  "trace_steps_executed": 46
+}

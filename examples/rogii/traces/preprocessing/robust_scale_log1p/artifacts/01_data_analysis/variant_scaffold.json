@@ -1,0 +1,5 @@
+{
+  "variant_slug": "robust_scale_log1p",
+  "approach": "RobustScaler + log1p target",
+  "feature_scaler": "robust"
+}
