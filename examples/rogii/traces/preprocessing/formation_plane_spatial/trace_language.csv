@@ -1,4 +1,24 @@
-data_downloader,schema-sentinel,eda_profiler,well_group_detector,target_diagnostician,feature_engineer,preprocessor,cv_orchestrator,model_trainer,model_ensembler,predictor,oof_evaluator,error_analyzer,submission_formatter,submission_validator,kaggle_submitter,seed-control-officer,experiment-design-architect,architecture-decision-recorder,dependency-graph-orchestrator
+data_downloader,schema-sentinel,eda_profiler,well_group_detector,target_diagnostician,feature_engineer,preprocessor,cv_orchestrator,model_trainer,model_ensembler,predictor,oof_evaluator,error_analyzer,submission_formatter,submission_validator,kaggle_submitter,seed-control-officer,experiment-design-architect,architecture-decision-recorder,dependency-graph-orchestrator,chomsky_type,llm_model,context_window_tokens,context_policy,long_term_memory,ltm_growth_bound,slurm_partition,slurm_resources,gpu_device
+declare_envelope,,,,,,,,,,,,,,,,,,,,Type-0,none,0,none,lustre_files,unbounded,matador,"cpus=8,mem=32G,gpu=0,time=02:00:00",none
+,declare_envelope,,,,,,,,,,,,,,,,,,,Type-3,none,0,halt,none,O(1),matador,"cpus=2,mem=4G,gpu=0,time=00:30:00",none
+,,declare_envelope,,,,,,,,,,,,,,,,,,Type-1,none,0,none,transcript,O(n),matador,"cpus=4,mem=16G,gpu=0,time=01:00:00",none
+,,,declare_envelope,,,,,,,,,,,,,,,,,Type-1,none,0,none,transcript,O(n),matador,"cpus=2,mem=8G,gpu=0,time=00:30:00",none
+,,,,declare_envelope,,,,,,,,,,,,,,,,Type-1,none,0,none,transcript,O(n),matador,"cpus=2,mem=8G,gpu=0,time=00:30:00",none
+,,,,,declare_envelope,,,,,,,,,,,,,,,Type-1,none,0,none,artifact_cache,O(n),matador,"cpus=8,mem=32G,gpu=0,time=01:00:00",none
+,,,,,,declare_envelope,,,,,,,,,,,,,,Type-1,none,0,none,artifact_cache,O(n),matador,"cpus=4,mem=16G,gpu=0,time=01:00:00",none
+,,,,,,,declare_envelope,,,,,,,,,,,,,Type-2,none,0,none,fold_stack,O(k),matador,"cpus=4,mem=16G,gpu=0,time=02:00:00",none
+,,,,,,,,declare_envelope,,,,,,,,,,,,Type-0,none,0,none,artifact_cache,unbounded,matador,"cpus=8,mem=100G,gpu=1,time=04:00:00",cuda:0
+,,,,,,,,,declare_envelope,,,,,,,,,,,Type-2,none,0,none,seed_stack,O(k),matador,"cpus=8,mem=64G,gpu=1,time=02:00:00",lightgbm_gpu
+,,,,,,,,,,declare_envelope,,,,,,,,,,Type-1,none,0,none,fold_stack,O(k),matador,"cpus=4,mem=32G,gpu=1,time=01:00:00",cuda:0
+,,,,,,,,,,,declare_envelope,,,,,,,,,Type-1,none,0,none,oof_vectors,O(n),matador,"cpus=2,mem=8G,gpu=0,time=00:30:00",none
+,,,,,,,,,,,,declare_envelope,,,,,,,,Type-1,none,0,none,residuals,O(n),matador,"cpus=2,mem=8G,gpu=0,time=00:30:00",none
+,,,,,,,,,,,,,declare_envelope,,,,,,,Type-3,none,0,halt,none,O(1),matador,"cpus=1,mem=4G,gpu=0,time=00:15:00",none
+,,,,,,,,,,,,,,declare_envelope,,,,,,Type-3,none,0,halt,none,O(1),matador,"cpus=1,mem=4G,gpu=0,time=00:15:00",none
+,,,,,,,,,,,,,,,declare_envelope,,,,,Type-0,none,0,none,external_api,unbounded,matador,"cpus=1,mem=4G,gpu=0,time=00:30:00",none
+,,,,,,,,,,,,,,,,declare_envelope,,,,Type-3,none,0,halt,seed_history,O(1),matador,"cpus=1,mem=2G,gpu=0,time=00:05:00",none
+,,,,,,,,,,,,,,,,,declare_envelope,,,Type-0,granite4:3b,8192,rolling_window,adr_store,unbounded,matador,"cpus=8,mem=32G,gpu=1,time=48:00:00",cuda:0
+,,,,,,,,,,,,,,,,,,declare_envelope,,Type-0,granite4:3b,8192,truncate_middle,markdown_files,unbounded,matador,"cpus=8,mem=32G,gpu=1,time=48:00:00",cuda:0
+,,,,,,,,,,,,,,,,,,,declare_envelope,Type-2,none,0,none,dag_stack,O(V+E),matador,"cpus=2,mem=4G,gpu=0,time=00:30:00",none
 ,,,,,,,,,,,,,,,,pin_seed,design_factorial_and_episodic_training,record_initial_adr,add_task
 ,,,,,,,,,,,,,,,,,,,add_dep
 ,,,,,,,,,,,,,,,,,,,topological_order
@@ -163,6 +183,10 @@ cd /lustre/work/sweeden/rogii && find data/train -name '*__horizontal_well.csv' 
 ,type3_consumer_bound_architecture_decision_recorder_after_cli,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,emit_review_findings_markdown,,,,,,,
 ,,,,,,,,,,,,,,,,,,,add_dep
+,,,,,,,,,,,,,,,,,evaluate_computing_resources_chomsky_rubric,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,validate_resource_bounds_per_chomsky_class,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,validate_slurm_envelope_vs_hpcc_scripts,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,cd /lustre/work/sweeden/rogii && python scripts/evaluate_computing_resources.py --trace /lustre/work/sweeden/rogii/traces/preprocessing/formation_plane_spatial/trace_language.csv --variant formation_plane_spatial -q,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,record,
 ,,,,,,,,,,,,,,,,,,serialize_markdown,
 ,,,,,,,,,,,,,,,,,,,topological_order
