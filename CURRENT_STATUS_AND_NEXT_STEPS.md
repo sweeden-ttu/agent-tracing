@@ -19,6 +19,7 @@ The Rogii trace-language experiment program is **~95% scaffolded** across all si
 | Ablation run manifests (`rogii/ablation_runs/`) | ✅ Initialized |
 | Slurm Ollama consumer review rule + script | ✅ Done |
 | Per-pipeline conda `environment.yml` (×6) | ✅ Done |
+| Base scientific papers (PDFs + links) | ✅ Done — [`BASE_PAPERS.md`](examples/rogii/BASE_PAPERS.md) |
 | HPCC Slurm scripts (module load + conda + Ollama) | ✅ Updated; consumer PASS |
 | Baseline merge to `main` | ⚠️ Local FF merge; not pushed |
 | Full Slurm ablation / training runs | ❌ Not started |
