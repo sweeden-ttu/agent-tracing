@@ -1,0 +1,166 @@
+\section{Research and Development Agent Model}
+\label{sec:rd_agent}
+
+\subsection{Introduction}
+
+The \emph{Research and Development (R\&D) Agent Model} is a formal framework for autonomous agents that engage in iterative scientific research and development workflows. Inspired by the RD-Agent framework from Microsoft Research, this model introduces a systematic approach to agentic programs that can propose hypotheses, construct solutions, implement code, validate through testing, and improve through feedback.
+
+\bigskip
+
+The R\&D agent cycle mirrors the scientific method:
+
+\begin{enumerate}
+\item \textbf{Hypothesis Generation} --- Proposing ideas based on domain expertise
+\item \textbf{Solution Construction} --- Building models, features, or code from hypotheses  
+\item \textbf{Implementation} --- Writing executable code
+\item \textbf{Testing/Validation} --- Running backtests, benchmarks, or experiments
+\item \textbf{Feedback Analysis} --- Evaluating results and identifying improvements
+\item \textbf{Iteration} --- Refining hypotheses based on feedback
+\end{enumerate}
+
+This cycle is applicable across domains including quantitative finance, machine learning engineering, scientific research, and automated discovery.
+
+\subsection{Chomsky Hierarchy Formalization}
+
+Following the agent schema definition in Definition~\ref{def:schema}, an \emph{Agent Schema} is:
+
+\[
+\mathcal{A} = (S, s_0, \mathcal{W}_0, \Sigma_{\mathrm{obs}}, \Gamma_{\mathrm{act}}, \delta, F)
+\]
+
+Where the components are defined as in Section~\ref{sec:schemata}.
+
+\medskip
+
+The four-level hierarchy of agent schemata maps to R\&D agents as follows:
+
+\begin{center}
+\begin{tabular}{|c|c|c|p{3cm}|}
+\hline
+Type & Automaton Class & Memory Constraint & Example R\&D Agent \\
+\hline
+Type-3 & Finite Automaton & No memory (Markovian) & Simple copilot agents \\
+Type-2 & Pushdown Automaton & Stack-based (nested calls) & Factor/Model evolution \\
+Type-1 & Linear-Bounded & O(n) workspace growth & Data science agents \\
+Type-0 & Turing Machine & Unbounded external store & Full R\&D with knowledge base \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Bayesian Loop Agent}
+
+We now introduce the \emph{Bayesian Loop Agent}, which extends the standard R\&D agent with explicit Bayesian inference at each cycle.
+
+\medskip
+
+The loop follows: \textbf{Perceive} $\to$ \textbf{Train} $\to$ \textbf{Test} $\to$ \textbf{Eval} $\to$ \textbf{Observe} $\to$ \textbf{Learn} $\to$ \textbf{Repeat}
+
+\begin{definition}[Bayesian Agent Schema]
+\label{def:bayesian_schema}
+A \emph{Bayesian Loop Agent} is a tuple:
+
+\[
+\mathcal{B} = (S, s_0, \mathcal{W}_0, \Sigma_{\mathrm{obs}}, \Gamma_{\mathrm{act}}, \delta_B, F, \mathcal{H}, \pi_0, \theta)
+\]
+
+Where:
+\begin{itemize}
+\item $\mathcal{H}$: Hypothesis space (parameter space)
+\item $\pi_0$: Prior distribution over $\mathcal{H}$
+\item $\theta$: Likelihood function $\theta: \mathcal{H} \times \mathcal{O} \to [0,1]$
+\item $\delta_B$: Bayesian transition relation incorporating posterior updates
+\end{itemize}
+\end{definition}
+
+\begin{definition}[Bayesian State Space]
+The Bayesian Loop Agent operates across nine states:
+
+\[
+S = \{s_p, s_t, s_{te}, s_e, s_o, s_l, s_r, s_c, s_\epsilon\}
+\]
+
+Where states represent: Perceive, Train, Test, Eval, Observe, Learn, Repeat, Complete, Error.
+\end{definition}
+
+\begin{definition}[Memory Stack]
+The workspace maintains Bayesian state:
+
+\[
+\mathcal{W} = \{
+  D_{\text{train}}: \text{training data},
+  D_{\text{test}}: \text{test data}},
+  h: \text{parameters},
+  \pi: \text{posterior distribution}},
+  \mathcal{L}: \text{log likelihood}},
+  \mathbb{E}: \text{evaluation metrics}}
+\]
+
+With growth: \emph{O(k)} where k is the number of parameters.
+\end{definition}
+
+\begin{definition}[Trace Language]
+\textbf{Observations alphabet:}
+\[
+\Sigma_{\mathrm{obs}} = \{\text{DATA}, \text{MODEL}, \text{METRICS}, \text{LIKELIHOOD}, \text{STOP}\}
+\]
+
+\textbf{Actions alphabet:}
+\[
+\Gamma_{\mathrm{act}} = \{\text{perceive}, \text{train}, \text{test}, \text{eval}, \text{observe}, \text{learn}, \text{repeat}\}
+\]
+
+\textbf{Production rules:}
+\[
+\begin{aligned}
+o_{\text{data}} &\to a_{\text{perceive}} \, o_{\text{model}} \\
+o_{\text{model}} &\to a_{\text{train}} \, o_{\text{test}} \\
+o_{\text{test}} &\to a_{\text{test}} \, o_{\text{eval}} \\
+o_{\text{eval}} &\to a_{\text{eval}} \, o_{\text{metrics}} \\
+o_{\text{metrics}} &\to a_{\text{observe}} \, o_{\text{likelihood}} \\
+o_{\text{likelihood}} &\to a_{\text{learn}} \, (o_{\text{repeat}} | o_{\text{stop}}) \\
+o_{\text{repeat}} &\to a_{\text{repeat}} \, o_{\text{data}}
+\end{aligned}
+\]
+\end{definition}
+
+This is a \emph{Type-1 (linear-bounded)} language with O(n) workspace growth.
+
+\begin{definition}[Bayesian Update Rule]
+The posterior update follows Bayes' theorem:
+
+\[
+\pi_{t+1}(h | D) \propto \pi_t(h) \cdot \mathcal{L}(D | h)
+\]
+
+Implemented via:
+\begin{enumerate}
+\item \textbf{Prior}: $\pi_t(h)$ --- Current hypothesis distribution
+\item \textbf{Likelihood}: $P(D | h)$ --- Probability of data given hypothesis  
+\item \textbf{Posterior}: $\pi_{t+1}(h)$ --- Updated distribution
+\item \textbf{Evidence}: $P(D) = \int \pi_t(h) \mathcal{L}(D | h) dh$
+\end{enumerate}
+\end{definition}
+
+\subsection{Convergence Criteria}
+
+The Bayesian agent terminates when:
+
+\begin{enumerate}
+\item \textbf{Maximum iterations}: $t \ge T_{\text{max}}$
+\item \textbf{Convergence}: $|\pi_t - \pi_{t-1}| < \epsilon$
+\item \textbf{Divergence}: Error state reached
+\end{enumerate}
+
+\subsection{Applications}
+
+The Bayesian Loop Agent applies to:
+
+\begin{itemize}
+\item \textbf{Quantitative Finance}: Perceive (market data) $\to$ Train (factor training) $\to$ Test (backtesting) $\to$ Eval (Sharpe ratio) $\to$ Observe (realized returns) $\to$ Learn (posterior update) $\to$ Repeat
+\item \textbf{Machine Learning}: Perceive (dataset) $\to$ Train (gradient descent) $\to$ Test (validation) $\to$ Eval (accuracy/F1) $\to$ Observe (prediction errors) $\to$ Learn (hyperparameter posterior) $\to$ Repeat
+\item \textbf{Scientific Discovery}: Perceive (experimental data) $\to$ Train (hypothesis instantiation) $\to$ Test (experimental validation) $\to$ Eval (error metrics) $\to$ Observe (measurements) $\to$ Learn (parameter posterior) $\to$ Repeat
+\end{itemize}
+
+\subsection{Conclusion}
+
+The Bayesian Loop Agent provides a principled framework for R\&D automation that explicitly accounts for uncertainty in hypothesis spaces. By maintaining a posterior distribution and updating via Bayesian inference, agents can quantify uncertainty, incorporate prior knowledge, adaptively explore the hypothesis space, and converge probabilistically rather than deterministically. This formalization extends the Chomsky hierarchy agent schema with probabilistic reasoning, yielding a powerful abstraction for autonomous scientific discovery.

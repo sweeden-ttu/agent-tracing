@@ -1,0 +1,67 @@
+\section{Agent-to-Agent Graphs, Trace Snapshots, and Context Bounds}
+\label{sec:graphs}
+
+\subsection{Nodes and edges}
+
+We distinguish a single agent schema $\mathcal{A}$ (Definition~\ref{def:schema}) from \emph{deployed instances} that may message one another. Inter-agent channels carry payloads drawn from finite grammars of messages (tool-delegation requests, structured observations, handoff tokens), not from raw unbounded natural language, once a discretization is fixed for analysis.
+
+\begin{definition}[Agent-to-agent node]
+\label{def:a2a-node}
+An \emph{agent node} (or \emph{deployment node}) is a tuple
+\[
+\nu = (\eta,\, s,\, \mathcal{W},\, \kappa),
+\]
+where $\eta$ is an instance identifier (e.g.\ URI or UUID), $(s,\mathcal{W}) \in S \times \mathcal{W}$ is the current local configuration of the underlying schema, and $\kappa$ collects \emph{hyperparameters and configuration} (Definition~\ref{def:hyper}) instantiated for this node: decoding settings, tool scopes, memory policy, and channel endpoints. Two nodes may share the same abstract schema but differ in $\eta$ or $\kappa$.
+\end{definition}
+
+\begin{definition}[Agent-to-agent edge]
+\label{def:a2a-edge}
+Fix a finite grammar of \emph{inter-agent messages} whose terminal forms populate a finite set $\mathcal{M}$ (message kinds with bounded payloads, after discretization). A \emph{directed agent edge} is a tuple
+\[
+e = (\nu_{\mathrm{src}},\, \nu_{\mathrm{tgt}},\, m,\, \iota),
+\]
+where $\nu_{\mathrm{src}}, \nu_{\mathrm{tgt}}$ are nodes, $m \in \mathcal{M}$ is the transmitted message, and $\iota$ is an interaction index (time step or sequence number) distinguishing parallel edges. An \emph{agent-to-agent graph} is a pair $G=(V,E)$ with $V$ a finite set of nodes and $E$ a multiset of edges closed under the intended channel topology.
+\end{definition}
+
+\begin{remark}[Alignment with ``nodes'' in software]
+In codebases, a ``node'' often denotes a planner state or graph-search vertex; here, \emph{node} means a \emph{deployed agent instance} (Definition~\ref{def:a2a-node}). A ``graph edge'' in orchestration layers corresponds to Definition~\ref{def:a2a-edge}; control-flow graphs inside one agent remain internal to $\delta$ and $\mathcal{W}$.
+\end{remark}
+
+\subsection{Trace snapshot languages by schema type}
+
+A \emph{state snapshot} records everything the analysis treats as observable about $(s,\mathcal{W})$ at a step (up to the chosen abstraction). Fix a finite set $\mathcal{Z}$ of \emph{snapshot descriptors} (encodings of modes plus bounded summaries of memory shape). A \emph{snapshot sequence} is a word in $\mathcal{Z}^\ast$.
+
+\begin{definition}[Type-3 (regular) snapshot traces]
+\label{def:snap-type3}
+For a regular schema (Definition~\ref{def:type3}), $\mathcal{W}$ ranges over a finite set. After fixing an injective encoding $\sigma : S \times \mathcal{W} \to \mathcal{Z}$, the set of feasible snapshot sequences is \emph{finite-state}: it is the language of a finite automaton over snapshot descriptors (equivalently, a Type-3 language over $\mathcal{Z}$ under the usual string view).
+\end{definition}
+
+\begin{definition}[Type-2 (pushdown-style) snapshot traces]
+\label{def:snap-type2}
+For a pushdown-style schema (Definition~\ref{def:type2}), fix a finite set of \emph{stack terminals} (symbols pushed/popped under $\delta$). A snapshot descriptor includes the finite control mode and a finite encoding of the stack (e.g.\ as a string over stack terminals). The set of feasible snapshot sequences is \emph{stack-structured}: it coincides with the behavior of a pushdown system over $\mathcal{Z}$ (analogous to Type-2 generative power on suitable encodings).
+\end{definition}
+
+\begin{definition}[Type-1 (linear-bounded) snapshot traces]
+\label{def:snap-type1}
+For a linear-bounded schema (Definition~\ref{def:type1}), fix $c,c_0$ and an encoding of $\mathcal{W}$ into a tape of length at most $cn+c_0$ after $n$ steps. Snapshot descriptors include the mode and such a bounded tape inscription. Feasible snapshot sequences respect the linear space bound at every prefix; under standard encodings, this matches the spirit of linear-bounded automata (Type~1 in the classical string setting).
+\end{definition}
+
+\subsection{Context window as finite memory and compaction policies}
+
+Real LLM-backed agents store prompts and transcripts in a buffer of bounded length (tokens or other measured units). We model this as a finite workspace component $\mathcal{W}_{\mathrm{ctx}}$ with capacity $M \in \mathbb{N}$, together with a \emph{compaction policy} applied when new content would exceed $M$.
+
+Let $H$ denote the logical interaction history (observations and actions, or their string rendering) and $B \in \mathcal{W}_{\mathrm{ctx}}$ the stored buffer. A policy is a partial map $\Pi : (B,H_{\mathrm{new}}) \mapsto B'$ such that $\lVert B' \rVert \le M$ whenever defined.
+
+\begin{definition}[Context-boundary policies]
+\label{def:ctx-policies}
+We distinguish three policies for upper bounds on context:
+\begin{enumerate}
+  \item \textbf{Halt at limit:} if appending $H_{\mathrm{new}}$ would exceed $M$, $\delta$ enters a designated halting or error mode and no further tokens are appended.
+  \item \textbf{Truncate middle (default finite-memory model):} $B'$ consists of a kept prefix, a kept suffix of the combined old and new material, and an optional fixed marker; middle segments are discarded so $\lVert B' \rVert \le M$. This is the default when describing agents with \emph{finite} memory realized by LLM context windows.
+  \item \textbf{Rolling window:} split capacity between a compacted summary region and a recent verbatim region: $B' = \mathrm{summary}(B,H_{\mathrm{new}}) \,\Vert\, \mathrm{recent}(B,H_{\mathrm{new}})$, where $\mathrm{summary}$ writes into a reserved sub-capacity of $\mathcal{W}_{\mathrm{ctx}}$ (lossy compression of older history), and $\mathrm{recent}$ preserves the tail up to the remaining budget. Execution continues (unlike halt), but older detail is only represented indirectly in the summary.
+\end{enumerate}
+\end{definition}
+
+\begin{remark}
+Truncate-middle and rolling-window policies are \emph{not} unbounded recall: they induce a finite-state or lossy summary of remote history. Claiming Type~0 power therefore requires external stores whose growth is not modeled by a fixed $M$ (Section~\ref{sec:hierarchy}).
+\end{remark}

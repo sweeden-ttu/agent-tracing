@@ -1,0 +1,34 @@
+\section{Agent Schemata and Transition Systems}
+\label{sec:schemata}
+
+\subsection{Configurations}
+
+\begin{definition}[Workspace]
+A \emph{workspace} is a structure $\mathcal{W}$ equipped with a size function $\lVert \cdot \rVert : \mathcal{W} \to \mathbb{N}$ and an update operator that may depend on observations and actions. Examples: (i) a finite register file; (ii) a stack of pending subgoals; (iii) a tape of length $f(n)$ after $n$ steps; (iv) read/write access to an unbounded external store.
+\end{definition}
+
+\begin{definition}[Agent schema]
+\label{def:schema}
+An \emph{agent schema} is a tuple
+\[
+\mathcal{A} = (S, s_0, \mathcal{W}_0, \Sigma_{\mathrm{obs}}, \Gamma_{\mathrm{act}}, \delta, F),
+\]
+where $S$ is a finite set of \emph{modes}, $s_0 \in S$ is the initial mode, $\mathcal{W}_0$ is the initial workspace, $\Sigma_{\mathrm{obs}}$ and $\Gamma_{\mathrm{act}}$ are the finite observation and action \textbf{terminal} sets fixed in Section~\ref{sec:prelim} (each grounded by a finite grammar of allowed surface forms), $F \subseteq S \times \mathcal{W}$ is a set of accepting configurations, and
+\[
+\delta : S \times \mathcal{W} \times \Sigma_{\mathrm{obs}} \to \mathcal{P}_{\mathrm{fin}}(S \times \mathcal{W} \times \Gamma_{\mathrm{act}}^\ast)
+\]
+is a (possibly nondeterministic) \emph{transition rule}. For every $(s,w,o)$, the set $\delta(s,w,o)$ is \emph{finite}; its elements are the \emph{finite successors} (successor mode, workspace, and finite action sequence).
+\end{definition}
+
+\begin{definition}[Run and trace language]
+A \emph{run} of $\mathcal{A}$ on observation sequence $o_1,\ldots,o_n$ is a sequence of configurations $(s_i,\mathcal{W}_i)$ and actions $a_i \in \Gamma_{\mathrm{act}}^\ast$ satisfying $(s_{i+1},\mathcal{W}_{i+1},a_{i+1}) \in \delta(s_i,\mathcal{W}_i,o_{i+1})$, starting at $(s_0,\mathcal{W}_0)$. The associated \emph{trace} is $(o_1,a_1)\cdots(o_n,a_n)$. The \emph{trace language} $L(\mathcal{A})$ is the set of traces of accepting runs (configurations in $F$) under a fixed termination rule (e.g., halting on a designated stop observation).
+\end{definition}
+
+\begin{remark}
+This definition intentionally mirrors automata theory: modes $S$ generalize finite control; $\mathcal{W}$ encodes whatever memory the agent design allows beyond finite control.
+\end{remark}
+
+\begin{definition}[Hyperparameters and configuration]
+\label{def:hyper}
+A \emph{configuration} is a pair $(s,\mathcal{W}) \in S \times \mathcal{W}$. \emph{Hyperparameters} are external tunables that fix the schema or its implementation (e.g.\ decoding temperature, maximum tool-call depth, retrieval top-$k$, stopping thresholds). \emph{Configuration} denotes environment-level bindings (paths, API endpoints, credential scopes, profile directories) that instantiate the schema in software without changing the abstract tuple $\mathcal{A}$.
+\end{definition}
