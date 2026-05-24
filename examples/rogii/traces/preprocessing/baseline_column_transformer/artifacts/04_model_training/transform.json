@@ -1,0 +1,27 @@
+{
+  "use_log1p": false,
+  "is_positive": true,
+  "target_column": "tvt",
+  "id_column": "id",
+  "cv_rmse": 0.7171393946486982,
+  "fold_rmses": [
+    0.8069656321998735,
+    0.7760937378974512,
+    0.6363734717995375,
+    0.7107168975036404,
+    0.6555472338429883
+  ],
+  "cv_scheme": "kfold",
+  "n_folds": 5,
+  "group_key": null,
+  "n_train_rows": 5278,
+  "max_rows_applied": 8000,
+  "backend": "sklearn.hist_gradient_boosting",
+  "feature_config": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/baseline_column_transformer/artifacts/03_feature_engineering/feature_config.json",
+  "paths": {
+    "data_dir": "/lustre/work/sweeden/rogii/data",
+    "train_csv": "/lustre/work/sweeden/rogii/data/_train_000d7d20_horizontal_well.csv",
+    "test_csv": "/lustre/work/sweeden/rogii/data/_test_000d7d20_horizontal_well.csv",
+    "sample_submission_csv": "/lustre/work/sweeden/rogii/data/sample_submission.csv"
+  }
+}

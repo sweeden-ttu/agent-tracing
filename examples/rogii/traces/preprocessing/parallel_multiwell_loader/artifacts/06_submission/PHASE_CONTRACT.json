@@ -1,0 +1,10 @@
+{
+  "variant": "parallel_multiwell_loader",
+  "phase": "06_submission",
+  "status": "pending",
+  "prior_phase": "05_evaluation",
+  "outputs": {
+    "submission_csv": "artifacts/06_submission/submission.csv",
+    "validation_report": "artifacts/06_submission/validation_report.json"
+  }
+}

@@ -3,6 +3,19 @@
   "approach": "ColumnTransformer + LightGBM baseline",
   "branch": "trace/baseline-column-transformer",
   "github_pr": "17",
+  "competition": {
+    "id": "rogii-wellbore-geology-prediction",
+    "url": "https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction",
+    "target": {
+      "column_submission": "tvt",
+      "column_train": "TVT",
+      "description": "True Vertical Thickness (ft) lithology label per test depth index"
+    },
+    "submission_envelope": {
+      "columns": ["id", "tvt"],
+      "metric": "rmse_post_ps"
+    }
+  },
   "base_paper": {
     "role": "model_experiment_descriptor",
     "id": "ke2017_lightgbm",
@@ -13,6 +26,7 @@
     "venue": "NeurIPS",
     "doi": "10.5555/3294996.3295074",
     "url": "https://papers.nips.cc/paper/6907-lightgbm-a-highly-efficient-gradient-boosting-decision-tree",
+    "repo_pdf": "papers/baseline_column_transformer/ke2017_lightgbm.pdf",
     "claims": [
       "Histogram-based GBDT improves tabular regression speed and accuracy vs level-wise boosting.",
       "Leaf-wise growth with regularization supports strong baselines on heterogeneous numeric features.",
@@ -26,8 +40,24 @@
       "set_objective_regression",
       "set_metric_rmse",
       "log_best_iteration",
-      "train_with_seed_42"
-    ]
+      "train_with_seed_42",
+      "train_with_seed_69",
+      "train_with_seed_2024",
+      "average_seed_predictions",
+      "collect_oof_predictions",
+      "compute_rmse_per_fold",
+      "compute_mean_oof_rmse",
+      "report_std_across_folds"
+    ],
+    "train_predict_py": {
+      "script": "/lustre/work/sweeden/rogii/train_predict.py",
+      "functions": [
+        "make_estimator",
+        "cross_val_and_predict",
+        "rmse"
+      ]
+    },
+    "trace_rows": [138, 139, 142, 144, 145, 146, 147, 148, 149, 151, 152]
   },
   "trace_theory_paper": {
     "paperbench_id": "agent-tracing",
@@ -51,6 +81,7 @@
       "venue": "NeurIPS",
       "doi": "10.5555/3294996.3295074",
       "url": "https://papers.nips.cc/paper/6907-lightgbm-a-highly-efficient-gradient-boosting-decision-tree",
+      "repo_pdf": "papers/baseline_column_transformer/ke2017_lightgbm.pdf",
       "claims": [
         "Histogram-based GBDT improves tabular regression speed and accuracy vs level-wise boosting.",
         "Leaf-wise growth with regularization supports strong baselines on heterogeneous numeric features.",
@@ -65,7 +96,22 @@
         "set_metric_rmse",
         "log_best_iteration",
         "train_with_seed_42"
-      ]
+      ],
+      "pipeline_phases": ["04_model_training", "05_evaluation"],
+      "primary_agents": ["model_trainer", "model_ensembler", "predictor", "oof_evaluator"],
+      "train_predict_py": {
+        "make_estimator": ["set_objective_regression", "set_metric_rmse"],
+        "cross_val_and_predict": [
+          "log_best_iteration",
+          "train_with_seed_42",
+          "collect_oof_predictions",
+          "compute_rmse_per_fold",
+          "predict_per_fold",
+          "inverse_log1p"
+        ],
+        "rmse": ["compute_rmse_per_fold", "compute_mean_oof_rmse"]
+      },
+      "trace_rows": [138, 139, 142, 144, 148, 149, 151, 152, 160, 161, 163]
     },
     {
       "id": "pedregosa2011_sklearn",
@@ -77,6 +123,7 @@
       "venue": "JMLR",
       "doi": "10.5555/1953048.2029494",
       "url": "https://jmlr.org/papers/v12/pedregosa11a.html",
+      "repo_pdf": "papers/baseline_column_transformer/pedregosa2011_sklearn.pdf",
       "claims": [
         "ColumnTransformer applies disjoint transformers to heterogeneous column blocks.",
         "Pipeline compose chains preprocessing and estimator for leak-safe CV.",
@@ -90,17 +137,109 @@
         "build_numeric_pipeline",
         "build_lowcard_pipeline",
         "build_highcard_pipeline",
-        "assemble_column_transformer"
+        "assemble_column_transformer",
+        "replace_sentinels_with_nan",
+        "choose_cv_scheme",
+        "instantiate_groupkfold",
+        "emit_fold_indices",
+        "provide_groups"
+      ],
+      "pipeline_phases": ["01_data_analysis", "03_feature_engineering"],
+      "primary_agents": ["schema-sentinel", "preprocessor", "cv_orchestrator", "well_group_detector"],
+      "train_predict_py": {
+        "infer_columns": ["register_schema", "infer_id_column", "infer_target_columns"],
+        "build_feature_matrix": [
+          "build_numeric_pipeline",
+          "build_lowcard_pipeline",
+          "build_highcard_pipeline",
+          "assemble_column_transformer"
+        ],
+        "categorize_columns": ["build_numeric_pipeline", "build_lowcard_pipeline", "build_highcard_pipeline"],
+        "replace_sentinels_with_nan": ["replace_sentinels_with_nan"],
+        "_effective_cv": ["choose_cv_scheme", "instantiate_groupkfold", "provide_groups"],
+        "cross_val_and_predict": ["emit_fold_indices"]
+      },
+      "trace_rows": [34, 35, 38, 40, 66, 68, 69, 70, 71, 72, 73, 75, 76]
+    }
+  ],
+  "pipeline_phases": [
+    {
+      "id": "01_data_analysis",
+      "notebook": "notebooks/01_data_analysis.ipynb",
+      "goal": "Load Rogii data; establish TVT as regression target",
+      "agents": ["data_downloader", "schema-sentinel", "eda_profiler", "well_group_detector", "target_diagnostician"],
+      "papers": ["pedregosa2011_sklearn"],
+      "train_predict_py_entrypoints": ["infer_columns", "align_train_target_to_schema", "recommend_log1p"]
+    },
+    {
+      "id": "02_statistical_framework",
+      "notebook": "notebooks/02_statistical_framework.ipynb",
+      "goal": "Bind Ke/Pedregosa papers to ablation design and DAG",
+      "agents": [
+        "experiment-design-architect",
+        "architecture-decision-recorder",
+        "dependency-graph-orchestrator",
+        "seed-control-officer"
+      ],
+      "papers": ["ke2017_lightgbm", "pedregosa2011_sklearn", "agent-tracing"],
+      "train_predict_py_entrypoints": []
+    },
+    {
+      "id": "03_feature_engineering",
+      "notebook": "notebooks/03_feature_engineering.ipynb",
+      "goal": "ColumnTransformer preprocessing and GroupKFold CV splits",
+      "agents": ["feature_engineer", "preprocessor", "cv_orchestrator"],
+      "papers": ["pedregosa2011_sklearn"],
+      "train_predict_py_entrypoints": [
+        "build_feature_matrix",
+        "categorize_columns",
+        "replace_sentinels_with_nan",
+        "_effective_cv",
+        "cross_val_and_predict"
       ]
+    },
+    {
+      "id": "04_model_training",
+      "notebook": "notebooks/04_model_training.ipynb",
+      "goal": "LightGBM regression on preprocessed features; OOF collection",
+      "agents": ["model_trainer", "model_ensembler", "predictor"],
+      "papers": ["ke2017_lightgbm"],
+      "train_predict_py_entrypoints": ["make_estimator", "cross_val_and_predict"],
+      "slurm_note": "Trace also lists train_tcn_episodic.slurm / train_tcn.slurm (TCN); paper-faithful path is train_predict.py"
+    },
+    {
+      "id": "05_evaluation",
+      "notebook": "notebooks/05_evaluation.ipynb",
+      "goal": "OOF RMSE on TVT scale; residual analysis",
+      "agents": ["oof_evaluator", "error_analyzer"],
+      "papers": ["ke2017_lightgbm"],
+      "train_predict_py_entrypoints": ["rmse", "cross_val_and_predict"]
+    },
+    {
+      "id": "06_submission",
+      "notebook": "notebooks/06_submission.ipynb",
+      "goal": "Format and validate id,tvt submission; Kaggle submit",
+      "agents": ["submission_formatter", "submission_validator", "kaggle_submitter"],
+      "papers": [],
+      "train_predict_py_entrypoints": ["main"]
     }
   ],
   "agent_implementation": {
     "trace_language_csv": "traces/preprocessing/baseline_column_transformer/trace_language.csv",
-    "trace_language_csv_absolute": "/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv",
+    "trace_language_csv_absolute": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv",
+    "trace_row_index_csv": "traces/preprocessing/baseline_column_transformer/trace_row_index.csv",
+    "trace_row_index_rows": 226,
+    "trace_row_index_script": "examples/rogii/scripts/write_trace_row_index.py",
+    "readme": "traces/preprocessing/baseline_column_transformer/README.md",
+    "mle_plan_json": "traces/preprocessing/baseline_column_transformer/mle_plan.json",
     "resource_envelope_rows": "2-21",
     "governance_bootstrap_rows": "22-26",
     "chomsky_audit": "sec/4 evaluation audit protocol (Type-3 consumer bounds)",
-    "orchestrator": "paperbench.trace_pipeline.orchestrator.TracePipelineOrchestrator"
+    "orchestrator": "paperbench.trace_pipeline.orchestrator.TracePipelineOrchestrator",
+    "trace_executor": "/lustre/work/sweeden/rogii/pipeline/trace_executor.py",
+    "canonical_runner": "/lustre/work/sweeden/rogii/train_predict.py",
+    "rogii_root": "/lustre/work/sweeden/rogii",
+    "conda_env": "kc-rogii-wellbore-geology-prediction"
   },
   "experiment": {
     "hypothesis": "ColumnTransformer + LightGBM baseline improves competition RMSE (post-PS) vs shared baseline under nested GroupKFold, as motivated by Ke et al. (2017), Pedregosa et al. (2011).",
@@ -113,28 +252,37 @@
       {
         "id": "target_log1p",
         "factor": "target_transform",
-        "levels": [
-          "none",
-          "log1p"
-        ]
+        "levels": ["none", "log1p"],
+        "paper": "ke2017_lightgbm",
+        "trace_token": "recommend_log1p",
+        "trace_row": 58,
+        "train_predict_py": "recommend_log1p; main (np.log1p / np.expm1)"
       },
       {
         "id": "numeric_scaler",
         "factor": "preprocessor",
-        "levels": [
-          "standard",
-          "robust"
-        ]
+        "levels": ["standard", "robust"],
+        "paper": "pedregosa2011_sklearn",
+        "trace_token": "build_numeric_pipeline",
+        "trace_row": 68,
+        "train_predict_py": "build_feature_matrix (median impute baseline; scaler ablation planned)",
+        "trace_gap": "standard vs robust not yet a first-class trace token"
       },
       {
         "id": "rolling_window",
         "factor": "feature_window",
-        "levels": [
-          "32",
-          "64",
-          "128"
-        ]
+        "levels": ["32", "64", "128"],
+        "paper": "ke2017_lightgbm",
+        "trace_token": "compute_rolling_features",
+        "trace_row": 62,
+        "train_predict_py": "— (not in baseline train_predict.py)",
+        "trace_gap": "rolling_window levels not yet tokenised in swim lanes"
       }
     ]
-  }
+  },
+  "known_gaps": [
+    "Ablation factors numeric_scaler and rolling_window declared in ablation_plan.json but not first-class trace tokens.",
+    "Multi-seed tokens train_with_seed_69/2024 in trace; train_predict.py uses random_state=42 only.",
+    "Slurm train_tcn.slurm runs Temporal CNN, not LightGBM — parallel infra, not Ke/Pedregosa path."
+  ]
 }

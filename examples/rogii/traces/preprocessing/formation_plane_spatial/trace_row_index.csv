@@ -1,0 +1,214 @@
+trace_row,agent,token,phase,paper,train_predict_py
+2,data_downloader,declare_envelope,01_data_analysis,agent-tracing (resource envelope),—
+3,schema-sentinel,declare_envelope,01_data_analysis,agent-tracing (resource envelope),—
+4,eda_profiler,declare_envelope,01_data_analysis,agent-tracing (resource envelope),—
+5,well_group_detector,declare_envelope,01_data_analysis,agent-tracing (resource envelope),—
+6,target_diagnostician,declare_envelope,01_data_analysis,agent-tracing (resource envelope),—
+7,feature_engineer,declare_envelope,03_feature_engineering,agent-tracing (resource envelope),—
+8,preprocessor,declare_envelope,03_feature_engineering,agent-tracing (resource envelope),—
+9,cv_orchestrator,declare_envelope,03_feature_engineering,agent-tracing (resource envelope),—
+10,model_trainer,declare_envelope,04_model_training,agent-tracing (resource envelope),—
+11,model_ensembler,declare_envelope,04_model_training,agent-tracing (resource envelope),—
+12,predictor,declare_envelope,04_model_training,agent-tracing (resource envelope),—
+13,oof_evaluator,declare_envelope,05_evaluation,agent-tracing (resource envelope),—
+14,error_analyzer,declare_envelope,05_evaluation,agent-tracing (resource envelope),—
+15,submission_formatter,declare_envelope,06_submission,agent-tracing (resource envelope),—
+16,submission_validator,declare_envelope,06_submission,agent-tracing (resource envelope),—
+17,kaggle_submitter,declare_envelope,06_submission,agent-tracing (resource envelope),—
+18,seed-control-officer,declare_envelope,02_statistical_framework,agent-tracing (resource envelope),—
+19,experiment-design-architect,declare_envelope,02_statistical_framework,agent-tracing (resource envelope),—
+20,architecture-decision-recorder,declare_envelope,02_statistical_framework,agent-tracing (resource envelope),—
+21,dependency-graph-orchestrator,declare_envelope,02_statistical_framework,agent-tracing (resource envelope),—
+22,seed-control-officer,pin_seed,02_statistical_framework,agent-tracing (experiment design),SeedControlOfficer.pin_seed (agents.py; train_tcn.py)
+22,experiment-design-architect,design_factorial_and_episodic_training,02_statistical_framework,agent-tracing (experiment design),ExperimentDesignArchitect.design_factorial_and_episodic_training
+22,architecture-decision-recorder,record_initial_adr,02_statistical_framework,agent-tracing (experiment design),ADRRecorder.record_initial_adr
+22,dependency-graph-orchestrator,add_task,02_statistical_framework,agent-tracing (experiment design),DependencyGraphOrchestrator.add_node
+23,dependency-graph-orchestrator,add_dep,02_statistical_framework,agent-tracing (experiment design),DependencyGraphOrchestrator.add_node
+24,dependency-graph-orchestrator,topological_order,02_statistical_framework,agent-tracing (experiment design),DependencyGraphOrchestrator
+25,dependency-graph-orchestrator,dispatch,02_statistical_framework,agent-tracing (experiment design),DependencyGraphOrchestrator
+26,dependency-graph-orchestrator,bind_producers_to_type3_consumers,02_statistical_framework,agent-tracing (experiment design),Type3ConsumerGate (trace_executor)
+27,data_downloader,kaggle --version,01_data_analysis,— (infrastructure),— (shell; not in train_predict.py)
+28,schema-sentinel,type3_consumer_bound_data_downloader_after_cli,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+29,data_downloader,cd /lustre/work/sweeden/rogii && kaggle competitions download -c rogii-wellbore-geology-prediction -p data/ -q,01_data_analysis,— (infrastructure),— (shell; not in train_predict.py)
+30,schema-sentinel,type3_consumer_bound_data_downloader_after_cli,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+31,data_downloader,cd /lustre/work/sweeden/rogii && unzip -o data/rogii-wellbore-geology-prediction.zip -d data/,01_data_analysis,— (infrastructure),— (shell; not in train_predict.py)
+32,schema-sentinel,type3_consumer_bound_data_downloader,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+33,data_downloader,cd /lustre/work/sweeden/rogii && find data/train -name '*__horizontal_well.csv' | sort,01_data_analysis,— (infrastructure),— (shell; not in train_predict.py)
+34,data_downloader,cd /lustre/work/sweeden/rogii && find data/train -name '*__horizontal_well.csv' | wc -l,01_data_analysis,— (infrastructure),— (shell; not in train_predict.py)
+35,schema-sentinel,register_schema,01_data_analysis,pedregosa2011_sklearn,infer_columns (+ SchemaSentinel.register_schema in agents.py)
+36,schema-sentinel,validate_xyz_gr_columns,01_data_analysis,—,—
+37,schema-sentinel,load_sample_submission,01_data_analysis,pedregosa2011_sklearn,infer_columns
+38,schema-sentinel,infer_target_columns,01_data_analysis,pedregosa2011_sklearn,infer_columns
+39,eda_profiler,compute_summary_stats,01_data_analysis,— (competition shared / EDA),— (EDA only)
+40,schema-sentinel,type3_consumer_bound_eda_profiler,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+41,eda_profiler,plot_correlation_matrix,01_data_analysis,— (competition shared / EDA),— (EDA only)
+42,well_group_detector,compute_pairwise_well_distances,01_data_analysis,—,—
+43,schema-sentinel,type3_consumer_bound_well_group_detector,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+44,well_group_detector,recommend_group_key,01_data_analysis,—,well_group_detector.recommend_group_key
+45,target_diagnostician,detect_sentinel_values,01_data_analysis,—,— (diagnostics only)
+46,schema-sentinel,type3_consumer_bound_target_diagnostician,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+47,experiment-design-architect,ollama show granite4:3b,02_statistical_framework,agent-tracing (experiment design),—
+48,schema-sentinel,type3_consumer_bound_experiment_design_architect,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+49,feature_engineer,compute_drilling_geometry_features,03_feature_engineering,— (competition shared / EDA),— (rolling/lag tokens not in baseline train_predict.py)
+50,schema-sentinel,type3_consumer_bound_feature_engineer,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+51,feature_engineer,compute_azimuth_inclination,03_feature_engineering,— (competition shared / EDA),— (rolling/lag tokens not in baseline train_predict.py)
+52,feature_engineer,fit_formation_plane_knn,03_feature_engineering,— (competition shared / EDA),— (rolling/lag tokens not in baseline train_predict.py)
+53,feature_engineer,encode_formation_codes,03_feature_engineering,— (competition shared / EDA),— (rolling/lag tokens not in baseline train_predict.py)
+54,feature_engineer,compute_rolling_features,03_feature_engineering,— (competition shared / EDA),— (rolling/lag tokens not in baseline train_predict.py)
+55,preprocessor,replace_sentinels_with_nan,03_feature_engineering,pedregosa2011_sklearn,replace_sentinels_with_nan (import pipeline.preprocessor)
+56,schema-sentinel,type3_consumer_bound_preprocessor,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+57,preprocessor,build_numeric_pipeline,03_feature_engineering,pedregosa2011_sklearn,categorize_columns + build_feature_matrix
+58,preprocessor,build_highcard_pipeline,03_feature_engineering,pedregosa2011_sklearn,categorize_columns + build_feature_matrix
+59,preprocessor,assemble_column_transformer,03_feature_engineering,pedregosa2011_sklearn,build_feature_matrix
+60,well_group_detector,provide_groups,01_data_analysis,pedregosa2011_sklearn,well_group_detector.provide_groups
+61,cv_orchestrator,choose_cv_scheme,03_feature_engineering,pedregosa2011_sklearn,choose_cv_scheme via _effective_cv
+62,schema-sentinel,type3_consumer_bound_cv_orchestrator,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+63,cv_orchestrator,instantiate_groupkfold,03_feature_engineering,pedregosa2011_sklearn,_effective_cv
+64,cv_orchestrator,emit_fold_indices,03_feature_engineering,pedregosa2011_sklearn,emit_fold_indices via cross_val_and_predict
+65,experiment-design-architect,plan_episodic_training_schedule,02_statistical_framework,agent-tracing (experiment design),—
+66,experiment-design-architect,cd /lustre/work/sweeden/frontier-evals/project/paperbench && uv run python -m paperbench.scripts.write_experiment_descriptors --variant formation_plane_spatial -q,02_statistical_framework,agent-tracing (experiment design),— (shell; not in train_predict.py)
+67,schema-sentinel,type3_consumer_bound_experiment_design_architect_after_cli,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+68,experiment-design-architect,load_experiment_descriptor,02_statistical_framework,ke2017_lightgbm; pedregosa2011_sklearn,— (ExperimentDesignArchitect; not train_predict.py)
+69,experiment-design-architect,cite_base_paper_ablations,02_statistical_framework,ke2017_lightgbm; pedregosa2011_sklearn,— (ExperimentDesignArchitect)
+70,experiment-design-architect,write_mle_plan_json,02_statistical_framework,agent-tracing (experiment design),— (ExperimentDesignArchitect)
+71,experiment-design-architect,define_statistical_framework,02_statistical_framework,agent-tracing (experiment design),— (ExperimentDesignArchitect)
+72,experiment-design-architect,design_ablation_factorial_grid,02_statistical_framework,ke2017_lightgbm; pedregosa2011_sklearn,— (ExperimentDesignArchitect)
+73,experiment-design-architect,configure_variant_ablation_flags,02_statistical_framework,agent-tracing (experiment design),— (ExperimentDesignArchitect)
+74,architecture-decision-recorder,record_ablation_plan,02_statistical_framework,agent-tracing (experiment design),— (ExperimentDesignArchitect / ADRRecorder)
+75,schema-sentinel,type3_consumer_bound_architecture_decision_recorder,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+76,experiment-design-architect,cd /lustre/work/sweeden/rogii && python scripts/experiment_design_architect.py --variant formation_plane_spatial --write-ablation-plan --enrich-mle-plan -q,02_statistical_framework,agent-tracing (experiment design),— (shell; not in train_predict.py)
+77,schema-sentinel,type3_consumer_bound_experiment_design_architect_after_cli,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+78,cv_orchestrator,subdivide_train_by_well,03_feature_engineering,pedregosa2011_sklearn,—
+79,cv_orchestrator,subdivide_train_by_depth_bin,03_feature_engineering,pedregosa2011_sklearn,—
+80,cv_orchestrator,nested_groupkfold_emit_fold_indices,03_feature_engineering,pedregosa2011_sklearn,—
+81,experiment-design-architect,report_smre_interval,02_statistical_framework,agent-tracing (experiment design),—
+82,experiment-design-architect,define_episode_boundaries_by_well_or_fold,02_statistical_framework,agent-tracing (experiment design),—
+83,experiment-design-architect,set_episode_max_steps_and_patience,02_statistical_framework,agent-tracing (experiment design),—
+84,architecture-decision-recorder,record_checkpoint_artifact_policy,02_statistical_framework,agent-tracing (experiment design),—
+85,architecture-decision-recorder,record_kaggle_dataset_or_model_publish_adr,02_statistical_framework,agent-tracing (experiment design),—
+86,dependency-graph-orchestrator,add_task,02_statistical_framework,agent-tracing (experiment design),DependencyGraphOrchestrator.add_node
+87,dependency-graph-orchestrator,add_dep,02_statistical_framework,agent-tracing (experiment design),DependencyGraphOrchestrator.add_node
+88,dependency-graph-orchestrator,add_dep,02_statistical_framework,agent-tracing (experiment design),DependencyGraphOrchestrator.add_node
+89,model_trainer,cd /lustre/work/sweeden/rogii && mkdir -p artifacts/checkpoints/episodes artifacts/model_card,04_model_training,— (infrastructure / TCN Slurm),— (shell; not in train_predict.py)
+90,schema-sentinel,type3_consumer_bound_model_trainer,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+91,model_trainer,cd /lustre/work/sweeden/rogii && sbatch --parsable hpcc/train_tcn_episodic.slurm,04_model_training,— (infrastructure / TCN Slurm),— (shell; not in train_predict.py)
+92,schema-sentinel,type3_consumer_bound_model_trainer_after_cli,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+93,model_trainer,cd /lustre/work/sweeden/rogii && python scripts/save_fold_checkpoint.py --out artifacts/checkpoints/fold_{k}.pkl,04_model_training,— (infrastructure / TCN Slurm),— (shell; not in train_predict.py)
+94,schema-sentinel,type3_consumer_bound_model_trainer_after_cli,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+95,model_trainer,cd /lustre/work/sweeden/rogii && python scripts/export_safetensors_adapter.py --out artifacts/checkpoints/fold_{k}.safetensors,04_model_training,— (infrastructure / TCN Slurm),— (shell; not in train_predict.py)
+96,schema-sentinel,type3_consumer_bound_model_trainer_after_cli,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+97,model_trainer,cd /lustre/work/sweeden/rogii && python scripts/write_episode_manifest.py --out artifacts/checkpoints/episode_manifest.json,04_model_training,— (infrastructure / TCN Slurm),— (shell; not in train_predict.py)
+98,schema-sentinel,type3_consumer_bound_model_trainer_after_cli,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+99,model_ensembler,load_episode_checkpoints,04_model_training,— (episodic TCN; not Ke/Pedregosa),—
+100,schema-sentinel,type3_consumer_bound_model_ensembler,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+101,model_ensembler,select_best_episode_by_oof_rmse,04_model_training,— (episodic TCN; not Ke/Pedregosa),—
+102,predictor,load_checkpoint_pkl_or_safetensors,04_model_training,—,—
+103,submission_validator,type3_consumer_bound_predictor,06_submission,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+104,predictor,generate_sample_submission_from_checkpoint,04_model_training,—,— (checkpoint path; train_predict.py writes submission in main)
+105,kaggle_submitter,cd /lustre/work/sweeden/rogii && kaggle datasets init -p artifacts/checkpoints,06_submission,— (infrastructure),— (shell; not in train_predict.py)
+106,submission_validator,type3_consumer_bound_kaggle_submitter_after_cli,06_submission,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+107,kaggle_submitter,cd /lustre/work/sweeden/rogii && python scripts/write_dataset_metadata.py -p artifacts/checkpoints -o artifacts/checkpoints/dataset-metadata.json,06_submission,— (infrastructure),— (shell; not in train_predict.py)
+108,submission_validator,type3_consumer_bound_kaggle_submitter_after_cli,06_submission,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+109,kaggle_submitter,cd /lustre/work/sweeden/rogii && kaggle datasets create -p artifacts/checkpoints -r zip -m rogii-checkpoints-v1,06_submission,— (infrastructure),— (shell; not in train_predict.py)
+110,submission_validator,type3_consumer_bound_kaggle_submitter_after_cli,06_submission,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+111,kaggle_submitter,cd /lustre/work/sweeden/rogii && kaggle datasets version -p artifacts/checkpoints -r zip -m rogii-checkpoints-v2,06_submission,— (infrastructure),— (shell; not in train_predict.py)
+112,submission_validator,type3_consumer_bound_kaggle_submitter_after_cli,06_submission,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+113,kaggle_submitter,cd /lustre/work/sweeden/rogii && kaggle models init -p artifacts/model_card,06_submission,— (infrastructure),— (shell; not in train_predict.py)
+114,submission_validator,type3_consumer_bound_kaggle_submitter_after_cli,06_submission,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+115,kaggle_submitter,cd /lustre/work/sweeden/rogii && python scripts/write_kaggle_model_description.py -p artifacts/model_card,06_submission,— (infrastructure),— (shell; not in train_predict.py)
+116,submission_validator,type3_consumer_bound_kaggle_submitter_after_cli,06_submission,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+117,kaggle_submitter,cd /lustre/work/sweeden/rogii && kaggle models create -p artifacts/model_card,06_submission,— (infrastructure),— (shell; not in train_predict.py)
+118,submission_validator,type3_consumer_bound_kaggle_submitter_after_cli,06_submission,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+119,kaggle_submitter,cd /lustre/work/sweeden/rogii && kaggle models versions create -m sweeden-ttu/rogii-wellbore-checkpoint -p artifacts/model_card -r zip,06_submission,— (infrastructure),— (shell; not in train_predict.py)
+120,submission_validator,type3_consumer_bound_kaggle_submitter_after_cli,06_submission,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+121,model_trainer,cd /lustre/work/sweeden/rogii && uv pip install lightgbm -q,04_model_training,— (infrastructure / TCN Slurm),— (shell; not in train_predict.py)
+122,schema-sentinel,type3_consumer_bound_model_trainer_after_cli,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+123,experiment-design-architect,cd /lustre/work/sweeden/rogii && sbatch --parsable hpcc/vague_spec_batch_matador.slurm,02_statistical_framework,agent-tracing (experiment design),— (shell; not in train_predict.py)
+124,schema-sentinel,type3_consumer_bound_experiment_design_architect_after_cli,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+125,model_trainer,set_objective_regression,04_model_training,ke2017_lightgbm,make_estimator (LGBMRegressor.objective)
+126,model_trainer,set_metric_rmse,04_model_training,ke2017_lightgbm,make_estimator + rmse
+127,model_trainer,cd /lustre/work/sweeden/rogii && sbatch --parsable hpcc/train_tcn.slurm,04_model_training,— (infrastructure / TCN Slurm),— (shell; not in train_predict.py)
+128,schema-sentinel,type3_consumer_bound_model_trainer_after_cli,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+129,model_trainer,log_best_iteration,04_model_training,ke2017_lightgbm,cross_val_and_predict (lgb.early_stopping)
+130,model_trainer,cd /lustre/work/sweeden/rogii && ls -la artifacts/,04_model_training,— (infrastructure / TCN Slurm),— (shell; not in train_predict.py)
+131,model_ensembler,train_with_seed_42,04_model_training,ke2017_lightgbm,make_estimator.random_state=42; cross_val_and_predict
+132,model_ensembler,train_with_seed_69,04_model_training,ke2017_lightgbm,— (multi-seed; trace only; train_predict uses seed 42)
+133,model_ensembler,train_with_seed_2024,04_model_training,ke2017_lightgbm,— (multi-seed; trace only)
+134,model_ensembler,average_seed_predictions,04_model_training,ke2017_lightgbm,— (multi-seed; trace only)
+135,predictor,collect_oof_predictions,04_model_training,ke2017_lightgbm,cross_val_and_predict (oof_fit)
+136,oof_evaluator,compute_rmse_per_fold,05_evaluation,ke2017_lightgbm,cross_val_and_predict + rmse
+137,schema-sentinel,type3_consumer_bound_oof_evaluator,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+138,oof_evaluator,compute_mean_oof_rmse,05_evaluation,ke2017_lightgbm,cross_val_and_predict
+139,oof_evaluator,report_std_across_folds,05_evaluation,ke2017_lightgbm,cross_val_and_predict (fold_rmses std)
+140,oof_evaluator,compare_to_baseline,05_evaluation,ke2017_lightgbm,—
+141,error_analyzer,compute_residuals,05_evaluation,— (competition shared / EDA),— (analysis / review scripts)
+142,schema-sentinel,type3_consumer_bound_error_analyzer,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+143,error_analyzer,slice_by_well,05_evaluation,— (competition shared / EDA),— (analysis / review scripts)
+144,error_analyzer,slice_by_depth_bin,05_evaluation,— (competition shared / EDA),— (analysis / review scripts)
+145,error_analyzer,plot_residuals_vs_target,05_evaluation,— (competition shared / EDA),— (analysis / review scripts)
+146,error_analyzer,identify_worst_wells,05_evaluation,— (competition shared / EDA),— (analysis / review scripts)
+147,predictor,load_fold_models,04_model_training,—,cross_val_and_predict (per-fold est)
+148,predictor,predict_per_fold,04_model_training,—,cross_val_and_predict
+149,predictor,average_test_predictions,04_model_training,—,main (test_mat.mean(axis=1))
+150,predictor,inverse_log1p,04_model_training,—,cross_val_and_predict + main (np.expm1 on test_pred)
+151,submission_formatter,align_to_sample_submission_columns,06_submission,— (submission envelope),main (out_df column filter)
+152,submission_validator,type3_consumer_bound_submission_formatter,06_submission,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+153,submission_formatter,set_id_column,06_submission,— (submission envelope),main (DataFrame id_col)
+154,submission_formatter,set_prediction_columns,06_submission,— (submission envelope),main (DataFrame target col)
+155,submission_formatter,cd /lustre/work/sweeden/rogii && cp submission.csv data/submission.csv,06_submission,— (infrastructure),— (shell; not in train_predict.py)
+156,submission_validator,assert_row_count_matches_test,06_submission,— (submission envelope),SubmissionEnvelopeValidator._row_count_matches
+157,submission_validator,assert_no_nans,06_submission,— (submission envelope),SubmissionEnvelopeValidator._no_nans (agents.py)
+158,submission_validator,assert_columns_match_sample,06_submission,— (submission envelope),SubmissionEnvelopeValidator._columns_match
+159,submission_validator,print_head_describe,06_submission,— (submission envelope),—
+160,kaggle_submitter,cd /lustre/work/sweeden/rogii && kaggle competitions files -c rogii-wellbore-geology-prediction -q,06_submission,— (infrastructure),— (shell; not in train_predict.py)
+161,submission_validator,type3_consumer_bound_kaggle_submitter_after_cli,06_submission,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+162,kaggle_submitter,kaggle config view -q,06_submission,— (infrastructure),— (shell; not in train_predict.py)
+163,submission_validator,type3_consumer_bound_kaggle_submitter_after_cli,06_submission,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+164,kaggle_submitter,kaggle kernels push --help,06_submission,— (infrastructure),— (shell; not in train_predict.py)
+165,submission_validator,type3_consumer_bound_kaggle_submitter_after_cli,06_submission,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+166,kaggle_submitter,squeue -u $USER -n rogii_tcn -h,06_submission,— (submission envelope),—
+167,submission_validator,type3_consumer_bound_kaggle_submitter,06_submission,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+168,kaggle_submitter,cd /lustre/work/sweeden/rogii && kaggle competitions submit -c rogii-wellbore-geology-prediction -f submission.csv -m rogii-trace -q,06_submission,— (infrastructure),— (shell; not in train_predict.py)
+169,submission_validator,type3_consumer_bound_kaggle_submitter_after_cli,06_submission,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+170,kaggle_submitter,cd /lustre/work/sweeden/rogii && kaggle competitions submissions -c rogii-wellbore-geology-prediction -q,06_submission,— (infrastructure),— (shell; not in train_predict.py)
+171,submission_validator,type3_consumer_bound_kaggle_submitter_after_cli,06_submission,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+172,kaggle_submitter,cd /lustre/work/sweeden/rogii && kaggle competitions leaderboard -c rogii-wellbore-geology-prediction -q,06_submission,— (infrastructure),— (shell; not in train_predict.py)
+173,submission_validator,type3_consumer_bound_kaggle_submitter_after_cli,06_submission,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+174,dependency-graph-orchestrator,add_task,02_statistical_framework,agent-tracing (experiment design),DependencyGraphOrchestrator.add_node
+175,dependency-graph-orchestrator,add_dep,02_statistical_framework,agent-tracing (experiment design),DependencyGraphOrchestrator.add_node
+176,seed-control-officer,idempotency_review,02_statistical_framework,agent-tracing (experiment design),—
+177,schema-sentinel,type3_consumer_bound_seed_control_officer,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+178,seed-control-officer,verify_rerun_produces_identical_artifacts,02_statistical_framework,agent-tracing (experiment design),—
+179,seed-control-officer,cd /lustre/work/sweeden/rogii && python scripts/idempotency_review.py --artifacts-dir artifacts/ -q,02_statistical_framework,agent-tracing (experiment design),— (shell; not in train_predict.py)
+180,schema-sentinel,type3_consumer_bound_seed_control_officer_after_cli,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+181,error_analyzer,code_review,05_evaluation,— (competition shared / EDA),— (analysis / review scripts)
+182,error_analyzer,review_shortcuts_and_hardcoded_values,05_evaluation,— (competition shared / EDA),— (analysis / review scripts)
+183,error_analyzer,cd /lustre/work/sweeden/rogii && python scripts/code_review_trace.py --scan-hardcoded --paths pipeline/ scripts/ hpcc/,05_evaluation,— (infrastructure),— (shell; not in train_predict.py)
+184,schema-sentinel,type3_consumer_bound_error_analyzer_after_cli,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+185,architecture-decision-recorder,architecture_review,02_statistical_framework,agent-tracing (experiment design),—
+186,architecture-decision-recorder,record_architecture_review_adr,02_statistical_framework,agent-tracing (experiment design),—
+187,submission_validator,test_review,06_submission,— (submission envelope),—
+188,submission_validator,cd /lustre/work/sweeden/rogii && mamba run -n kc-rogii-wellbore-geology-prediction pytest tests/ -q --tb=line 2>/dev/null || pytest tests/ -q --tb=line,06_submission,— (infrastructure),— (shell; not in train_predict.py)
+189,model_trainer,training_review,04_model_training,— (infrastructure / TCN Slurm),—
+190,model_trainer,review_checkpoint_manifest_vs_training_plan,04_model_training,ke2017_lightgbm,—
+191,model_trainer,cd /lustre/work/sweeden/rogii && ls -la artifacts/checkpoints/ && test -f artifacts/checkpoints/episode_manifest.json,04_model_training,— (infrastructure / TCN Slurm),— (shell; not in train_predict.py)
+192,experiment-design-architect,statistical_mathematical_soundness_review,02_statistical_framework,agent-tracing (experiment design),—
+193,experiment-design-architect,verify_rmse_objective_matches_competition_metric,02_statistical_framework,agent-tracing (experiment design),—
+194,experiment-design-architect,verify_cv_splits_respect_group_leakage_constraints,02_statistical_framework,agent-tracing (experiment design),—
+195,architecture-decision-recorder,summarize_hardcoded_parameters,02_statistical_framework,agent-tracing (experiment design),—
+196,architecture-decision-recorder,summarize_hardcoded_variables_with_explanations,02_statistical_framework,agent-tracing (experiment design),—
+197,architecture-decision-recorder,cd /lustre/work/sweeden/rogii && python scripts/hardcoded_audit.py --out artifacts/hardcoded_parameter_summary.json --explain,02_statistical_framework,agent-tracing (experiment design),— (shell; not in train_predict.py)
+198,schema-sentinel,type3_consumer_bound_architecture_decision_recorder_after_cli,01_data_analysis,agent-tracing (Type-3 audit),Type3ConsumerGate (agents.py) / trace_executor.execute_step
+199,error_analyzer,emit_review_findings_markdown,05_evaluation,— (competition shared / EDA),— (analysis / review scripts)
+200,dependency-graph-orchestrator,add_dep,02_statistical_framework,agent-tracing (experiment design),DependencyGraphOrchestrator.add_node
+201,experiment-design-architect,validate_resource_bounds_per_chomsky_class,02_statistical_framework,agent-tracing (experiment design),—
+202,architecture-decision-recorder,validate_slurm_envelope_vs_hpcc_scripts,02_statistical_framework,agent-tracing (experiment design),—
+203,experiment-design-architect,validate_resource_bounds_per_chomsky_class,02_statistical_framework,agent-tracing (experiment design),—
+204,architecture-decision-recorder,validate_slurm_envelope_vs_hpcc_scripts,02_statistical_framework,agent-tracing (experiment design),—
+205,experiment-design-architect,evaluate_computing_resources_chomsky_rubric,02_statistical_framework,agent-tracing (experiment design),—
+206,experiment-design-architect,validate_resource_bounds_per_chomsky_class,02_statistical_framework,agent-tracing (experiment design),—
+207,architecture-decision-recorder,validate_slurm_envelope_vs_hpcc_scripts,02_statistical_framework,agent-tracing (experiment design),—
+208,architecture-decision-recorder,cd /lustre/work/sweeden/rogii && python scripts/evaluate_computing_resources.py --trace /lustre/work/sweeden/rogii/traces/preprocessing/formation_plane_spatial/trace_language.csv --variant formation_plane_spatial -q,02_statistical_framework,agent-tracing (experiment design),— (shell; not in train_predict.py)
+209,architecture-decision-recorder,record,02_statistical_framework,agent-tracing (experiment design),—
+210,architecture-decision-recorder,serialize_markdown,02_statistical_framework,agent-tracing (experiment design),—
+211,dependency-graph-orchestrator,topological_order,02_statistical_framework,agent-tracing (experiment design),DependencyGraphOrchestrator
