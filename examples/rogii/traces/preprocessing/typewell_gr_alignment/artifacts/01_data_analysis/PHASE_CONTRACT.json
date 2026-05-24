@@ -1,0 +1,13 @@
+{
+  "variant": "typewell_gr_alignment",
+  "phase": "01_data_analysis",
+  "status": "pending",
+  "prior_phase": null,
+  "outputs": {
+    "schema": "artifacts/01_data_analysis/schema.json",
+    "data_paths": "artifacts/01_data_analysis/data_paths.json",
+    "well_groups": "artifacts/01_data_analysis/well_groups.json",
+    "target_diagnosis": "artifacts/01_data_analysis/target_diagnosis.json",
+    "eda_summary": "artifacts/01_data_analysis/eda_summary.json"
+  }
+}
