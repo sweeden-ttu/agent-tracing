@@ -1,0 +1,49 @@
+---
+description: Schedule ML pipeline train/test/full runs via Slurm; one active job per trace branch (6 max).
+alwaysApply: true
+---
+
+# Slurm-only pipeline execution
+
+Machine learning work — training, testing, evaluation, checkpointing, and **full trace pipeline execution** — must run on HPCC via **Slurm**, not on the login node.
+
+## Required
+
+- Submit with `sbatch` (or an existing `hpcc/*.slurm` wrapper). Do not run `train_tcn.py`, episodic training, pytest-at-scale, orchestrator `--execute`, or end-to-end `run_pipeline.sh` logic interactively on the login node.
+- **One active Slurm job per branch / trace variant** at a time. Each of the six trace branches owns at most one running or pending pipeline job:
+  - `trace/baseline-column-transformer`
+  - `trace/typewell-gr-alignment`
+  - `trace/ps-point-leakage-aware`
+  - `trace/robust-scale-log1p`
+  - `trace/parallel-multiwell-loader`
+  - `trace/formation-plane-spatial`
+- **Six jobs maximum** across the project (one per variant). Never queue a second job for the same branch while another is `PENDING`, `RUNNING`, or `COMPLETING`.
+- Name jobs so the variant is identifiable (e.g. `-J trace_baseline`, `-J trace_typewell`) and tag with `--export=ALL,TRACE_VARIANT=baseline_column_transformer`.
+
+## Before submitting
+
+1. Check existing jobs for that variant:
+   ```bash
+   squeue -u "$USER" -o "%.18i %.9P %.30j %.8T %.10M %R" | grep -E 'trace_|rogii_tcn|TRACE_'
+   ```
+2. If a job for that branch/variant is already queued or running, **do not submit** — wait or cancel the existing job first.
+3. Prefer variant-specific Slurm scripts under `/lustre/work/sweeden/rogii/hpcc/` (e.g. `train_tcn.slurm`, `train_tcn_episodic.slurm`).
+
+## Allowed on login node
+
+- Chomsky / trace CSV validation (`implement_agent_tracing --validate-traces`)
+- Orchestrator **`--dry-run`** (no training or heavy IO)
+- Unit tests that do not train models or scan full competition data
+- Editing trace CSVs, notebooks, and Slurm scripts
+
+## Trace CSV alignment
+
+When adding pipeline rows to `trace_language.csv`, training and full-pipeline steps must use **`sbatch`** cells (Type-0 envelope), not bare `python train_*.py` on the login node. Resource envelopes in rows 2–21 must match the Slurm allocation in the submitted script.
+
+## Ollama / agent jobs
+
+Before **`sbatch`** on any script that runs LLM agents or Ollama, follow **`.cursor/rules/slurm-ollama-consumer-review.mdc`**: triage last logs, TTU Ollama setup, interactive preflight via `/etc/slurm/scripts/interactive`, then `bash hpcc/review_slurm_before_submit.sh`.
+
+## Mid-trace resume
+
+When continuing from a **middle row** of `trace_language.csv` (not from the start), follow **`.cursor/rules/trace-language-mid-resume-slurm-gate.mdc`**: confirm prior `sbatch` steps show `COMPLETED` in `sacct`, and that checkpoint / ablation / submission artifacts from those jobs are the inputs for the next step.
