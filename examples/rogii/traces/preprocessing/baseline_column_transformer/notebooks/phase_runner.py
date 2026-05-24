@@ -178,7 +178,7 @@ def finalize_phase(
     prior = PRIOR_PHASE[phase]
     normalized_outputs = {key: _rel_path(value) for key, value in outputs.items()}
     manifest = {
-        "variant": "baseline_column_transformer",
+        "variant": VARIANT_DIR.name,
         "phase": phase,
         "completed_at": _utc_now(),
         "prior_phase": prior,
