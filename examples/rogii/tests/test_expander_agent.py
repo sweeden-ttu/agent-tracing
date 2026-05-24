@@ -2,20 +2,24 @@
 
 from __future__ import annotations
 
+import importlib.util
 from pathlib import Path
 
 import pytest
 
 EXAMPLES = Path(__file__).resolve().parents[1]
-sys_path = EXAMPLES
+_spec = importlib.util.spec_from_file_location(
+    "trace_scaffold_expander",
+    EXAMPLES / "pipeline" / "trace_scaffold_expander.py",
+)
+assert _spec and _spec.loader
+_mod = importlib.util.module_from_spec(_spec)
 import sys
 
-sys.path.insert(0, str(EXAMPLES))
-
-from pipeline.trace_scaffold_expander import (  # noqa: E402
-    audit_variant,
-    slurm_six_phase_status,
-)
+sys.modules[_spec.name] = _mod
+_spec.loader.exec_module(_mod)
+audit_variant = _mod.audit_variant
+slurm_six_phase_status = _mod.slurm_six_phase_status
 
 
 @pytest.mark.parametrize(

@@ -6,6 +6,7 @@
 |--------|---------|
 | `scaffold_trace_variant.py` | Create phase dirs, contracts, notebooks; `--sync-worktrees` |
 | `expander_agent.py` | Audit gaps, expand all scaffolding, sync tracking, optional Chomsky gate |
+| `benchmark_episodic_training.py` | Aggregate `episodic_benchmark.json` across six TCN variant runs |
 | `download_variant_papers.py` | Fetch variant base PDFs; `--verify-only` |
 | `download_layer_papers.py` | Fetch leaderboard ensemble layer PDFs |
 | `write_trace_row_index.py` | Generate `trace_row_index.csv` from trace CSV |

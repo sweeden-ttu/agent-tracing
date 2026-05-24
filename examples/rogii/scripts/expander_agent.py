@@ -84,17 +84,6 @@ def _run_validate_traces(agent_tracing_root: Path) -> int:
     return proc.returncode
 
 
-def _run_scaffold_batch(examples_root: Path, *, sync_worktrees: bool, quiet: bool) -> None:
-    script = examples_root / "scripts" / "scaffold_trace_variant.py"
-    if not script.is_file():
-        return
-    cmd = [sys.executable, str(script), "--all-variants"]
-    if sync_worktrees:
-        cmd.append("--sync-worktrees")
-    print("+", " ".join(cmd), flush=True)
-    subprocess.run(cmd, cwd=REPO_ROOT, check=False)
-
-
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -141,7 +130,6 @@ def main(argv: list[str] | None = None) -> int:
         exit_code = _print_audit(reports)
 
     if args.expand_all:
-        _run_scaffold_batch(examples_root, sync_worktrees=not args.no_sync_worktrees, quiet=args.quiet)
         summary = expand_all_variants(
             examples_root,
             sync_worktrees=not args.no_sync_worktrees,
