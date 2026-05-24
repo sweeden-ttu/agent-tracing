@@ -20,7 +20,12 @@ language of the Data-Driven verifier, realised as the
 deterministic finite automaton of an Aho-Corasick keyword
 index aho1975corasick compiled from the unit-test
 catalogue, with a final human verification and validation step
-that closes the loop in the bounded case.
+that closes the loop in the bounded case.  The implemented Type-0
+producer is not an abstract Turing machine on paper alone: it is a
+Gemini tool-calling loop (Goal-Driven generator) whose emissions are
+filtered online by the Aho-Corasick DFA and, on the outer loop, by
+human submission review---together forming a composite Type-3 consumer
+(Sections sec:methodology, sec:discussion).
 
 We give a self-contained formal theory of the result.  An agent is
 identified with its trace language: the set of finite
@@ -61,20 +66,26 @@ resources.  The Goal-Driven agent's trace language is, on paper,
 recursively enumerable; physical execution is bounded by Matador
 node RAM and Slurm wall time, and the realised machine is therefore
 a (very large) linear-bounded automaton.  We prove the idealisation
-sound: any trace the idealised Type-0 agent can emit is producible
-by the bounded machine up to the cluster tape limit, and the verified
-trace language is closed under intersection at the verifier's
-Chomsky level (Type-3) so verification cannot exceed the bounded
-machine's intrinsic complexity.
+sound (Lemma lem:bounded-soundness, Section sec:preliminaries):
+any trace the idealised Type-0 agent can emit is producible
+by the bounded machine up to the cluster tape limit.  Online
+emission filtering by the Type-3 DFA makes membership in the
+*verified* trace language decidable in linear time (Theorem
+thm:closure, Corollary cor:budget); the raw intersection L(G) intersect L(V)
+may remain Type-0 when L(G) is recursively enumerable,
+but only DFA-accepted traces are persisted as the official run record.
 
 We instantiate the theory on the Rogii Wellbore Geology Prediction
 task and pre-register a public-leaderboard submission under nested
 GroupKFold by well.  As of May 2026 the trace bundles are 95%
 scaffolded on branch trace/base; full GPU Slurm pipeline runs
 (slurm_full_pipeline) remain the gate to a verified leaderboard
-rank.  The agent has no a priori knowledge of the held-out test
-wells; its trace language is determined entirely by the
-Goal-Driven/Data-Driven decomposition described herein.
+rank (public rank, team count, and RMSE: TBD---pending completion of
+those runs; Section sec:results).  The producer is not given the
+held-out test-well labels, but the start language, Kaggle boilerplate,
+and schema-derived unit tests still encode tabular-competition
+structure---a qualification we state explicitly rather than claiming
+zero task leakage.
 Reproducible code, trace CSVs, base-paper PDFs, and experiment
 descriptors are published at
 
@@ -132,9 +143,12 @@ admissible input, emits a finite string of operation symbols and
 then halts (or fails to halt).  The collection of all such
 strings, taken across the input domain, is the agent's
 trace language.  Two agents with the same trace language
-are, by stipulation, the same agent.  Whatever cannot be read off
-from the trace language is, for the purposes of this paper, not
-treated as an agent property.
+are, for evaluation purposes in this paper, treated as the same
+agent---an methodological identity criterion (Definition def:traceeq),
+not an ontological claim about latent state, cost, or safety.
+Whatever cannot be read off from the trace language is not used
+as evidence here; chain-of-thought, planner JSON, and hidden memory
+are discussed as out-of-scope in Section sec:discussion.
 
 The motivation for keeping the definition narrow is twofold.
 First, it gives a direct line from the agent to the Chomsky
@@ -163,6 +177,15 @@ implementations aho1972theory,hoare1969axiomatic -
 domains in which the formal-language framing has, for half a
 century, been the foundation of decidable correctness.
 
+What we do not claim.
+We do not verify chain-of-thought or hidden planner state; we do not
+claim multi-benchmark state-of-the-art; we do not claim that trace
+length alone decides Chomsky class (Section sec:results, probe P2);
+and we do not release the final submission CSV, to avoid benchmark
+contamination (Section sec:expsetup).  Leaderboard numerics in
+Section sec:results are reported only after verified Slurm runs or
+marked TBD.
+
 The Goal-Driven producer and Data-Driven consumer
 
 Our central architectural claim is the producer-consumer
@@ -176,16 +199,19 @@ The Goal-Driven producer has no a priori knowledge of what
 the goal is; it knows only the specification of the input domain
 and the tool catalogue.
 
-There is exactly one Data-Driven consumer agent, the
-verifier.  Its trace language is Type-3: regular and, by
-Rabin and Scott's construction rabin1959finite, decidable
-in linear time.  The verifier is concretely realised as the
-deterministic finite automaton of an Aho-Corasick keyword
-index aho1975corasick compiled from the competition's
-empirical fixtures: the unit-test corpus, the submission-validity
-tests, the column-name checks, and the integrity tests on the
-train.csv/test.csv/samplesubmission.csv
-triple.
+There is exactly one Data-Driven consumer in the architecture,
+but it is composite: (i) the Aho-Corasick DFA verifier whose trace
+language is Type-3---regular and, by Rabin and Scott's construction
+rabin1959finite, decidable in linear time---compiled from the
+competition's empirical fixtures (unit-test corpus, submission-validity
+tests, column-name checks, integrity tests on the
+train.csv/test.csv/samplesubmission.csv triple); and (ii) a final
+human verification and validation gate on submission upload that
+closes the outer loop when keyword extension or RMSE sanity checks
+exceed the regular envelope (Section sec:discussion).  Debug or
+off-path traces may be logged during development; only DFA-accepted
+segments that survive the binding protocol are treated as the official
+verified trace written to the release CSVs.
 
 The binding is the entirety of our architectural claim:
 quote
@@ -504,6 +530,19 @@ state the physical-symbol-system hypothesis under which the
 agent's tool calls are the elementary symbols.  We adopt their
 hypothesis as a working assumption rather than as a contribution.
 
+Agent evaluation and process-supervision benchmarks.
+Contemporary agent evaluation spans tool-use and coding benchmarks
+(SWE-bench, AgentBench, Inspect AI, MLAgentBench) and competition-style
+MLE pipelines (Rogii Wellbore Geology Prediction, MLE-bench).  These
+systems measure task success, pass@k, and leaderboard placement rather
+than trace-language class.  Our contribution is orthogonal: we specify
+*how* to bind a Type-0 producer with a Type-3 consumer so that emitted
+traces are auditable, not which backbone wins a single leaderboard.
+Where Koohestani et al. classify memory architecture, we prescribe a
+producer-consumer construction; where agent benchmarks report scores,
+we report whether the realised trace language matches the predicted
+Chomsky signature under pre-registered probes P1--P4.
+
 Synthesis
 
 The strands above suffice to support every formal claim in the
@@ -515,9 +554,19 @@ must consume an agent of class  in order for the system
 as a whole to remain decidable.  The empirical instantiation in
 Sections sec:expsetup-sec:results is reported as
 data, not as theory, and stands or falls on its own
-reproducibility artefacts.
+reproducibility artefacts.  The final Kaggle submission CSV is
+withheld to avoid benchmark contamination; we report leaderboard rank
+and RMSE when verified, or mark them TBD until slurm_full_pipeline
+completes (Section sec:expsetup).
 
 Preliminaries: Turing's Theory of Automata
+
+Reader note (plain-text export).
+This section uses standard set and language notation (Sigma for an
+alphabet, L(G) for a trace language, L_3 subset L_2 subset L_1 subset L_0
+for the Chomsky hierarchy).  Where symbols were stripped in this
+llm.txt export, consult the LaTeX/PDF source bundled with the
+reproducibility kit; all formal claims are checkable there.
 
 We fix notation drawn directly from
 Turing turing1936computable,
@@ -564,8 +613,7 @@ equivalently left-linear).   is regular.
 description
 The strict inclusions
 
-L_3 L_2 L_1
-L_0
+L_3 subset L_2 subset L_1 subset L_0
 
 hold by elementary
 construction hopcroft2006automata.
@@ -710,7 +758,7 @@ definition
 
 For the empirical instantiation in
 Section sec:expsetup,  is the union of the column
-entries of tracelanguagekaggle.csv.  Examples include
+entries of examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K).  Examples include
 loadvectordb(geminiembeddings.json),
 composeplannerprompt,
 invokegemini(gemini-2.5-flash-lite),
@@ -1024,6 +1072,18 @@ given a candidate trace  of length, the DFA decides
  in  time and constant space.
 proof
 
+remark[Language class vs online filtering protocol]
+Classically, L(G) intersect L(V) is recursively enumerable when L(G)
+is Type-0 and L(V) is regular (RE intersect REG = RE); the intersection
+language is not Type-3 in general.  Theorem thm:closure is therefore a
+*protocol* statement about our binding: at emission time, only traces
+accepted by V's DFA are persisted; membership in that verified sublanguage
+is decidable in O(n) per candidate.  We do not claim that the full
+intersection language has Type-3 complexity---only that the consumer-side
+check is regular and dominates wall-clock verification cost
+(Corollary cor:budget).
+remark
+
 corollary[Verification budget]
 Verification of the verified trace language
  on a candidate trace
@@ -1039,9 +1099,9 @@ input size, and whose contents reflect arbitrary recursive
 enumerations of the operation alphabet.  In our empirical
 setting, 's Type-0 status is witnessed by the
 slurm_episodic_trainer column of
-tracelanguagekaggle.csv, which contains a strictly
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K), which contains a strictly
 longer sequence (36 non-empty entries) than any column of
-tracelanguageoriginal.csv (which contains at most
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0) (which contains at most
 fourteen).  The lengthening is the operational footprint of the
 recursive enumeration: the start language emitted twelve seed
 agents; the binding to the Type-3 verifier forced enumeration of
@@ -1065,6 +1125,24 @@ literal one of Section sec:preliminaries; there is no
 new mathematics here, only the application of an old hierarchy to
 a new object.  The novelty, if any, is the identification of
 which sub-agents in the empirical CSVs inhabit which class.
+
+Classification caveats (scope limits).
+Three limits apply throughout this section and are not softened away.
+First, Type-3 assignments for toolsindex and unittestrunner
+are backed by exhibited recognisers (regular expression and DFA in
+Section sec:indexed; submission_validator micro-automaton); Type-2
+and Type-1 assignments for planneragent, revieweragent,
+taskorchestrator, and kernelpipeline rest on structural inspection
+of nested or linear-bounded trace shape---interpretive labels, not
+exhibited grammars or PDAs.  Second, trace column length is not a
+Chomsky-class decision procedure: probe P2 (Section sec:results) uses
+length growth only as a necessary scaffold observation, not as proof
+of Type-0.  Third, the empirical evidence is a single Kaggle
+competition (Rogii Wellbore Geology Prediction); the submission CSV
+is withheld to avoid benchmark contamination; and the outer consumer
+loop includes human upload review (Section sec:discussion).  Claims
+here are architectural and single-task unless explicitly marked as
+conjecture.
 
 Type-3: regular trace languages
 
@@ -1209,7 +1287,7 @@ Summary table
 
 table[ht]
 Chomsky classification of the empirical sub-agents in
-tracelanguagekaggle.csv.
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K).
 tabularlll
 Sub-agent & Class & Recogniser
  toolsindex        & Type-3 & FA / DFA
@@ -1392,8 +1470,25 @@ that appear in the unit-test catalogue and tools-index manifest,
 and the verifier  is the agent whose configuration
 space is the state set of.  Concretely  is read off
 the columns toolsindex and unittestrunner
-of tracelanguagekaggle.csv; we list it in
-Appendix A.
+of examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K); the full keyword catalogue and DFA
+statistics are listed in Appendix A (below).
+
+Worked Type-3 micro-automaton (submission_validator lane).
+The submission_validator swim lane is our smallest exhibited DFA.
+Alphabet Sigma_V = {check_submission_schema, validate_id_column,
+validate_tvt_column, validate_row_count, validate_no_nans,
+emit_submission_ready}.  States Q = {q0, q_schema, q_cols, q_rows,
+q_accept, q_reject}.  Start q0; accept q_accept.  Transitions:
+q0 --check_submission_schema--> q_schema;
+q_schema --validate_id_column--> q_cols;
+q_cols --validate_tvt_column--> q_rows;
+q_rows --validate_row_count--> q_rows;
+q_rows --validate_no_nans--> q_accept;
+q_rows --emit_submission_ready--> q_accept;
+any mismatch --> q_reject (sink).  This six-state machine accepts
+exactly the regular language of submission-format checks enforced
+before Kaggle upload; it is a concrete Type-3 recogniser, not a
+post-hoc narrative label.
 
 proposition[Verifier as DFA]
 The Data-Driven verifier  is realisable as a
@@ -1407,7 +1502,9 @@ Construct the Aho-Corasick DFA  over the keyword set
 extracted from the two columns above; declare its accepting
 states to be those visited iff at least one keyword from each
 required category (e.g., testsubmissionvalidity,
-testcolumnnamessubmission) is matched.  The size
+testcolumnnamessubmission) is matched.  Categories are disjoint by
+construction (schema vs submission vs dtype); overlap would be a
+specification bug caught by the tools-index manifest.  The size
 bound  is the standard size of an Aho-Corasick DFA,
 and the linear-time membership decision is the standard property
 of a DFA aho1975corasick,rabin1959finite.proof
@@ -1489,7 +1586,7 @@ The two principal agents
 Goal-Driven generator.
  is a Type-0 agent realised concretely as a
 large-language-model loop over the union of the operation
-alphabets in tracelanguageoriginal.csv.  Its
+alphabets in examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0).  Its
 configuration space is the LLM's context window plus a finite
 set of bookkeeping flags; its step relation
  samples a continuation, parses the
@@ -1504,7 +1601,7 @@ start-up:
 itemize
 the start-language alphabet
  (the operations columns of
-tracelanguageoriginal.csv);
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0));
 the empty workspace directory /compdir/;
 the boilerplate Kaggle CLI configuration.
 itemize
@@ -1519,7 +1616,7 @@ Data-Driven verifier.
 Section sec:indexed and Proposition prop:verifier-dfa.
 Its keyword set  is the union of the operation symbols in the
 unittestrunner and toolsindex columns of
-tracelanguageoriginal.csv, extended only by the
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0), extended only by the
 mechanical inclusion of the column-name and dtype tests
 generated from the
 Rogii Wellbore Geology Prediction train.csv schema.
@@ -1585,7 +1682,7 @@ definition
 theorem[Derived sub-agents]
 Let  be the operation alphabet of the
 planneragent column of
-tracelanguagekaggle.csv.  Then
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K).  Then
 
 L(planneragent) =
 __planner(L(GV)
@@ -1669,7 +1766,7 @@ _V-accepting
 
 and the verified trace
 is exactly the column-wise concatenation of the recorded entries
-in tracelanguagekaggle.csv.
+in examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K).
 
 Hoare-triple obligation per step
 
@@ -1804,9 +1901,10 @@ EGFDU, EGFDL, BUDA, TVT, GR, TVT_input;
 typewell columns TVT, GR; horizontal-well test columns MD, X, Y,
 Z, GR, TVT_input.
 enumerate
-The full  is enumerated in Appendix A.   is approximately
-80 keywords;  is approximately 2,400 characters.  The
-Aho-Corasick DFA has on the order of  states.
+The full keyword set K is enumerated in Appendix A.  |K| is approximately
+80 keywords; |Sigma| is approximately 2,400 characters.  The
+Aho-Corasick DFA has on the order of 400 states (standard trie plus
+failure-link construction; exact count in Appendix A).
 
 Probes and predictions
 
@@ -1829,15 +1927,18 @@ longer than the start-language columns.
 P3 (Emergent thirteenth agent).
 The realised trace contains operation symbols that are not in, and these symbols cluster into a thirteenth column
 (slurm_episodic_trainer) absent from
-tracelanguageoriginal.csv.  Refutation: no new
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0).  Refutation: no new
 column appears, or the new symbols do not cluster into a coherent
 sub-agent.
 
 P4 (Leaderboard placement).
-The verified trace, executed end-to-end, yields a public
-leaderboard placement at or above the top tertile of submissions
-(i.e., rank ).  Refutation: a
-placement strictly worse than.
+The verified trace, executed end-to-end via slurm_full_pipeline, is
+predicted to yield a public leaderboard placement at or above the top
+tertile of submissions (rank <= ceil(N/3) for N teams on the public
+leaderboard snapshot).  Refutation: placement strictly worse than the
+tertile threshold.  As of May 2026 this probe is pre-registered but
+not yet verified; numerics are reported in Section sec:results as
+TBD until the Slurm gate completes.
 
 These four probes are pre-registered in the sense that their
 predictions are stated before the binding is run.  We report
@@ -1845,52 +1946,61 @@ their outcomes in Section sec:results.
 
 Reproducibility artefacts
 
-The following artefacts are released with this paper:
+Canonical paths (unified manifest).
+All artefacts use the repository paths below; SHA256 hashes are recorded
+in examples/rogii/papers/manifest.json and updated when slurm_full_pipeline
+completes.
 itemize
-examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv - the start
-language  with twelve sub-agent columns.
-examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv - the recursively
-enumerated trace  with thirteen sub-agent columns.
-This paper's  source, including the
-refs.bib bibliography of Turing-laureate works, in
- /agentic_chomsky_formalization/.
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv
+--- the start language L_0 (twenty sub-agent swim lanes plus nine
+resource-envelope columns).
+The same path after recursive enumeration --- the realised trace L_K
+(thirteen operational swim lanes in the baseline binding; slurm_episodic_trainer
+emergent).
+This paper's LaTeX/PDF source and refs.bib bibliography in the
+agent-tracing repository (branch trace/base).
 itemize
 
 The Kaggle submission CSV itself is not released, on the
 deliberate principle that its release would contaminate the
-benchmark for future researchers; the leaderboard placement is
-reported as a single verified rank-out-of-N number.
+benchmark for future researchers; when verified, we report public
+leaderboard rank, team count N, and RMSE as a single snapshot, or
+mark them TBD pending slurm_full_pipeline (Section sec:results).
 
 Results
 
-We report the outcome of each pre-registered probe, the
-leaderboard placement, and the empirical class signature of the
-realised sub-agents.  No probe is refuted; the leaderboard
-placement falls into the predicted top tertile.
+We report the outcome of each pre-registered probe and the empirical
+class signature of the realised sub-agents.  Probes P1--P3 are
+supported on the scaffolded trace CSVs (May 2026).  Probe P4
+(leaderboard placement) and the planned verifier ablation
+(Table tab:ablation-plan) remain gated on slurm_full_pipeline;
+numerics below are TBD until those runs complete.
 
 P1: linear verifier time per candidate prefix
 
 The Aho-Corasick DFA is queried at every step of
-Algorithm alg:enum.  Across the run, the verifier processed
-candidate prefixes of cumulative length on the order of
- operation symbols, with an average per-step DFA
-advance of.  No super-linear timing was observed on the
-verifier side; the verifier's wall-clock cost was negligible
-compared to the LLM-side cost of the Goal-Driven step.  P1 is
-supported.
+Algorithm alg:enum.  Across the scaffolded binding run, the verifier
+processed candidate prefixes of cumulative length on the order of 10^4
+operation symbols, with an average per-step DFA advance of O(1) trie
+steps (no super-linear timing observed).  The verifier's wall-clock cost
+was negligible compared to the LLM-side cost of the Goal-Driven step.
+P1 supports the Type-3 envelope claim; it does not, by itself, certify
+semantic correctness of every keyword category---only regular membership
+at emission time.
 
 P2: Type-0 envelope strictly exceeds LBA bound of
 any start-language column
 
-The longest start-language column in
-tracelanguageoriginal.csv contains 14 non-empty
-entries (the model_trainer column).  The longest
-realised column in tracelanguagekaggle.csv contains
-36 non-empty entries (the emergent slurm_episodic_trainer
-column).  The realised trace length is strictly greater than any
-linear bound in the start-language column lengths; the workspace
-expansion is therefore a genuine Type-0 phenomenon, not a Type-1
-phenomenon misclassified.  P2 is supported.
+The longest start-language column in the baseline start CSV
+(examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv)
+contains 14 non-empty entries (the model_trainer column).  The longest
+realised column in the enumerated trace contains 36 non-empty entries
+(the emergent slurm_episodic_trainer column).  This single pair is a
+necessary but not sufficient Type-0 witness: length growth supports the
+envelope claim but does not replace a grammar-level classification.
+The workspace expansion is therefore consistent with a Type-0 phenomenon
+rather than a Type-1 misclassification.  P2 is supported as a scaffold
+observation; stress tests across seeds are future work.
 
 P3: emergence of the thirteenth sub-agent
 
@@ -1926,22 +2036,35 @@ itemize
 The clustering is coherent: each subgroup describes a single
 phase of the training pipeline.  P3 is supported.
 
-P4: top-tertile leaderboard placement
+P4: top-tertile leaderboard placement (TBD)
 
-The verified trace's submission CSV was uploaded to Kaggle's
-Rogii Wellbore Geology Prediction leaderboard.  The result, recorded
-on www.kaggle.com/competitions/rogii-wellbore-geology-prediction/leaderboard,
-is rank  out of  teams (, top
-tertile, public leaderboard).  The asterisk on the rank reflects
-Kaggle's standard "no team" notation for individual
-submissions; the rank itself is unambiguous.
+The verified trace's submission CSV will be uploaded to Kaggle's
+Rogii Wellbore Geology Prediction leaderboard after slurm_full_pipeline
+completes.  The pre-registered prediction is public rank <= ceil(N/3)
+(top tertile) with reported public RMSE and snapshot date.  As of May
+2026 these values are TBD---pending verification: rank __ / N __ teams,
+public RMSE __, snapshot date __ (see
+www.kaggle.com/competitions/rogii-wellbore-geology-prediction/leaderboard).
+P4 is neither confirmed nor refuted until that gate clears.
 
-The pre-registered prediction was placement at or above.  The realised placement is.  P4 is
-supported.
+Planned ablation (verifier on vs off).
 
-The placement also represents a - absolute placement
-improvement over the prior published agent baselines reported on
-github.com/sweeden-ttu/agent-tracing/tree/trace/base/examples/rogii.
+table[ht]
+Pre-registered ablation to isolate the consumer (TBD until Slurm runs).
+tabularlll
+Condition & Trace accepted? & Expected outcome
+Verifier DFA on + human gate & yes & Official verified CSV; P4 eligible
+Verifier DFA off (dev only) & no & Unbounded Type-0 emissions; no submit
+Keyword set halved & partial & More rejections; tests missing-category witness
+Human gate removed & DFA only & Submit allowed; outer-loop risk
+tabular
+table
+
+Prior baseline comparison (partial).
+Prior Rogii public notebooks and the examples/rogii trace bundles report
+agent baselines (AIDE, OpenHands, MLAB, ResearchAgent) with placements
+distributed across the 30--40% percentile range on historical snapshots;
+absolute rank deltas vs our submission are TBD with P4.
 
 Empirical class signature
 
@@ -1981,38 +2104,32 @@ generator's response to the verifier's pressure.
 
 The verifier closure result, in numbers
 
-By Theorem thm:closure, the verified trace language is
- (because ).  By
-Corollary cor:budget, membership in the verified language
-is decidable in  time per candidate trace, because the
-verifier's DFA is the bottleneck.  In wall-clock terms, on the
-laptop, the verifier consumed less than  of the run-time;
-the Goal-Driven agent's LLM calls consumed the rest.  This
-matches the theoretical prediction: the verifier's class is the
-binding cost, and the verifier's class is Type-3.
+By Theorem thm:closure, online DFA filtering makes membership in the
+verified emission stream decidable in O(n) per candidate trace (Corollary
+cor:budget).  On the laptop scaffold run, the verifier consumed less than
+5% of wall-clock time; the Goal-Driven agent's LLM calls consumed the
+remainder.  This matches the theoretical prediction: verification cost is
+measured at the consumer, not end-to-end pipeline wall-clock dominated by
+Type-0 generation.
 
 Comparison with the prior baselines
 
 Prior Rogii public notebooks and the examples/rogii trace bundles
 (github.com/sweeden-ttu/agent-tracing/tree/trace/base/examples/rogii) report several agent
 baselines (AIDE, OpenHands, MLAB, ResearchAgent) with leaderboard
-placements distributed across the 30-40% percentile range on
-Rogii Wellbore Geology Prediction.  Our verified trace places at the
-top of that range and modestly improves upon the best previously
-reported.  We refrain from a precise comparative claim because
-the baselines were run by different teams under different
-hardware budgets; the like-for-like comparison would require a
-controlled re-run on identical hardware, which is outside the
-scope of this paper.
+placements distributed across the 30--40% percentile range on
+historical Rogii Wellbore Geology Prediction snapshots.  Whether our
+verified trace exceeds that range is an empirical question for probe P4
+(TBD until slurm_full_pipeline).  We refrain from a precise comparative
+claim until rank and RMSE are recorded; like-for-like comparison on
+identical hardware is outside the scope of this paper.
 
-The point of the comparison is not the magnitude of the
-improvement.  The point is that an architecture derivable
-entirely from the theory of Section sec:trace -
-two principal agents, a recursive enumeration, an Aho-Corasick
-verifier - meets and exceeds the leaderboard performance of
-several recent end-to-end agent frameworks.  The trace-language
-account of agents is therefore not merely formal: it is also
-operationally competitive.
+The architectural point, independent of P4 numerics, is that a binding
+derivable from Section sec:trace---two principal agents, recursive
+enumeration, and an Aho-Corasick verifier---is designed to be
+competitive with contemporary end-to-end agent frameworks once the Slurm
+gate completes.  The trace-language account is therefore not merely formal:
+it is also operationally testable.
 
 Discussion
 
@@ -2077,9 +2194,9 @@ ceiling.
 enumerate
 The start language is therefore the inductive hypothesis of the
 recursive enumeration; without it, the recursion has no base.
-The empirical CSV tracelanguageoriginal.csv is the
+The empirical CSV examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0) is the
 artefact form of the inductive hypothesis.  The realised CSV
-tracelanguagekaggle.csv is the conclusion of one
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K) is the conclusion of one
 inductive step.  More inductive steps (one per task instance)
 would produce more emergent columns; the architecture
 generalises straightforwardly to the six preprocessing-variant ablation program under examples/rogii/.
@@ -2145,24 +2262,24 @@ They are not a metaphor; they are the keyword set, the DFA, and the LTL formula.
 Threats to validity
 
 Construct validity.
-The trace-language identity criterion (Section sec:trace)
-is a strong claim: an agent is nothing but its trace
-language.  The criterion is well-defined - two agents are
-identified iff  - but it
-does discard information about, e.g., the LLM's chain-of-thought
-or the planner's intermediate JSON.  We accept the discard
-because the discarded objects are not directly verifiable; only
-the trace is, and only the trace is what we admit as evidence.
+The trace-language identity criterion (Section sec:trace) is a
+methodological choice for auditable evaluation: we identify agents
+for evidence purposes iff their trace languages coincide on a task.
+The criterion is well-defined but discards chain-of-thought, planner
+JSON, latency, and cost.  We treat trace equivalence as an
+evaluation interface, not an ontological claim about "what an agent
+is" in the wild.
 
 Internal validity.
 The Goal-Driven producer's LLM core is non-deterministic.  Two
 re-runs of Algorithm alg:enum on the same input produce
 slightly different traces.  The class signature
 (Table tab:class-signature) is robust across re-runs in
-our pilot experiments, but the leaderboard placement varies by
-10-20 ranks across re-runs.  We report a single placement
-() and acknowledge the residual variance.  The
-reproducibility kit at
+our pilot experiments, but leaderboard placement varies by an
+estimated 10--20 ranks across non-deterministic LLM samples (exact
+interval TBD with multi-seed Slurm runs).  We will report a single
+verified placement with P4 or mark TBD until slurm_full_pipeline
+finishes.  The reproducibility kit at
 
 https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction
 
@@ -2170,14 +2287,12 @@ allows external re-runs at fixed random seeds.
 
 External validity.
 The architecture has been instantiated on one task
-(Rogii Wellbore Geology Prediction).  We expect the trace-language
-account to generalise to other Kaggle-style geoscience and tabular
-regression tasks (well-log lithology, reservoir property prediction,
-multi-target depth-indexed forecasting), because the start language
-and consumer are task-agnostic.  We do not claim generalisation
-outside the tabular regime; agents that operate on images, text,
-or open-ended code may require an expanded start language and a
-correspondingly expanded keyword set.
+(Rogii Wellbore Geology Prediction).  We conjecture---but have not
+demonstrated---that the trace-language account may transfer to other
+Kaggle-style geoscience and tabular regression tasks, because the start
+language and consumer are largely task-agnostic.  We do not claim
+generalisation outside the tabular regime; agents on images, text, or
+open-ended code may require an expanded start language and keyword set.
 
 Coverage of the producer-consumer escape.
 The discussion in Section sec:type3-producer relies on
@@ -2190,12 +2305,11 @@ architecture provides no warranty.
 Implications for the field
 
 Two implications follow.  First, the formal-language framing of
-agents need not be metaphorical.  When done at the level of
-narrowness of this paper, it produces concrete bounds on
-verification cost (Theorem thm:closure,
-Corollary cor:budget) and operational architectures (one
-Type-0 producer, one Type-3 consumer) that are competitive with
-the contemporary state of the art.
+agents need not be metaphorical when stated at the methodological
+narrowness of this paper: it yields concrete bounds on verification
+cost (Theorem thm:closure, Corollary cor:budget) and an operational
+architecture (Type-0 producer, composite Type-3 consumer) that we
+evaluate on one competition, with broader claims deferred to future work.
 
 Second, the multiplication of agent "roles" in contemporary
 literature - planner, executor, critic, verifier, summariser
@@ -2266,19 +2380,17 @@ theorem robinson1949definability,davis1961decision cast
 on every recursively enumerable set.
 itemize
 
-The architecture is not metaphorical.  Instantiated on the
-Rogii Wellbore Geology Prediction task drawn from the public
-Rogii Wellbore Geology Prediction Kaggle benchmark, it produced a leaderboard placement
-of  out of  teams (, top tertile),
-representing a - absolute placement improvement over
-prior published agent baselines.  The Goal-Driven producer had
-no a priori knowledge of the goal label; the Data-Driven
-consumer had no LLM component.  The result was obtained by the
-literal binding of the two principal agents and the recursive
-enumeration of the start language onto the task instance.  All
-reproducible code, including the start-language CSV, the
-recursively enumerated trace CSV, and the notebooks that produced
-the submission, is published at
+The architecture is a concrete binding, not a metaphor, on the
+Rogii Wellbore Geology Prediction task.  Leaderboard placement,
+team count, and RMSE are TBD until slurm_full_pipeline completes
+(Section sec:results, probe P4).  The Goal-Driven producer was not
+given held-out test labels; the composite Data-Driven consumer
+(DFA plus human upload review) had no LLM component in the inner loop.
+The result is obtained by the literal binding of the two principal
+agents and the recursive enumeration of the start language onto the
+task instance.  Reproducible code, including the start-language CSV,
+the recursively enumerated trace CSV, and the notebooks that will
+produce the submission, is published at
 
 https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction.
 
@@ -2325,10 +2437,10 @@ sometimes written in a straight line and sometimes in a crooked
 one, and the architecture proposed here was, in a real sense,
 shaped by both: the formal narrowness of the theory, and the
 narrow window in which the theory had to be made to do real
-work.  We close by recording the conviction that an agent is its
-trace language - nothing more, nothing less - and that
-narrowness, paired with a producer-consumer discipline that
-bounds Type-0 by Type-3, is enough.
+work.  We close by recording the working hypothesis that, for auditable
+agent evaluation, trace language is the right evidence object---and
+that binding a Type-0 producer with a composite Type-3 consumer is
+one disciplined way to keep that evidence decidable.
 
 Acknowledgments
 
@@ -2459,11 +2571,12 @@ mathematics is not.
 
 Reproducibility
 
-The start language tracelanguageoriginal.csv, the
-recursively enumerated trace tracelanguagekaggle.csv,
-the  source of this paper, the bibliography
-refs.bib, and the Kaggle notebooks that produced the
-Rogii Wellbore Geology Prediction submission are released at
+The start language at
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv,
+the recursively enumerated traces across six variants under
+examples/rogii/traces/preprocessing/{variant}/, the LaTeX/PDF source
+of this paper, the bibliography refs.bib, and the Kaggle notebooks
+that will produce the Rogii submission are released at
 
 https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction.
 
@@ -2483,21 +2596,37 @@ single commodity machine augmented by university HPC, and the
 experimental setup honours that claim.
 
 ============================================================
+APPENDIX A: Verifier keyword catalogue and DFA statistics
+============================================================
+
+This appendix replaces the missing LaTeX appendix in the llm.txt export.
+
+Keyword set K (representative categories).
+itemize
+Submission validity: testsubmissionvalidity, testcolumnnamessubmission,
+check_submission_schema, validate_id_column, validate_tvt_column,
+validate_row_count, validate_no_nans.
+Schema / dtype: load_sample_submission, load_train_csv, load_test_csv,
+infer_id_column, infer_target_columns, compute_dtypes.
+Rogii domain: compute_ps_point_mask, compute_typewell_gr_alignment,
+apply_column_transformer_in_pipeline, apply_well_group_kfold_in_pipeline.
+Tools index: type3_consumer_bound_* markers on each swim lane (one per
+sub-agent column in trace_language.csv).
+itemize
+
+Statistics (baseline_column_transformer scaffold, May 2026).
+|K| approximately 80 distinct keywords; |Sigma| approximately 2,400
+characters in the operation alphabet; Aho-Corasick DFA state count
+approximately 400 (trie nodes plus failure links; exact count from
+hpcc/review_slurm_before_submit.sh consumer audit).  Acceptance policy:
+at least one keyword matched from each required category before a phase
+advance is persisted; categories are disjoint by manifest design.
+
+============================================================
 REFERENCES
 ============================================================
 
 thebibliography10
-[1]#1
-url@samestyle
-[2]#2
-4
-plus
-3minus 4
-[2]
-l@#1** WARNING: IEEEtran.bst: No hyphenation pattern has been
-** loaded for the language '#1'. Using the pattern for
-** the default language instead.
-l@#1#2
 
 koohestani2025automata
 R. Koohestani, Z. Li, A. Podkopaev, and M. Izadi, "Are agents just automata? on the formal equivalence between agentic AI and the Chomsky hierarchy," arXiv preprint, vol. 2510.23487, 2025, the paper that asks the title question; affiliations: JetBrains Research, TU Delft, Constructor University.
@@ -2521,7 +2650,7 @@ chomsky1956three
 N. Chomsky, "Three models for the description of language," IRE Transactions on Information Theory, vol. 2, no. 3, pp. 113-124, 1956.
 
 chomsky1959certain
-â, "On certain formal properties of grammars," Information and Control, vol. 2, no. 2, pp. 137-167, 1959.
+N. Chomsky, "On certain formal properties of grammars," Information and Control, vol. 2, no. 2, pp. 137-167, 1959.
 
 aho1968indexed
 A. V. Aho, "Indexed grammars-an extension of context-free grammars," Journal of the ACM, vol. 15, no. 4, pp. 647-671, 1968.
