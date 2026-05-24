@@ -1,0 +1,70 @@
+{
+  "factorial_runs": [
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "standard",
+      "rolling_window": "32"
+    },
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "standard",
+      "rolling_window": "64"
+    },
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "standard",
+      "rolling_window": "128"
+    },
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "robust",
+      "rolling_window": "32"
+    },
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "robust",
+      "rolling_window": "64"
+    },
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "robust",
+      "rolling_window": "128"
+    },
+    {
+      "target_log1p": "log1p",
+      "numeric_scaler": "standard",
+      "rolling_window": "32"
+    },
+    {
+      "target_log1p": "log1p",
+      "numeric_scaler": "standard",
+      "rolling_window": "64"
+    },
+    {
+      "target_log1p": "log1p",
+      "numeric_scaler": "standard",
+      "rolling_window": "128"
+    },
+    {
+      "target_log1p": "log1p",
+      "numeric_scaler": "robust",
+      "rolling_window": "32"
+    },
+    {
+      "target_log1p": "log1p",
+      "numeric_scaler": "robust",
+      "rolling_window": "64"
+    },
+    {
+      "target_log1p": "log1p",
+      "numeric_scaler": "robust",
+      "rolling_window": "128"
+    }
+  ],
+  "episodes_per_fold": 3,
+  "schedule": "well_or_fold_boundaries",
+  "recommended_baseline": {
+    "target_log1p": "none",
+    "cv_scheme": "kfold"
+  }
+}

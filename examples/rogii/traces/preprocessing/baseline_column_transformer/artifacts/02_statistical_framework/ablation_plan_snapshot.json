@@ -1,0 +1,92 @@
+{
+  "variant": "baseline_column_transformer",
+  "branch": "trace/baseline-column-transformer",
+  "github_pr": "17",
+  "approach": "ColumnTransformer + LightGBM baseline",
+  "base_papers": [
+    {
+      "id": "ke2017_lightgbm",
+      "citation": "Ke et al. (2017) LightGBM",
+      "role": "model"
+    },
+    {
+      "id": "pedregosa2011_sklearn",
+      "citation": "Pedregosa et al. (2011) scikit-learn ColumnTransformer",
+      "role": "preprocessing"
+    }
+  ],
+  "ablation_factors": [
+    {
+      "id": "target_log1p",
+      "factor": "target_transform",
+      "levels": [
+        "none",
+        "log1p"
+      ]
+    },
+    {
+      "id": "numeric_scaler",
+      "factor": "preprocessor",
+      "levels": [
+        "standard",
+        "robust"
+      ]
+    },
+    {
+      "id": "rolling_window",
+      "factor": "feature_window",
+      "levels": [
+        "32",
+        "64",
+        "128"
+      ]
+    }
+  ],
+  "factorial_grid_size": 12,
+  "factorial_grid_sample": [
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "standard",
+      "rolling_window": "32"
+    },
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "standard",
+      "rolling_window": "64"
+    },
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "standard",
+      "rolling_window": "128"
+    },
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "robust",
+      "rolling_window": "32"
+    },
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "robust",
+      "rolling_window": "64"
+    },
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "robust",
+      "rolling_window": "128"
+    },
+    {
+      "target_log1p": "log1p",
+      "numeric_scaler": "standard",
+      "rolling_window": "32"
+    },
+    {
+      "target_log1p": "log1p",
+      "numeric_scaler": "standard",
+      "rolling_window": "64"
+    }
+  ],
+  "primary_metric": "rmse_post_ps",
+  "smre": "mean_rmse_plus_std_across_folds",
+  "episodic_training": true,
+  "slurm_single_job_per_branch": true
+}
