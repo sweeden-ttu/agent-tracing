@@ -69,7 +69,7 @@ def _rel_path(path: str | Path) -> str:
         return str(path_obj)
 
 
-def _manifest_path(path: str | Path) -> Path:
+def _resolve_path(path: str | Path) -> Path:
     path_obj = Path(path)
     return path_obj if path_obj.is_absolute() else (VARIANT_DIR / path_obj)
 
@@ -293,9 +293,9 @@ def run_02_statistical_framework() -> dict:
     desc = json.loads((VARIANT_DIR / "experiment_descriptor.json").read_text(encoding="utf-8"))
     abl = json.loads((VARIANT_DIR / "ablation_plan.json").read_text(encoding="utf-8"))
     mle = json.loads((VARIANT_DIR / "mle_plan.json").read_text(encoding="utf-8"))
-    well_groups = _read_json(_manifest_path(p01["outputs"]["well_groups"]))
-    target_diag = _read_json(_manifest_path(p01["outputs"]["target_diagnosis"]))
-    eda_summary = _read_json(_manifest_path(p01["outputs"]["eda_summary"]))
+    well_groups = _read_json(_resolve_path(p01["outputs"]["well_groups"]))
+    target_diag = _read_json(_resolve_path(p01["outputs"]["target_diagnosis"]))
+    eda_summary = _read_json(_resolve_path(p01["outputs"]["eda_summary"]))
 
     architect = ExperimentDesignArchitect()
     seed_officer = SeedControlOfficer()
@@ -378,8 +378,8 @@ def run_03_feature_engineering(*, n_splits: int = 5) -> dict:
     from pipeline.preprocessor import replace_sentinels_with_nan
     from pipeline import well_group_detector as wgd
 
-    paths = _read_json(_manifest_path(p01["outputs"]["data_paths"]))
-    schema = _read_json(_manifest_path(p01["outputs"]["schema"]))
+    paths = _read_json(_resolve_path(p01["outputs"]["data_paths"]))
+    schema = _read_json(_resolve_path(p01["outputs"]["schema"]))
     id_col = schema["id_column"]
     target = p01["target_column"]
 
@@ -460,10 +460,10 @@ def run_04_model_training(*, n_splits: int = 5, max_rows: int | None = None) -> 
     from pipeline.preprocessor import replace_sentinels_with_nan
     from pipeline.nb_support import ensure_id_column
 
-    paths = _read_json(_manifest_path(p01["outputs"]["data_paths"]))
-    target_diag = _read_json(_manifest_path(p01["outputs"]["target_diagnosis"]))
-    cv_cfg = _read_json(_manifest_path(p03["outputs"]["cv_config"]))
-    feat_cfg = _read_json(_manifest_path(p03["outputs"]["feature_config"]))
+    paths = _read_json(_resolve_path(p01["outputs"]["data_paths"]))
+    target_diag = _read_json(_resolve_path(p01["outputs"]["target_diagnosis"]))
+    cv_cfg = _read_json(_resolve_path(p03["outputs"]["cv_config"]))
+    feat_cfg = _read_json(_resolve_path(p03["outputs"]["feature_config"]))
 
     id_col = cv_cfg["id_column"]
     target = cv_cfg["target_column"]
@@ -559,10 +559,10 @@ def run_05_evaluation() -> dict:
     p04 = load_phase_manifest("04_model_training")
     tp = _load_train_predict()
 
-    paths = _read_json(_manifest_path(p01["outputs"]["data_paths"]))
-    transform = _read_json(_manifest_path(p04["outputs"]["transform"]))
-    metrics = _read_json(_manifest_path(p04["outputs"]["training_metrics"]))
-    oof_fit = np.load(_manifest_path(p04["outputs"]["oof_predictions"]))
+    paths = _read_json(_resolve_path(p01["outputs"]["data_paths"]))
+    transform = _read_json(_resolve_path(p04["outputs"]["transform"]))
+    metrics = _read_json(_resolve_path(p04["outputs"]["training_metrics"]))
+    oof_fit = np.load(_resolve_path(p04["outputs"]["oof_predictions"]))
 
     target = transform["target_column"]
     train_df = pd.read_csv(paths["train_csv"])
@@ -627,10 +627,10 @@ def run_06_submission() -> dict:
     tp = _load_train_predict()
     from pipeline.agents import SubmissionEnvelopeValidator
 
-    paths = _read_json(_manifest_path(p01["outputs"]["data_paths"]))
-    schema = _read_json(_manifest_path(p01["outputs"]["schema"]))
-    transform = _read_json(_manifest_path(p04["outputs"]["transform"]))
-    test_mat = np.load(_manifest_path(p04["outputs"]["test_preds_per_fold"]))
+    paths = _read_json(_resolve_path(p01["outputs"]["data_paths"]))
+    schema = _read_json(_resolve_path(p01["outputs"]["schema"]))
+    transform = _read_json(_resolve_path(p04["outputs"]["transform"]))
+    test_mat = np.load(_resolve_path(p04["outputs"]["test_preds_per_fold"]))
 
     id_col = schema["id_column"]
     target = transform["target_column"]
