@@ -1,7 +1,7 @@
 {
   "variant": "parallel_multiwell_loader",
   "phase": "03_feature_engineering",
-  "completed_at": "2026-05-24T10:24:23Z",
+  "completed_at": "2026-05-24T09:49:19Z",
   "prior_phase": "02_statistical_framework",
   "outputs": {
     "feature_config": "artifacts/03_feature_engineering/feature_config.json",

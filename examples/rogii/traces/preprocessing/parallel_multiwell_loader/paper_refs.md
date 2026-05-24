@@ -2,9 +2,11 @@
 
 **Approach:** Parallel IO + geology surfaces
 
-## Base paper (ablation / experiment design)
+## Base papers (ablation / experiment design)
 
-- **Title:** Dask: Parallel Computation with Blocked algorithms and Task Scheduling
+### 1. Dask: Parallel Computation with Blocked algorithms and Task Scheduling
+
+- **Role:** primary_experiment_descriptor
 - **Authors:** Rocklin
 - **Year / venue:** 2015 / SciPy proceedings
 - **URL:** https://conference.scipy.org/proceedings/scipy2015/matthew_rocklin.html
