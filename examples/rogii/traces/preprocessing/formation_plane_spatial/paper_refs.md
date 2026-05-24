@@ -2,9 +2,11 @@
 
 **Approach:** Drilling geometry + formation KNN
 
-## Base paper (ablation / experiment design)
+## Base papers (ablation / experiment design)
 
-- **Title:** Nearest Neighbor Pattern Classification
+### 1. Nearest Neighbor Pattern Classification
+
+- **Role:** primary_experiment_descriptor
 - **Authors:** Cover, Hart
 - **Year / venue:** 1967 / IEEE Trans. Information Theory
 - **DOI:** 10.1109/TIT.1967.1053964
