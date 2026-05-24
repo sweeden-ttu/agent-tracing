@@ -1,11 +1,7 @@
 # Funding and References
 
-Source: llm.txt lines 2431–2710
+Source: llm.txt lines 2431–2706
 
-Acknowledgments
-
-The first author thanks Dr. Akbar Siami Namin
-(akbar.namin@ttu.edu, EC 306G, Department of Computer
 Science, Texas Tech University) and Dr. Yuanlin Zhang
 (y.zhang@ttu.edu, EC 313, Department of Computer
 Science, Texas Tech University) for their patient and generous

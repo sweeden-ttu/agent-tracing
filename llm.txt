@@ -2099,23 +2099,19 @@ Comparison with the prior baselines
 Prior Rogii public notebooks and the examples/rogii trace bundles
 (github.com/sweeden-ttu/agent-tracing/tree/trace/base/examples/rogii) report several agent
 baselines (AIDE, OpenHands, MLAB, ResearchAgent) with leaderboard
-placements distributed across the 30-40% percentile range on
-Rogii Wellbore Geology Prediction.  Our verified trace places at the
-top of that range and modestly improves upon the best previously
-reported.  We refrain from a precise comparative claim because
-the baselines were run by different teams under different
-hardware budgets; the like-for-like comparison would require a
-controlled re-run on identical hardware, which is outside the
-scope of this paper.
+placements distributed across the 30--40% percentile range on
+historical Rogii Wellbore Geology Prediction snapshots.  Whether our
+verified trace exceeds that range is an empirical question for probe P4
+(TBD until slurm_full_pipeline).  We refrain from a precise comparative
+claim until rank and RMSE are recorded; like-for-like comparison on
+identical hardware is outside the scope of this paper.
 
-The point of the comparison is not the magnitude of the
-improvement.  The point is that an architecture derivable
-entirely from the theory of Section sec:trace -
-two principal agents, a recursive enumeration, an Aho-Corasick
-verifier - meets and exceeds the leaderboard performance of
-several recent end-to-end agent frameworks.  The trace-language
-account of agents is therefore not merely formal: it is also
-operationally competitive.
+The architectural point, independent of P4 numerics, is that a binding
+derivable from Section sec:trace---two principal agents, recursive
+enumeration, and an Aho-Corasick verifier---is designed to be
+competitive with contemporary end-to-end agent frameworks once the Slurm
+gate completes.  The trace-language account is therefore not merely formal:
+it is also operationally testable.
 
 Discussion
 

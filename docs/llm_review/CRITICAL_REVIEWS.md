@@ -1,6 +1,6 @@
 # Critical reviews of `llm.txt` by section
 
-Each review assumes the corresponding section file in [`sections/`](sections/) as input. Reviews focus on **logic**, **evidence**, **/ **clarity for external readers**, and **fit for submission** (AAAI / formal-methods / ML-engineering audiences).
+Each review assumes the corresponding section file in [`sections/`](sections/) as input. Reviews focus on **logic**, **evidence**, **clarity for external readers**, and **fit for submission** (AAAI / formal-methods / ML-engineering audiences).
 
 ## Revision status (May 24, 2026)
 
@@ -368,4 +368,4 @@ The manuscript has a **coherent thesis**: treat agents as trace languages, bind 
 
 **Weakest link:** Equating empirical trace length / author-assigned labels with Chomsky class, plus single-competition evidence with withheld submission and human final gate.
 
-**Recommendation before external review:** Fix P0 items, soften ontological identity claims to methodological ones, and add one minimal formal artefact (DFA or grammar) plus one ablation table.
+**Recommendation before external review:** P4 numerics and ablation Slurm runs remain; manuscript is internally consistent with May 2026 scaffold status. Next gate: complete `slurm_full_pipeline`, insert verified rank/RMSE, run verifier on/off ablation.
