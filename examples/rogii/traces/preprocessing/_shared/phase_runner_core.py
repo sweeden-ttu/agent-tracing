@@ -57,6 +57,37 @@ def _load_train_predict():
     return tp
 
 
+def _numeric_feature_cols(
+    train_df: pd.DataFrame,
+    test_df: pd.DataFrame,
+    *,
+    id_col: str,
+    target: str,
+    extra_cols: list[str] | None = None,
+) -> list[str]:
+    """Numeric columns present in both train and test plus variant extras."""
+    skip = {id_col, target, "well_id", "is_train"}
+    cols = [
+        c
+        for c in train_df.columns
+        if c not in skip
+        and c in test_df.columns
+        and pd.api.types.is_numeric_dtype(train_df[c])
+        and pd.api.types.is_numeric_dtype(test_df[c])
+    ]
+    for c in extra_cols or []:
+        if (
+            c not in cols
+            and c in train_df.columns
+            and c in test_df.columns
+            and pd.api.types.is_numeric_dtype(train_df[c])
+        ):
+            cols.append(c)
+    if "MD" in train_df.columns and "MD" in test_df.columns and "MD" not in cols:
+        cols.insert(0, "MD")
+    return cols
+
+
 def _build_preprocessor(tp: Any, X_train: pd.DataFrame, num: list[str], low_c: list[str], high_c: list[str]):
     """Build ColumnTransformer; use RobustScaler numeric block when variant requires it."""
     if HOOKS.numeric_scaler != "robust":
@@ -465,7 +496,9 @@ def run_03_feature_engineering(*, n_splits: int = 5) -> dict:
     data_dir = Path(paths.get("data_dir", ROGII_ROOT / "data"))
     train_df, test_df, extra_cols = HOOKS.augment_train_test(train_df, test_df, data_dir=data_dir)
 
-    feature_cols = [c for c in train_df.columns if c not in (id_col, target) and c in test_df.columns]
+    feature_cols = _numeric_feature_cols(
+        train_df, test_df, id_col=id_col, target=target, extra_cols=extra_cols
+    )
     X_train = replace_sentinels_with_nan(train_df[feature_cols].copy())
     X_test = replace_sentinels_with_nan(test_df[feature_cols].copy())
 
@@ -556,14 +589,20 @@ def run_04_model_training(*, n_splits: int = 5, max_rows: int | None = None) -> 
     train_df = ensure_id_column(train_df, id_col)
     test_df = ensure_id_column(test_df, id_col)
     data_dir = Path(paths.get("data_dir", ROGII_ROOT / "data"))
-    train_df, test_df, _extra = HOOKS.augment_train_test(train_df, test_df, data_dir=data_dir)
+    train_df, test_df, extra = HOOKS.augment_train_test(train_df, test_df, data_dir=data_dir)
 
     y_raw = train_df[target].astype(np.float64).values
     use_log1p = HOOKS.resolve_log1p(target_diag)
     is_positive = bool(target_diag.get("strict_positivity", {}).get("strict_positive", False))
     y_fit = np.log1p(np.clip(y_raw, 0, None)) if use_log1p else y_raw
 
-    feature_cols = feat_cfg["feature_cols"]
+    feature_cols = _numeric_feature_cols(
+        train_df,
+        test_df,
+        id_col=id_col,
+        target=target,
+        extra_cols=list(dict.fromkeys(list(feat_cfg.get("variant_extra_cols", [])) + extra)),
+    )
     X_train = replace_sentinels_with_nan(train_df[feature_cols].copy())
     X_test = replace_sentinels_with_nan(test_df[feature_cols].copy())
 
@@ -607,7 +646,7 @@ def run_04_model_training(*, n_splits: int = 5, max_rows: int | None = None) -> 
         "id_column": id_col,
         "numeric_scaler": HOOKS.numeric_scaler,
         "eval_mask": HOOKS.eval_mask,
-        "variant_extra_cols": _extra,
+        "variant_extra_cols": extra,
         "cv_rmse": cv_rmse,
         "fold_rmses": fold_rmses,
         "cv_scheme": scheme,
