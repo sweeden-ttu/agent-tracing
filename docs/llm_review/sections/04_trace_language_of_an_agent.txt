@@ -1,0 +1,387 @@
+# Trace Language of an Agent
+
+Source: llm.txt lines 736–1118
+
+The Trace Language of an Agent
+
+This section is the formal core of the paper.  We define an agent
+as a tuple of seven objects, three of which are derivative.  We
+then define the agent's trace language and prove that the
+definition satisfies the Chomsky hierarchy verbatim.  The
+construction is austere and self-contained; nothing beyond
+Section sec:preliminaries is assumed.
+
+Operation alphabet
+
+definition[Operation alphabet]
+An operation alphabet is a finite, non-empty set
+whose elements  each denote an effectful
+computation name, called an operation symbol.
+Each  is associated with a (possibly partial) computable
+function
+acting on a state space  and producing a successor state in, so that the abstract symbol carries an effect when
+executed.  The function  is fixed once
+and for all by the runtime environment and is not a property of
+the agent.
+definition
+
+For the empirical instantiation in
+Section sec:expsetup,  is the union of the column
+entries of examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K).  Examples include
+loadvectordb(geminiembeddings.json),
+composeplannerprompt,
+invokegemini(gemini-2.5-flash-lite),
+runphaseunittests(phase; compdir), and
+trainstackedensemble(LGBM+XGB+HistGB+linearmeta).
+The operation symbol is the name plus its parenthesised
+argument list as written in the source; two invocations of the
+same name with different arguments are different operation
+symbols, exactly as Liskov's abstract data types prescribe for
+parameterised operations liskov1974abstraction.
+
+Agent
+
+definition[Agent]
+An agent is a 7-tuple
+
+A = (_A,
+                       Q_A,
+                       q_0^A,
+                       X_A,
+                       _A,
+                       F_A,
+                       h_A)
+
+where
+itemize
+ is the agent's
+operation alphabet;
+ is a (possibly countably infinite)
+configuration space;
+ is the initial
+configuration;
+ is the (computable) input domain;
+ is the
+agent's step relation: at configuration  on input
+it returns a successor configuration  together with a finite
+string of operation symbols emitted by the step;
+ is the halting
+set;
+ is the halting verdict.
+itemize
+
+The objects
+are derivative:  is determined by  and the
+runtime environment;  is the agent's
+program; and  is fixed by the convention
+that a configuration in  accepts iff it carries
+the post-condition for which the trace was emitted.
+definition
+
+remark
+The 7-tuple is the minimal one that lets us speak of an emitted
+string per step.  A 5-tuple of the
+ Hopcroft-Ullman hopcroft2006automata
+form would force  to emit a single symbol per step, which
+is too restrictive: a single "call to the planner" in our
+empirical agent emits a structured prompt-build sequence that we
+prefer to record as a string of three or four operation symbols.
+The choice of  rather than
+in the codomain of  is therefore essential.
+remark
+
+Run, trace, and trace language
+
+definition[Run]
+A run of  on input  is a
+finite or infinite sequence
+
+= ((q_0, w_0), (q_1, w_1), (q_2, w_2),
+)
+
+with,, and for each,  defined.
+The run is halting if it is finite and its last
+configuration  lies in; it is
+accepting if additionally.
+definition
+
+definition[Trace]
+The trace of a run  is the concatenation
+
+() = w_0 w_1 w_n
+_A^*.
+
+We write  for the trace of the run of
+ on  when that run is unique.
+definition
+
+definition[Trace language]
+The trace language of  is
+
+L(A) =
+():  is an accepting run of
+A  on some  xX_A
+ _A^*.
+
+definition
+
+Trace-equivalence
+
+definition[Trace equivalence]
+Two agents  over a common alphabet
+ are trace-equivalent, written, iff.
+definition
+
+The austerity claim of the paper, in two lines, is:
+An agent is its trace language, and only its trace
+language.  Trace-equivalent agents are the same agent.  The
+internal architecture (LLM, neural network, hand-coded controller,
+mixture of all three) is irrelevant to the identity criterion.
+
+Multi-agent systems
+
+definition[Multi-agent system]
+A multi-agent system is a finite tuple  where each
+ is an agent and  is an orchestration relation
+specifying which agent's emission, on which prefix, may be
+consumed by which other agent.
+definition
+
+The trace language of  is the set of strings over the
+common alphabet  that
+are obtainable by the orchestrated shuffle: pick an accepting run
+of each, then interleave their traces in any order
+consistent with.  Formally,
+
+L(M) =
+_(_1,, _k)
+        L(A_1)L(A_k)
+shuffle_R(_1,, _k)
+
+where  is the standard interleaving
+restricted by  hopcroft2006automata.
+
+The CSV files are languages
+
+We make explicit the empirical correspondence used throughout the
+sequel.  The header row of
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv
+names twenty sub-agent swim lanes:
+
+A_1 = data_downloader, , A_20 = dependency-graph-orchestrator,
+
+followed by nine resource-envelope columns (chomsky_type, llm_model,
+context_window_tokens, context_policy, long_term_memory,
+ltm_growth_bound, slurm_partition, slurm_resources, gpu_device).
+
+For each sub-agent A_i, the i-th swim-lane column of the file (skipping
+empty cells) is a single string.  This string is one accepting run of
+the orchestrator on the Rogii Wellbore Geology Prediction input.  The
+trace language L(G) contains, in principle, infinitely many other
+strings; the column records exactly the one that the recursive
+enumeration emitted.
+
+The same correspondence holds for each variant trace under
+examples/rogii/traces/preprocessing/{variant}/trace_language.csv.
+The baseline variant uses ColumnTransformer + LightGBM tokens; sibling
+variants swap preprocessing tokens (typewell alignment, PS masks,
+RobustScaler+log1p, parallel loaders, formation KNN) while preserving
+the twenty-lane orchestrator skeleton.
+
+Variant trace languages and critical review
+
+We audited all eight roots matching /lustre/work/sweeden/agent-tracing*
+for trace_language.csv artefacts that implement the Rogii Wellbore
+Geology Prediction Kaggle competition
+(rogii-wellbore-geology-prediction) under the scientific concept of
+each variant's base paper (examples/rogii/BASE_PAPERS.md).  The
+unified repository agent-tracing holds all six variant bundles under
+examples/rogii/traces/preprocessing/{variant}/ together with
+experiment_descriptor.json, ablation_plan.json, and paper PDFs.
+Each branch worktree agent-tracing-trace-{baseline,typewell,ps,robust,
+parallel,formation} carries a single variant CSV for isolated review;
+agent-tracing-main mirrors baseline only.  Canonical traces for
+critical review are the main-repo CSVs; baseline matches its worktree
+byte-for-byte; the other five worktree copies are stale snapshots that
+omit recent experiment-design tokens (configure_variant_ablation_flags,
+design_ablation_factorial_grid, load_experiment_descriptor).
+
+Every variant trace solves the same submission envelope: predict tvt
+for each test id (columns id, tvt).  Training consumes per-well
+horizontal-well CSVs with columns MD, X, Y, Z, ANCC, ASTNU, ASTNL,
+EGFDU, EGFDL, BUDA, TVT, GR, TVT_input; typewell CSVs with TVT, GR;
+test horizontal-well CSVs with MD, X, Y, Z, GR, TVT_input.  Shared
+orchestrator lanes (data_downloader through dependency-graph-orchestrator)
+bootstrap a Type-3-bounded DAG, enforce nested GroupKFold by well, train
+LightGBM with objective regression and metric RMSE, and emit
+slurm_episodic_trainer tokens only after Matador GPU binding.  Variant
+theory enters in the feature_engineer, preprocessor, target_diagnostician,
+and cv_orchestrator lanes---not in the trainer tail, which is
+competition-shared.
+
+Critical review by variant (paper concept vs realised trace language):
+
+itemize
+baseline_column_transformer (Ke et al. 2017 LightGBM; Pedregosa et al.
+2011 sklearn ColumnTransformer).  Branch trace/baseline-column-transformer;
+GitHub PR #17; worktree agent-tracing-trace-baseline.  The trace
+language implements the competition baseline as heterogeneous column
+blocks fused by assemble_column_transformer, with
+build_numeric_pipeline, build_lowcard_pipeline, and
+build_highcard_pipeline (Pedregosa) feeding set_objective_regression,
+set_metric_rmse, log_best_iteration, and multi-seed
+train_with_seed_{42,69,2024} (Ke).  Automated paper compliance
+(reviews/paper_compliance_latest.json) marks both paper claims
+satisfied.  Critical gap: ablation factors target_log1p, numeric_scaler,
+and rolling_window from ablation_plan.json are not yet named as
+first-class trace tokens; Ke's histogram and leaf-wise vocabulary is
+implicit in lightgbm_gpu rather than explicit in Sigma_G.
+typewell_gr_alignment (Sakoe and Chiba 1978 DTW).  Branch
+trace/typewell-gr-alignment; worktree agent-tracing-trace-typewell.
+The trace language encodes geologic transfer via
+align_horizontal_to_typewell, build_typewell_gr_interpolator,
+gr_to_tvt_lookup, attach_typewell_gr_at_estimated_tvt, and
+evaluate_gr_baseline_rmse_by_well---a depth-indexed alignment story
+consistent with Sakoe--Chiba warping applied to GR/typewell curves.
+Critical gap: no dtw, warp_path, band_constraint, or pchip tokens
+despite ablation_plan factors gr_alignment, gr_interp (linear vs
+pchip), and baseline_gr_rmse; the Type-2 stack theory (sec/3) is
+realised operationally but not with the paper's formal symbol names.
+ps_point_leakage_aware (Kaufman et al. 2012 leakage).  Branch
+trace/ps-point-leakage-aware; worktree agent-tracing-trace-ps.  The
+trace language is the strongest Kaufman instantiation: detect_ps_per_well,
+mask_post_ps_only_for_rmse, compute_rmse_per_fold_post_ps_mask, and
+audit_tvt_input_prefix_consistency_across_wells directly encode
+leakage-aware evaluation on the post-PS horizon that Kaggle scores.
+Critical gap: ablation levels full_well vs post_ps_only, auto vs
+manual_offset PS detection, and strict vs lenient leakage_audit are
+declared in ablation_plan.json but not tokenised in the swim lanes;
+configure_variant_ablation_flags appears without level-specific symbols.
+robust_scale_log1p (Hampel et al. 1986 robust statistics; DOI link
+only, not redistributed).  Branch trace/robust-scale-log1p; worktree
+agent-tracing-trace-robust.  The trace language implements the
+influence-function programme operationally via fit_log1p_transform_params,
+build_robust_scaler_pipeline, persist_transform_metadata, and
+inverse_log1p---coupling skew-stabilised targets with outlier-resistant
+feature scaling (RobustScaler).  Critical gap: no hampel, influence, or
+M-estimator tokens; Hampel theory is approximated through sklearn's
+RobustScaler API rather than explicit robust-location estimators; inverse
+at predict is present but not ablation-gated in the trace alphabet.
+parallel_multiwell_loader (Rocklin 2015 Dask).  Branch
+trace/parallel-multiwell-loader; worktree agent-tracing-trace-parallel.
+The trace language scales multi-well ingestion via
+engineer_per_well_feature_matrix, attach_geology_surface_features,
+inspect_well_and_surface_column_schema, and shell-parallel
+xargs -P 4 over per-well CSV paths; the data_downloader envelope
+requests higher cpus/mem (16/64G) than sibling variants.  Critical gap:
+no dask, delayed, compute, or task-graph tokens despite Rocklin's
+scheduling theory and ablation factors io_workers (4/8/16), loader_cache,
+and surface_cols; parallelism is shell-level, not Dask-API-level.
+formation_plane_spatial (Cover and Hart 1967 k-NN).  Branch
+trace/formation-plane-spatial; worktree agent-tracing-trace-formation.
+The trace language adds spatial structure via compute_pairwise_well_distances,
+compute_drilling_geometry_features, fit_formation_plane_knn, and
+encode_formation_codes---nearest-neighbour formation propagation in
+survey XYZ space.  Critical gap: ablation factors knn_k (3/5/11),
+geometry_feats, and plane_fit are not emitted as trace tokens; Cover--Hart
+risk bounds are motivation in experiment_descriptor.json but not
+auditable symbols in the CSV.
+itemize
+
+Across variants, the trace-language theory claim holds at the
+architectural level: each CSV is one accepting run of a
+Goal-Driven Type-0 producer bounded by a Data-Driven Type-3 consumer,
+and each variant's distinguishing operations appear in the
+feature/preprocess lanes before the shared LightGBM tail.  The
+remaining engineering debt is symbol-level fidelity between
+ablation_plan.json factorial levels and the emitted alphabet Sigma_G,
+and synchronising branch worktree CSVs with the canonical main-repo
+traces before merge.  Full paper-to-token joins are machine-readable in
+examples/rogii/traces/preprocessing/{variant}/experiment_descriptor.json
+and human-readable in paper_refs.md.
+
+Closure under intersection with the verifier
+
+We now state the closure result that is the architectural pivot
+of the paper.
+
+theorem[Verifier closure]
+Let  be an agent with  in Chomsky
+class  for some.  Let
+ be an agent with
+(a regular language).  Define the verified composition
+ as the agent that emits a
+trace  iff  and  is accepted
+by  when treated as input to its DFA.  Then
+
+L(GV)
+= L(G) L(V)
+ L_i.
+
+In particular, the Chomsky class of the verified trace language
+is no greater than the Chomsky class of  alone, and
+the membership problem for
+is decidable in linear time whenever a candidate trace is
+presented to 's DFA.
+theorem
+
+proof
+Each Chomsky class  is closed under intersection
+with regular languages.  For, this is the standard
+product-construction rabin1959finite.  For, it is
+the standard product of a PDA with a DFA, which is again a
+PDA hopcroft2006automata.  For, it follows from
+LBA closure under intersection (regular languages are
+context-sensitive).  For, it is the standard product
+of a Turing machine with a DFA, which is again a Turing machine
+turing1936computable,hopcroft2006automata.
+
+The decidability claim follows because  is a DFA:
+given a candidate trace  of length, the DFA decides
+ in  time and constant space.
+proof
+
+remark[Language class vs online filtering protocol]
+Classically, L(G) intersect L(V) is recursively enumerable when L(G)
+is Type-0 and L(V) is regular (RE intersect REG = RE); the intersection
+language is not Type-3 in general.  Theorem thm:closure is therefore a
+*protocol* statement about our binding: at emission time, only traces
+accepted by V's DFA are persisted; membership in that verified sublanguage
+is decidable in O(n) per candidate.  We do not claim that the full
+intersection language has Type-3 complexity---only that the consumer-side
+check is regular and dominates wall-clock verification cost
+(Corollary cor:budget).
+remark
+
+corollary[Verification budget]
+Verification of the verified trace language
+ on a candidate trace
+of length  runs in  time and  space.  The Type-0
+class of  does not enlarge the verifier's complexity.
+corollary
+
+The empirical signature of a Type-0 trace language
+
+A trace language  is Type-0 iff  can
+emit traces whose length grows without a recursive bound in the
+input size, and whose contents reflect arbitrary recursive
+enumerations of the operation alphabet.  In our empirical
+setting, 's Type-0 status is witnessed by the
+slurm_episodic_trainer column of
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K), which contains a strictly
+longer sequence (36 non-empty entries) than any column of
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0) (which contains at most
+fourteen).  The lengthening is the operational footprint of the
+recursive enumeration: the start language emitted twelve seed
+agents; the binding to the Type-3 verifier forced enumeration of
+arbitrarily long check-train-validate cycles; the result was a
+strictly more complex trace, materialised on disk by the
+recursive Type-0 step.
+
+The undecidability that Robinson's
+theorem robinson1949definability,davis1961decision fixes
+on the Type-0 class is therefore a real property of:
+were it not for the Type-3 verifier, no algorithm would decide
+whether a candidate trace lay in.  The verifier
+is the entire reason the system is decidable in practice.
+

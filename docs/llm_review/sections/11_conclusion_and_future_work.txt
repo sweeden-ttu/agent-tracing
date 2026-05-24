@@ -1,0 +1,110 @@
+# Conclusion and Future Work
+
+Source: llm.txt lines 2339–2444
+
+Conclusion
+
+Koohestani et al. koohestani2025automata asked whether
+agents are just automata; we accept their answer and move on to
+the operational question: can the Chomsky type of one agent be
+used to bound the type of another?  We have given a self-contained
+formal theory that answers yes, derived from
+Turing's turing1936computable 1936 theory of automata and
+Chomsky's 1956-59 hierarchy chomsky1956three,
+chomsky1959certain, in which an agent is identified with, and
+only with, its trace language.  Within this theory:
+itemize
+Agents are 7-tuples
+ over a fixed
+operation alphabet
+(Section sec:trace, Definition def:agent).
+Trace languages classify into the standard
+Chomsky hierarchy (Section sec:chomsky), with the
+indexed-grammar zone of Aho aho1968indexed
+appearing naturally between Type-2 and Type-1.
+The producer-consumer construction of
+Dijkstra dijkstra1968cooperating, instantiated as a
+Type-0 Goal-Driven producer bound by a Type-3 Data-Driven
+consumer, suffices: their intersection is closed at the
+producer's class and decidable in linear time at the consumer's
+DFA (Theorem thm:closure,
+Corollary cor:budget).
+The Type-3 consumer is realised as the deterministic
+Aho-Corasick aho1975corasick multi-pattern matcher
+compiled from the unit-test catalogue.
+Type-2, indexed-zone, and Type-1 sub-agents are not
+designed; they are projected from the binding
+(Theorem thm:derived).
+A Type-3 agent may itself act as a producer,
+backward-inferring constrained changes to the tape, provided the
+inference terminates in a decidable verdict; otherwise the
+halting problem returns and the verification budget collapses
+(Section sec:type3-producer).
+The undecidability shadow on the Type-0 envelope is the
+shadow Robinson and the MRDP
+theorem robinson1949definability,davis1961decision cast
+on every recursively enumerable set.
+itemize
+
+The architecture is a concrete binding, not a metaphor, on the
+Rogii Wellbore Geology Prediction task.  Leaderboard placement,
+team count, and RMSE are TBD until slurm_full_pipeline completes
+(Section sec:results, probe P4).  The Goal-Driven producer was not
+given held-out test labels; the composite Data-Driven consumer
+(DFA plus human upload review) had no LLM component in the inner loop.
+The result is obtained by the literal binding of the two principal
+agents and the recursive enumeration of the start language onto the
+task instance.  Reproducible code, including the start-language CSV,
+the recursively enumerated trace CSV, and the notebooks that will
+produce the submission, is published at
+
+https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction.
+
+The realised trace is the empirical witness to the theory.  Its
+thirteenth column, slurm_episodic_trainer, is the emergent
+agent that the binding forced into existence: the start language
+had twelve sub-agents and no trainer; the realised language has
+thirteen sub-agents and a 36-step training trace.  The expansion
+is the operational form of the Type-0 recursive enumeration; the
+laptop's finite tape is the operational form of the Type-1 bound
+that brings the enumeration to a halt.
+
+Future work
+
+Four directions are immediate.  First, the architecture should
+be evaluated on the remaining six preprocessing variants to
+test the external-validity claim of
+Section sec:discussion.  Second, the start language should
+be examined as a design object in its own right: which start
+languages produce stable bindings, and which fail to converge?
+Third, the trace-language identity criterion of
+Definition def:traceeq invites a formal study of agent
+equivalence: when are two agents with different LLM backbones
+trace-equivalent on a given task?  Fourth, suggested by the
+Section sec:type3-producer discussion, is to characterise
+the class of regular keyword-update rules that preserve
+decidability under a Type-3 producer; we conjecture this class
+is exactly the regular extensions of the start-language alphabet.
+
+Closing remark
+
+Turing wrote in 1936 that "the justification [for the
+definitions] lies in the fact that the human memory is
+necessarily limited" turing1936computable.  Our laptop's
+memory is necessarily limited.  Our agent's tape is necessarily
+limited.  Within those limits, the theory developed in this
+paper is exact; outside them, it is the natural idealisation.
+
+A final note.  This paper began as a question in an email about
+arithmetic grammars and grew under conditions in which other
+deliverables were not available to the first author - a
+sequence we record honestly in the Acknowledgments.  Papers are
+sometimes written in a straight line and sometimes in a crooked
+one, and the architecture proposed here was, in a real sense,
+shaped by both: the formal narrowness of the theory, and the
+narrow window in which the theory had to be made to do real
+work.  We close by recording the working hypothesis that, for auditable
+agent evaluation, trace language is the right evidence object---and
+that binding a Type-0 producer with a composite Type-3 consumer is
+one disciplined way to keep that evidence decidable.
+
