@@ -1,7 +1,11 @@
 # Discussion
 
-Source: llm.txt lines 2120–2324
+Source: llm.txt lines 2134–2338
 
+Discussion
+
+We discuss five matters: the meaning of "idealised Type-0" on a
+laptop, the role of the start language, the producer-consumer
 restatement and the subtlety of a Type-3 producer, threats to
 validity, and the relationship between the trace-language theory
 and the prior literature on agent architectures.
@@ -203,7 +207,3 @@ languages, derived from Turing's automata theory and bound by an
 Aho-Corasick consumer, suffices to produce a top-tertile
 leaderboard result on a contemporary ML-engineering benchmark.
 
-Conclusion
-
-Koohestani et al. koohestani2025automata asked whether
-agents are just automata; we accept their answer and move on to

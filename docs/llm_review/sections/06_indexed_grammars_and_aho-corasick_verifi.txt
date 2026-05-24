@@ -1,6 +1,6 @@
 # Indexed Grammars and Aho-Corasick Verifier
 
-Source: llm.txt lines 1347–1555
+Source: llm.txt lines 1365–1573
 
 Indexed Grammars and the Aho-Corasick Verifier
 

@@ -1,7 +1,11 @@
 # Conclusion and Future Work
 
-Source: llm.txt lines 2325–2430
+Source: llm.txt lines 2339–2444
 
+Conclusion
+
+Koohestani et al. koohestani2025automata asked whether
+agents are just automata; we accept their answer and move on to
 the operational question: can the Chomsky type of one agent be
 used to bound the type of another?  We have given a self-contained
 formal theory that answers yes, derived from
@@ -104,7 +108,3 @@ agent evaluation, trace language is the right evidence object---and
 that binding a Type-0 producer with a composite Type-3 consumer is
 one disciplined way to keep that evidence decidable.
 
-Acknowledgments
-
-The first author thanks Dr. Akbar Siami Namin
-(akbar.namin@ttu.edu, EC 306G, Department of Computer

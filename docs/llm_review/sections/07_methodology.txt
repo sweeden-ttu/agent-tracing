@@ -1,6 +1,6 @@
 # Methodology
 
-Source: llm.txt lines 1556–1795
+Source: llm.txt lines 1574–1813
 
 Methodology: The Goal-Driven/Data-Driven Architecture
 
