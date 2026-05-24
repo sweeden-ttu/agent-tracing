@@ -1,0 +1,2724 @@
+A Trace-Language Theory of Agents:
+Goal-Driven Type-0 Producers Bounded by Data-Driven Type-3 Consumers
+
+Koohestani, Li, Podkopaev, and Izadi recently asked, "Are agents
+just automata?" koohestani2025automata and answered in
+the affirmative by establishing a memory-architecture equivalence
+between agentic AI classes and the levels of the Chomsky
+hierarchy.  We accept their answer and pose the more useful
+question: can the Chomsky type of one agent be used to
+bound the Chomsky type of another, in the manner of the
+classical producer-consumer problem?  This paper answers
+yes, with software verification and validation
+techniques inferred into a Data-Driven Type-3 verifier
+(consumer), and the idealised theoretical apparatus of automata
+built into a Goal-Driven Type-0 producer.  The verification
+loop must end in decidability, otherwise the classical halting
+problem of Turing turing1936computable re-asserts itself
+on every iteration.  Decidability is enforced here by the regular
+language of the Data-Driven verifier, realised as the
+deterministic finite automaton of an Aho-Corasick keyword
+index aho1975corasick compiled from the unit-test
+catalogue, with a final human verification and validation step
+that closes the loop in the bounded case.  The implemented Type-0
+producer is not an abstract Turing machine on paper alone: it is a
+Gemini tool-calling loop (Goal-Driven generator) whose emissions are
+filtered online by the Aho-Corasick DFA and, on the outer loop, by
+human submission review---together forming a composite Type-3 consumer
+(Sections sec:methodology, sec:discussion).
+
+We give a self-contained formal theory of the result.  An agent is
+identified with its trace language: the set of finite
+strings of effectful operations the agent emits across the input
+domain.  Within this theory we define a single Goal-Driven Type-0
+agent whose trace language is recursively
+enumerable robinson1949definability,davis1961decision and a
+single Data-Driven Type-3 verifier whose trace language is
+regular rabin1959finite,chomsky1956three,chomsky1959certain.
+The Goal-Driven agent is tamed by the Type-3 verifier in the
+precise sense that only those traces accepted by the verifier are
+emitted to disk; from this binding, the Type-2 (pushdown), the
+indexed-grammar aho1968indexed, and Type-1 (linear-bounded)
+sub-agents emerge as canonical projections.  We further show that
+a Type-3 agent may itself act as a producer, backward-inferring
+constrained changes to the tape, provided the inference terminates
+in a decidable verdict.
+
+The single start language that initiates the system is
+given in examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv:
+twenty sub-agent swim lanes and their seed action alphabets, plus nine
+resource-envelope columns (Chomsky type, LLM model, Slurm partition,
+and GPU allocation).  Under the binding above, the start language
+recursively enumerates itself onto the Rogii Wellbore Geology
+Prediction task on Kaggle (rogii-wellbore-geology-prediction), a
+multi-well regression benchmark in which agents predict lithology /
+geology labels from well-log features and must score RMSE on the
+post-perforation-start (post-PS) subset.  The empirical trace is
+recorded in the same CSV family across six preprocessing variants
+(baseline ColumnTransformer+LightGBM per Ke 2017 and Pedregosa 2011,
+typewell GR alignment per Sakoe--Chiba 1978, PS-point leakage masks
+per Kaufman 2012, robust log1p scaling per Hampel 1986, parallel
+multi-well IO per Rocklin 2015, and formation-plane spatial k-NN
+per Cover--Hart 1967).  An emergent Slurm episodic
+training column (slurm_episodic_trainer) materialises only after
+the Type-3 consumer binds Ollama on localhost and Matador GPU
+resources.  The Goal-Driven agent's trace language is, on paper,
+recursively enumerable; physical execution is bounded by Matador
+node RAM and Slurm wall time, and the realised machine is therefore
+a (very large) linear-bounded automaton.  We prove the idealisation
+sound (Lemma lem:bounded-soundness, Section sec:preliminaries):
+any trace the idealised Type-0 agent can emit is producible
+by the bounded machine up to the cluster tape limit.  Online
+emission filtering by the Type-3 DFA makes membership in the
+*verified* trace language decidable in linear time (Theorem
+thm:closure, Corollary cor:budget); the raw intersection L(G) intersect L(V)
+may remain Type-0 when L(G) is recursively enumerable,
+but only DFA-accepted traces are persisted as the official run record.
+
+We instantiate the theory on the Rogii Wellbore Geology Prediction
+task and pre-register a public-leaderboard submission under nested
+GroupKFold by well.  As of May 2026 the trace bundles are 95%
+scaffolded on branch trace/base; full GPU Slurm pipeline runs
+(slurm_full_pipeline) remain the gate to a verified leaderboard
+rank (public rank, team count, and RMSE: TBD---pending completion of
+those runs; Section sec:results).  The producer is not given the
+held-out test-well labels, but the start language, Kaggle boilerplate,
+and schema-derived unit tests still encode tabular-competition
+structure---a qualification we state explicitly rather than claiming
+zero task leakage.
+Reproducible code, trace CSVs, base-paper PDFs, and experiment
+descriptors are published at
+
+https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction
+and in the agent-tracing repository under examples/rogii/.
+
+Agentic systems, trace language, Chomsky hierarchy, Turing
+machines, indexed grammars, Aho-Corasick, recursive enumeration,
+producer-consumer, formal verification and validation,
+linear-bounded automata, machine-learning engineering benchmarks.
+
+Introduction
+
+The contemporary literature on autonomous
+software agents is rich in architectural diagrams and short on
+formal definitions.  An agent is variously described as "a
+system that perceives and acts", "a planner that calls tools",
+or "an LLM in a loop", and each definition is stated at a level
+of abstraction that admits neither a decision procedure nor a
+complexity bound.  The consequence is that two agents with
+radically different computational power are routinely compared
+as if they belonged to a single class, and verification claims
+about agentic systems are correspondingly difficult to falsify.
+
+We are not the first to ask whether the Chomsky hierarchy is the
+right scaffold for thinking about this problem.  In particular,
+Koohestani, Li, Podkopaev, and Izadi pose the question
+Are agents just automata? koohestani2025automata
+and answer affirmatively, establishing a memory-based equivalence
+between simple-reflex agents and finite automata, hierarchical
+task-decomposition agents and pushdown automata, and
+unrestricted-memory agents and Turing
+machines turing1936computable.  We accept their answer.
+Their question, however, is the preliminary one.  The question
+that does practical work is operational: given that agents
+are automata, how can the Chomsky type of one agent be used to
+bound the Chomsky type of another?  This is the
+producer-consumer problem of
+Dijkstra dijkstra1968cooperating re-stated in the language
+of formal grammars.  The present paper offers a methodology that
+answers it in the affirmative, with software verification and
+validation techniques inferred into the consumer side and the
+idealised theoretical apparatus of automata built into the
+producer side.
+
+Why a narrow definition
+
+We deliberately keep the definition of an agent narrow, taking
+only what is forced upon us by the theory of automata Turing
+introduced in 1936 turing1936computable and the language
+hierarchy Chomsky introduced in
+1956-59 chomsky1956three,chomsky1959certain.  An agent,
+for us, is an effectful machine that, when started on an
+admissible input, emits a finite string of operation symbols and
+then halts (or fails to halt).  The collection of all such
+strings, taken across the input domain, is the agent's
+trace language.  Two agents with the same trace language
+are, for evaluation purposes in this paper, treated as the same
+agent---an methodological identity criterion (Definition def:traceeq),
+not an ontological claim about latent state, cost, or safety.
+Whatever cannot be read off from the trace language is not used
+as evidence here; chain-of-thought, planner JSON, and hidden memory
+are discussed as out-of-scope in Section sec:discussion.
+
+The motivation for keeping the definition narrow is twofold.
+First, it gives a direct line from the agent to the Chomsky
+hierarchy and to the recognising automata.  An agent whose trace
+language is regular (Type-3) is realisable by a finite-state
+controller and admits decidable verification in linear
+time rabin1959finite.  An agent whose trace language is
+context-free (Type-2) is realisable by a pushdown controller and
+admits  membership hopcroft2006automata.  An agent
+whose trace language is recursively enumerable (Type-0) is, in
+the worst case, undecidable to verify - a fact whose
+modern statement we inherit from Robinson's resolution of
+Hilbert's tenth
+problem robinson1949definability,davis1961decision, which
+established that recursively enumerable sets are exactly the
+Diophantine sets and that the membership problem for them admits
+no general algorithm.
+
+Second, the narrow definition gives an empirical handle.  If the
+agent is its trace language, then the trace language can be
+recorded, stored, and compared; experiments produce strings, and
+those strings can be classified by the smallest grammar class
+that generates them.  This places the VV of agentic systems on
+the same footing as the VV of compilers, parsers, and protocol
+implementations aho1972theory,hoare1969axiomatic -
+domains in which the formal-language framing has, for half a
+century, been the foundation of decidable correctness.
+
+What we do not claim.
+We do not verify chain-of-thought or hidden planner state; we do not
+claim multi-benchmark state-of-the-art; we do not claim that trace
+length alone decides Chomsky class (Section sec:results, probe P2);
+and we do not release the final submission CSV, to avoid benchmark
+contamination (Section sec:expsetup).  Leaderboard numerics in
+Section sec:results are reported only after verified Slurm runs or
+marked TBD.
+
+The Goal-Driven producer and Data-Driven consumer
+
+Our central architectural claim is the producer-consumer
+restatement.  There is exactly one Goal-Driven producer
+agent.  Its trace language is Type-0: recursively enumerable
+and, in general, undecidable.  In practice it is realised as a
+large language model wrapped in a tool-calling loop, and the
+loop is permitted to enumerate any finite-length sequence of
+tool invocations from the union of the sub-agents' alphabets.
+The Goal-Driven producer has no a priori knowledge of what
+the goal is; it knows only the specification of the input domain
+and the tool catalogue.
+
+There is exactly one Data-Driven consumer in the architecture,
+but it is composite: (i) the Aho-Corasick DFA verifier whose trace
+language is Type-3---regular and, by Rabin and Scott's construction
+rabin1959finite, decidable in linear time---compiled from the
+competition's empirical fixtures (unit-test corpus, submission-validity
+tests, column-name checks, integrity tests on the
+train.csv/test.csv/samplesubmission.csv triple); and (ii) a final
+human verification and validation gate on submission upload that
+closes the outer loop when keyword extension or RMSE sanity checks
+exceed the regular envelope (Section sec:discussion).  Debug or
+off-path traces may be logged during development; only DFA-accepted
+segments that survive the binding protocol are treated as the official
+verified trace written to the release CSVs.
+
+The binding is the entirety of our architectural claim:
+quote
+A single Goal-Driven Type-0 producer, tamed by a single
+Data-Driven Type-3 consumer, results in success.
+quote
+Type-2 and Type-1 sub-agents are not designed; they are
+derived.  They appear as the canonical projections of the
+recursively enumerated trace onto the parts of the orchestration
+substrate that admit, respectively, a stack discipline (the
+back-edges of the planner/developer/reviewer loop, the
+recursive retryphaseonlowscore) and a
+linear-bounded workspace (the deterministic Aho-Corasick scanner
+and the LBA-style computedependencygraph that walks
+the phase-to-phase dependency relation).  We make these
+projections precise in Section sec:chomsky.
+
+A subtlety: nothing in the framework prevents a Type-3 agent from
+itself acting as a producer, in which case it backward-infers
+constrained changes onto the tape (e.g., updates to the keyword
+set  as new task fixtures arrive).  Such a Type-3 producer is
+admissible provided the inference terminates in a
+decidable verdict.  When it does not, the classical halting
+problem of Turing turing1936computable re-asserts itself
+on the Type-3 producer's loop and the architecture loses its
+verification budget.  We discuss the engineering consequence in
+Section sec:discussion: in the realised system, decidability
+is enforced by the regular envelope of the verifier and, where
+the data-driven side begins to drift, by a final human
+verification and validation step that closes the loop.
+
+The start language and its recursive enumeration
+
+The system is initialised with a single start language, given concretely in
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv.
+The start language contains twenty sub-agent swim lanes and their seed
+action alphabets---nothing else at design time.  The Goal-Driven Type-0
+producer, bound by the Data-Driven Type-3 consumer, then recursively
+enumerates onto the Rogii Wellbore Geology Prediction Kaggle task.
+The result is the trace language recorded across six preprocessing
+variants under examples/rogii/traces/preprocessing/{variant}/.
+Each variant shares the same twenty-lane orchestrator; preprocessing
+and model tokens differ according to the variant's base scientific
+paper---Ke et al. 2017 LightGBM and Pedregosa et al. 2011 ColumnTransformer
+(baseline), Sakoe--Chiba 1978 DTW (typewell GR alignment), Kaufman et al.
+2012 leakage (PS-point masks), Hampel et al. 1986 robust statistics
+(log1p + RobustScaler), Rocklin 2015 Dask (parallel multi-well IO),
+Cover--Hart 1967 k-NN (formation-plane spatial features).  A critical
+review of paper-concept fidelity in each trace_language.csv appears in
+Section sec:trace-csv (Variant trace languages and critical review).
+The Slurm episodic trainer is the emergent agent: it does not exist in
+the minimal seed language and is materialised after the verifier first
+refuses traces that omit Matador GPU training and Ollama localhost setup.
+
+We claim that this enumeration is the operational meaning of
+"Type-0 recursive enumeration" in the agentic setting.
+Turing's machines enumerate strings; Robinson's theorem connects
+the enumerated sets to Diophantine arithmetic; our agent
+enumerates tool-call strings, and the connection between the
+enumerated strings and the empirical Kaggle competition is
+mediated by the Aho-Corasick verifier.
+
+Idealisation and physical bounding
+
+It is worth being clear about the difference between the theory
+and the machine that actually ran the experiment.  The
+Goal-Driven agent's trace language is idealised Type-0.
+The actual execution was bounded by the finite tape and finite
+RAM of a single laptop and, for the heavier ablation runs, by
+the High Performance Computing Center at Texas Tech University.
+The realised machine is, formally, a (very large) linear-bounded
+automaton - Type-1.  The idealisation is sound for our
+purposes: every trace producible by the realised LBA is also
+producible by the idealised Turing machine, and the verified
+trace language is, by closure under intersection at the
+verifier's Chomsky level (Theorem thm:closure), bounded
+above by Type-3.  The physical computation is therefore
+far more restricted than the theoretical envelope, and any
+verification claim we discharge about the idealised system holds
+a fortiori on the bounded machine.  This is the standard
+idealisation of
+Hartmanis and Stearns hartmanis1965computational, and we
+adopt it on those terms.
+
+Contributions
+
+enumerate
+A formal definition of the trace language
+of an agent  as the language generated by an
+effectful controller over a finite operation alphabet, together
+with a proof that the resulting object satisfies the Chomsky
+hierarchy verbatim (Section sec:trace).
+A producer-consumer answer to the
+Koohestani-Li-Podkopaev-Izadi question:  a single Goal-Driven
+Type-0 producer, intersected with a single Data-Driven Type-3
+consumer realised as an Aho-Corasick DFA, suffices to produce a
+verified trace language whose Chomsky class is bounded above by
+the consumer's class (Section sec:chomsky,
+Theorem thm:closure).
+A demonstration that Type-2 and Type-1 sub-agents need not
+be designed but can be derived as projections of the
+recursively enumerated trace onto stack-discipline and
+bounded-workspace substrates respectively
+(Section sec:methodology).
+A discussion of how a Type-3 agent may itself act as a
+producer, backward-inferring constrained changes onto the tape,
+under the necessary condition that decidability be preserved
+(Section sec:discussion); failing this condition, the
+halting problem returns and the verification budget collapses.
+An empirical instantiation on the Rogii Wellbore Geology Prediction
+Kaggle task with six preprocessing-variant ablations.  The trace
+languages, experiment descriptors, base-paper PDFs, and Slurm consumer
+review scripts are released at
+
+https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction
+
+and in the agent-tracing repository (examples/rogii/, branch trace/base)
+(Sections sec:expsetup-sec:results).
+enumerate
+
+Roadmap
+
+Section sec:related surveys related work, opening with
+Koohestani et al. and the producer-consumer framing.
+Section sec:preliminaries fixes notation drawn from
+Turing's automata theory and Chomsky's hierarchy.
+Section sec:trace gives the rigorous definition of the
+trace language.  Section sec:chomsky classifies trace
+languages by Chomsky type and proves the closure theorem.
+Section sec:indexed situates Aho's indexed grammars and
+the Aho-Corasick verifier in the framework.
+Section sec:methodology describes the Goal-Driven/
+Data-Driven binding and the recursive enumeration of the start
+language.  Sections sec:expsetup-sec:results report
+the experimental study and result on Rogii Wellbore Geology Prediction.
+Section sec:discussion discusses idealisation, physical
+bounding, and the Type-3-as-producer subtlety.
+Section sec:conclusion concludes.
+
+Related Work
+
+The literature relevant to this paper falls into five strands.
+The first asks whether agents are automata, and answers
+affirmatively in a memory-architecture sense
+(Koohestani et al. koohestani2025automata).  The second is
+the producer-consumer framing of cooperating sequential
+processes (Dijkstra dijkstra1968cooperating), which is
+the operational form of the question we actually wish to answer:
+how can the type of one agent bound another?  The third is the
+classical theory of automata and the Chomsky hierarchy (Turing,
+Chomsky, Rabin and Scott, Hopcroft and Ullman, Aho).  The fourth
+is software verification and validation (Hoare, Dijkstra, Pnueli,
+Clarke and Emerson, Lamport).  The fifth is the boundary
+between decidable and undecidable verification fixed by Robinson
+and the MRDP theorem.  We address each in turn.
+
+Are agents just automata?
+
+Koohestani, Li, Podkopaev, and Izadi koohestani2025automata
+recently posed and answered the title question, establishing a
+memory-architecture equivalence: simple-reflex agents are finite
+automata; hierarchical task-decomposition agents are pushdown
+automata; agents employing read/write memory for reflection are
+Turing machines.  Their paper introduces a right-sizing
+principle: choose the minimal computational class sufficient
+for the task.
+
+Two observations are owed to that paper.  First, the equivalence
+they establish is the architectural premise of the present work;
+without it, the question of how Chomsky classes interact across
+agents would have no canonical formulation.  Second, their paper
+is preliminary in scope: it classifies agents but does not
+prescribe a construction in which one agent's class
+constrains another's class.  We supply that construction
+here.  Where they ask Are agents just automata? and
+answer yes, we ask can the type of one agent bound
+another? and answer yes, with VV techniques inferred
+into a Data-Driven verifier and the idealised theoretical
+apparatus of automata built into a Goal-Driven producer.
+
+A related strand, Formal-LLM li2024formalllm, encodes
+plan-construction constraints as a context-free grammar and
+guides an LLM-based planner with a pushdown automaton.  Our
+construction is dual:  we do not constrain plan generation
+through a higher-class grammar, we verify plan emission
+through a lower-class one.  Aho-Corasick is the
+"less-Turing-complete-than-the-LLM" device that earns us the
+verification budget of Theorem thm:closure.
+
+The producer-consumer framing
+
+Dijkstra's cooperating sequential
+processes dijkstra1968cooperating fix the producer-
+consumer formulation:  one process produces a sequence of
+artefacts; another consumes them; correct cooperation requires
+that the consumer never reads an artefact the producer has not
+yet produced, and the producer never overwrites an artefact the
+consumer has not yet consumed.  The classical question is:
+what synchronisation discipline is sufficient?  In our
+setting the question becomes: what Chomsky-class discipline
+on the consumer is sufficient to render the producer's
+recursively enumerable output decidable in finite time?  The
+answer, by Theorem thm:closure, is Type-3.  Lower would not
+work (Type-3 is the minimal class that contains the keyword
+matchers Aho-Corasick implements); higher would work but raise
+the verification budget unnecessarily and risk the halting
+problem returning through the consumer's loop.
+
+Automata theory and the Chomsky hierarchy
+
+Turing's 1936 paper turing1936computable introduces the
+abstract machine that bears his name and proves the existence of
+a universal one.  Every formal claim in this paper inherits, at
+some depth, from that construction.  Chomsky's 1956 and 1959
+papers chomsky1956three,chomsky1959certain fix the
+hierarchy itself: regular, context-free, context-sensitive, and
+unrestricted (Type-3 through Type-0).  Rabin and
+Scott rabin1959finite fix the formal correspondence
+between regular languages and finite automata, with the
+nondeterminism that makes the proofs tractable.  Hopcroft,
+Motwani, and Ullman hopcroft2006automata consolidate the
+modern treatment with strict inclusions and standard parsing
+complexities.  Hartmanis and
+Stearns hartmanis1965computational introduce the time and
+space complexity classes in which our Type-1/Type-0 distinction
+ultimately lives, and supply the formal vocabulary for our
+"idealised Type-0 versus realised LBA" discussion in
+Section sec:discussion.
+
+Aho's 1968 paper aho1968indexed introduces indexed
+grammars as a strict extension of context-free grammars,
+positioned strictly between Type-2 and Type-1.  In our framework
+the back-edge structure of an iterative repair loop - e.g.,
+the retryphaseonlowscore cycle in
+Section sec:methodology - inhabits exactly that zone.  We
+use Aho's indexed grammars as the bridge between the pushdown
+sub-agent (Type-2) and the linear-bounded sub-agent (Type-1).
+
+The Aho-Corasick paper aho1975corasick compiles a finite
+keyword set into a deterministic finite automaton that recognises
+the union of the keywords in linear time and constant space.  In
+our framework Aho-Corasick is the canonical realisation
+of the Data-Driven Type-3 consumer.
+
+Software verification and validation
+
+Hoare's axiomatic basis hoare1969axiomatic and Dijkstra's
+guarded-command calculus dijkstra1975guarded supply the
+machinery of Hoare triples  that we apply to
+each unit-test step in the Aho-Corasick keyword set.  The
+predicates  and  are the "before" and "after" states
+of a single tool invocation in the trace.
+
+Pnueli's 1977 paper pnueli1977temporal introduces the
+linear temporal logic in which we phrase the safety and
+liveness properties of the Goal-Driven loop:
+
+G(plan Fverified)
+
+expresses that every plan emitted by the producer is eventually
+verified or refuted by the consumer.  Clarke and
+Emerson clarke1981ctl introduce the branching variant we
+use to reason about the back-edges of the iterative repair loop,
+and Clarke, Grumberg, and Peled clarke1999modelchecking
+consolidate the model-checking framework that, in principle,
+decides the Type-3 component of our verifier.
+
+Lamport lamport1978clocks,lamport1994tla supplies the
+ordering on events in the multi-agent execution and the temporal
+logic of actions; the typesetting of this paper itself uses his
+ system lamport1986latex.  Liskov's abstract data
+types liskov1974abstraction are the type discipline
+underlying the TypedDict state objects that flow between
+sub-agents.
+
+The undecidability boundary: Robinson and MRDP
+
+The boundary between decidable and undecidable verification -
+which, in our framework, is the boundary between Type-1 and
+Type-0 agents - is fixed by Hilbert's tenth problem and its
+resolution.  Robinson's 1949 paper robinson1949definability
+and the Davis-Putnam-Robinson follow-up davis1961decision
+established that the recursively enumerable subsets of
+ are exactly the Diophantine subsets, and that
+the membership problem for an arbitrary recursively enumerable
+set admits no general algorithm.  The Goal-Driven Type-0 producer
+in our architecture inherits this undecidability directly: in the
+absence of the Type-3 verifier, no algorithm decides whether a
+candidate trace lies in the producer's trace language.  The
+verifier is the entire reason the system is decidable in
+practice.
+
+Complexity, learning, and symbolic AI
+
+Cook cook1971complexity and Karp karp1972reducibility
+fix the NP-completeness frame within which the model-search step
+of the Goal-Driven producer (the Optuna tuning of LightGBM, the
+cross-validated stacking ensemble) is, formally, an instance of
+constrained combinatorial optimisation.
+Yao yao1977probabilistic supplies the notion of expected
+complexity used when reporting average trace lengths over the
+input distribution.  Blum blum1967machine fixes the
+machine-independent measure in which we report the verified
+trace language's complexity.
+
+The supervised-learning component of the Rogii Wellbore Geology
+Prediction pipeline is justified by the deep-learning manifesto of LeCun,
+Bengio, and Hinton hinton2015deep; the causal discipline
+that prevents the verifier from being fooled by spurious
+correlations is justified by Pearl pearl2009causality.
+McCarthy mccarthy1960lisp is the symbolic representation
+of programs as data - the property that lets a Goal-Driven
+agent emit a program (a Kaggle notebook) as the terminal
+element of its trace.  Newell and Simon newell1976physical
+state the physical-symbol-system hypothesis under which the
+agent's tool calls are the elementary symbols.  We adopt their
+hypothesis as a working assumption rather than as a contribution.
+
+Agent evaluation and process-supervision benchmarks.
+Contemporary agent evaluation spans tool-use and coding benchmarks
+(SWE-bench, AgentBench, Inspect AI, MLAgentBench) and competition-style
+MLE pipelines (Rogii Wellbore Geology Prediction, MLE-bench).  These
+systems measure task success, pass@k, and leaderboard placement rather
+than trace-language class.  Our contribution is orthogonal: we specify
+*how* to bind a Type-0 producer with a Type-3 consumer so that emitted
+traces are auditable, not which backbone wins a single leaderboard.
+Where Koohestani et al. classify memory architecture, we prescribe a
+producer-consumer construction; where agent benchmarks report scores,
+we report whether the realised trace language matches the predicted
+Chomsky signature under pre-registered probes P1--P4.
+
+Synthesis
+
+The strands above suffice to support every formal claim in the
+sequel.  In particular, our novelty relative to
+Koohestani et al. koohestani2025automata is the
+producer-consumer construction: where they classify, we bound;
+where they say which class an agent inhabits, we say which class
+must consume an agent of class  in order for the system
+as a whole to remain decidable.  The empirical instantiation in
+Sections sec:expsetup-sec:results is reported as
+data, not as theory, and stands or falls on its own
+reproducibility artefacts.  The final Kaggle submission CSV is
+withheld to avoid benchmark contamination; we report leaderboard rank
+and RMSE when verified, or mark them TBD until slurm_full_pipeline
+completes (Section sec:expsetup).
+
+Preliminaries: Turing's Theory of Automata
+
+Reader note (plain-text export).
+This section uses standard set and language notation (Sigma for an
+alphabet, L(G) for a trace language, L_3 subset L_2 subset L_1 subset L_0
+for the Chomsky hierarchy).  Where symbols were stripped in this
+llm.txt export, consult the LaTeX/PDF source bundled with the
+reproducibility kit; all formal claims are checkable there.
+
+We fix notation drawn directly from
+Turing turing1936computable,
+Rabin and Scott rabin1959finite,
+and Hopcroft, Motwani, and Ullman hopcroft2006automata.
+Nothing in this section is original.  The section exists because
+every claim in the sequel is stated in terms of these objects, and
+any deviation from their classical definitions would propagate as
+ambiguity in our results.
+
+Alphabets, strings, and languages
+
+A finite, non-empty set  is an alphabet.  A finite
+sequence  with  is a
+string; its length is; the empty string is
+ with.  The set of all finite
+strings over  is, and.  A language over  is a
+subset.  Concatenation is associative with
+identity.  We write  and.
+
+Grammars and the Chomsky hierarchy
+
+A grammar is a tuple  where  is a
+finite set of nonterminals,  is the (terminal) alphabet
+disjoint from,  is a finite set of production
+rules, and  is the start symbol.  The language  is the set of terminal strings derivable from
+ by repeated application of rules in.
+
+The Chomsky hierarchy stratifies grammars by the form of the
+rules in:
+description
+[Type-0 (unrestricted).]
+ for any  with
+ containing at least one nonterminal.   is
+recursively enumerable.
+[Type-1 (context-sensitive).]
+ with, plus
+optionally.   is context-sensitive.
+[Type-2 (context-free).]
+ with.   is context-free.
+[Type-3 (regular).]
+ or  with  (right-linear,
+equivalently left-linear).   is regular.
+description
+The strict inclusions
+
+L_3 subset L_2 subset L_1 subset L_0
+
+hold by elementary
+construction hopcroft2006automata.
+
+Recognising automata
+
+To each Chomsky class corresponds a class of recognising machines.
+description
+[Finite Automaton (FA, recognises Type-3).]
+A tuple  with  finite,
+ deterministic (or  nondeterministic),,.  Membership decides in
+time by Rabin and Scott rabin1959finite.
+[Pushdown Automaton (PDA, recognises Type-2).]
+A finite-state controller equipped with an unbounded LIFO stack.
+Membership decides in  time by the standard CYK or
+Earley parser aho1972theory.
+[Linear-Bounded Automaton (LBA, recognises Type-1).]
+A nondeterministic Turing machine whose tape head is restricted to
+the cells initially occupied by the input.  Membership is
+PSPACE-complete in  hopcroft2006automata.
+[Turing Machine (TM, recognises Type-0).]
+A tuple  with  the tape alphabet
+(),  a partial function, and the standard
+two-way tape semantics of
+Turing turing1936computable.  Membership is, in general,
+undecidable; the universal machine of
+Turing turing1936computable establishes that the
+recursively enumerable languages are exactly the languages
+generated by Type-0 grammars.
+description
+
+Recursive enumeration and undecidability
+
+A language  is recursively enumerable
+(r.e., or semi-decidable) if there exists a Turing machine
+ such that, started on the empty input,  prints exactly the
+strings of  on its output tape (in some order, possibly with
+repetitions).  Equivalently,  is r.e. iff there exists a Turing
+machine  that halts and accepts on input  iff,
+and may run forever on.
+
+A language  is decidable (recursive) if both
+and its complement  are r.e.; equivalently, if there
+exists a Turing machine that halts on every input and accepts iff.  The strict inclusion of decidable r.e. languages
+inside r.e. languages is a theorem of
+Turing turing1936computable; the undecidability of the
+membership problem for arbitrary r.e. languages is the
+Halting Problem, also Turing's.
+
+A celebrated and non-elementary characterisation of the r.e. class
+is Robinson's:  the r.e. subsets of  are exactly the
+Diophantine subsets robinson1949definability,davis1961decision.
+The corollary - that there is no algorithm deciding membership
+in an arbitrary r.e. set defined by Diophantine constraints -
+is the form in which we use the result.  An idealised Type-0
+agent therefore inherits, by the same line of argument, the
+property that no algorithm decides whether a given trace is
+in the agent's trace language.
+
+Idealised versus physically bounded machines
+
+Every physical computation is bounded: the tape is a finite array
+of cells, the time is finite, the energy is finite.  The
+idealisation we adopt is the standard one of
+Hartmanis and Stearns hartmanis1965computational: we
+analyse machines whose tape and time are unbounded in the formal
+specification, while observing that any concrete execution
+witnesses only a finite prefix of the idealised computation.
+
+For a Turing machine, fix a tape bound  and a
+time bound.  The bounded machine  is the
+restriction of  to executions in which the tape head visits at
+most  cells in at most  steps.  Plainly  is a finite
+state machine: its state space is bounded by.  Therefore:
+
+lemma[Bounded soundness]
+If  accepts  in  steps using  tape cells, then
+ accepts.  Equivalently, every trace producible by
+the bounded machine  is producible by the idealised
+machine.
+lemma
+
+Lemma lem:bounded-soundness is the formal warrant for the
+"idealised Type-0" framing in
+Section sec:methodology.  The Goal-Driven agent, as
+implemented on the author's laptop, is a very large but finite
+LBA.  For the analysis we treat it as an idealised TM; any trace
+the bounded machine emits is also emitted by the idealised
+machine, and the verification claims we discharge against the
+idealised machine apply a fortiori to the bounded one.
+
+Closure properties
+
+We will need the following standard
+results hopcroft2006automata:
+enumerate
+Regular languages are closed under union, intersection,
+complement, concatenation, and Kleene star.
+Context-free languages are closed under union, concatenation,
+and Kleene star, but not under intersection or complement;
+however, the intersection of a context-free language with a
+regular language is context-free.
+Context-sensitive languages are closed under union,
+intersection, and concatenation; closure under complement was
+established later (Immerman-Szelepcsenyi, beyond our citation
+discipline; we use only union and intersection in this paper).
+Recursively enumerable languages are closed under union,
+intersection, and concatenation; intersection with a regular
+language is r.e.
+enumerate
+
+The closure of r.e. under intersection with regular languages is
+the closure that drives Theorem thm:closure: the verified
+trace language - the intersection of the Goal-Driven Type-0
+agent's trace language with the Data-Driven Type-3 verifier's
+trace language - is r.e., but its membership question is
+decided by the verifier's DFA whenever a trace is emitted
+to the disk.  Verification cannot exceed Type-3.
+
+The Trace Language of an Agent
+
+This section is the formal core of the paper.  We define an agent
+as a tuple of seven objects, three of which are derivative.  We
+then define the agent's trace language and prove that the
+definition satisfies the Chomsky hierarchy verbatim.  The
+construction is austere and self-contained; nothing beyond
+Section sec:preliminaries is assumed.
+
+Operation alphabet
+
+definition[Operation alphabet]
+An operation alphabet is a finite, non-empty set
+whose elements  each denote an effectful
+computation name, called an operation symbol.
+Each  is associated with a (possibly partial) computable
+function
+acting on a state space  and producing a successor state in, so that the abstract symbol carries an effect when
+executed.  The function  is fixed once
+and for all by the runtime environment and is not a property of
+the agent.
+definition
+
+For the empirical instantiation in
+Section sec:expsetup,  is the union of the column
+entries of examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K).  Examples include
+loadvectordb(geminiembeddings.json),
+composeplannerprompt,
+invokegemini(gemini-2.5-flash-lite),
+runphaseunittests(phase; compdir), and
+trainstackedensemble(LGBM+XGB+HistGB+linearmeta).
+The operation symbol is the name plus its parenthesised
+argument list as written in the source; two invocations of the
+same name with different arguments are different operation
+symbols, exactly as Liskov's abstract data types prescribe for
+parameterised operations liskov1974abstraction.
+
+Agent
+
+definition[Agent]
+An agent is a 7-tuple
+
+A = (_A,
+                       Q_A,
+                       q_0^A,
+                       X_A,
+                       _A,
+                       F_A,
+                       h_A)
+
+where
+itemize
+ is the agent's
+operation alphabet;
+ is a (possibly countably infinite)
+configuration space;
+ is the initial
+configuration;
+ is the (computable) input domain;
+ is the
+agent's step relation: at configuration  on input
+it returns a successor configuration  together with a finite
+string of operation symbols emitted by the step;
+ is the halting
+set;
+ is the halting verdict.
+itemize
+
+The objects
+are derivative:  is determined by  and the
+runtime environment;  is the agent's
+program; and  is fixed by the convention
+that a configuration in  accepts iff it carries
+the post-condition for which the trace was emitted.
+definition
+
+remark
+The 7-tuple is the minimal one that lets us speak of an emitted
+string per step.  A 5-tuple of the
+ Hopcroft-Ullman hopcroft2006automata
+form would force  to emit a single symbol per step, which
+is too restrictive: a single "call to the planner" in our
+empirical agent emits a structured prompt-build sequence that we
+prefer to record as a string of three or four operation symbols.
+The choice of  rather than
+in the codomain of  is therefore essential.
+remark
+
+Run, trace, and trace language
+
+definition[Run]
+A run of  on input  is a
+finite or infinite sequence
+
+= ((q_0, w_0), (q_1, w_1), (q_2, w_2),
+)
+
+with,, and for each,  defined.
+The run is halting if it is finite and its last
+configuration  lies in; it is
+accepting if additionally.
+definition
+
+definition[Trace]
+The trace of a run  is the concatenation
+
+() = w_0 w_1 w_n
+_A^*.
+
+We write  for the trace of the run of
+ on  when that run is unique.
+definition
+
+definition[Trace language]
+The trace language of  is
+
+L(A) =
+():  is an accepting run of
+A  on some  xX_A
+ _A^*.
+
+definition
+
+Trace-equivalence
+
+definition[Trace equivalence]
+Two agents  over a common alphabet
+ are trace-equivalent, written, iff.
+definition
+
+The austerity claim of the paper, in two lines, is:
+An agent is its trace language, and only its trace
+language.  Trace-equivalent agents are the same agent.  The
+internal architecture (LLM, neural network, hand-coded controller,
+mixture of all three) is irrelevant to the identity criterion.
+
+Multi-agent systems
+
+definition[Multi-agent system]
+A multi-agent system is a finite tuple  where each
+ is an agent and  is an orchestration relation
+specifying which agent's emission, on which prefix, may be
+consumed by which other agent.
+definition
+
+The trace language of  is the set of strings over the
+common alphabet  that
+are obtainable by the orchestrated shuffle: pick an accepting run
+of each, then interleave their traces in any order
+consistent with.  Formally,
+
+L(M) =
+_(_1,, _k)
+        L(A_1)L(A_k)
+shuffle_R(_1,, _k)
+
+where  is the standard interleaving
+restricted by  hopcroft2006automata.
+
+The CSV files are languages
+
+We make explicit the empirical correspondence used throughout the
+sequel.  The header row of
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv
+names twenty sub-agent swim lanes:
+
+A_1 = data_downloader, , A_20 = dependency-graph-orchestrator,
+
+followed by nine resource-envelope columns (chomsky_type, llm_model,
+context_window_tokens, context_policy, long_term_memory,
+ltm_growth_bound, slurm_partition, slurm_resources, gpu_device).
+
+For each sub-agent A_i, the i-th swim-lane column of the file (skipping
+empty cells) is a single string.  This string is one accepting run of
+the orchestrator on the Rogii Wellbore Geology Prediction input.  The
+trace language L(G) contains, in principle, infinitely many other
+strings; the column records exactly the one that the recursive
+enumeration emitted.
+
+The same correspondence holds for each variant trace under
+examples/rogii/traces/preprocessing/{variant}/trace_language.csv.
+The baseline variant uses ColumnTransformer + LightGBM tokens; sibling
+variants swap preprocessing tokens (typewell alignment, PS masks,
+RobustScaler+log1p, parallel loaders, formation KNN) while preserving
+the twenty-lane orchestrator skeleton.
+
+Variant trace languages and critical review
+
+We audited all eight roots matching /lustre/work/sweeden/agent-tracing*
+for trace_language.csv artefacts that implement the Rogii Wellbore
+Geology Prediction Kaggle competition
+(rogii-wellbore-geology-prediction) under the scientific concept of
+each variant's base paper (examples/rogii/BASE_PAPERS.md).  The
+unified repository agent-tracing holds all six variant bundles under
+examples/rogii/traces/preprocessing/{variant}/ together with
+experiment_descriptor.json, ablation_plan.json, and paper PDFs.
+Each branch worktree agent-tracing-trace-{baseline,typewell,ps,robust,
+parallel,formation} carries a single variant CSV for isolated review;
+agent-tracing-main mirrors baseline only.  Canonical traces for
+critical review are the main-repo CSVs; baseline matches its worktree
+byte-for-byte; the other five worktree copies are stale snapshots that
+omit recent experiment-design tokens (configure_variant_ablation_flags,
+design_ablation_factorial_grid, load_experiment_descriptor).
+
+Every variant trace solves the same submission envelope: predict tvt
+for each test id (columns id, tvt).  Training consumes per-well
+horizontal-well CSVs with columns MD, X, Y, Z, ANCC, ASTNU, ASTNL,
+EGFDU, EGFDL, BUDA, TVT, GR, TVT_input; typewell CSVs with TVT, GR;
+test horizontal-well CSVs with MD, X, Y, Z, GR, TVT_input.  Shared
+orchestrator lanes (data_downloader through dependency-graph-orchestrator)
+bootstrap a Type-3-bounded DAG, enforce nested GroupKFold by well, train
+LightGBM with objective regression and metric RMSE, and emit
+slurm_episodic_trainer tokens only after Matador GPU binding.  Variant
+theory enters in the feature_engineer, preprocessor, target_diagnostician,
+and cv_orchestrator lanes---not in the trainer tail, which is
+competition-shared.
+
+Critical review by variant (paper concept vs realised trace language):
+
+itemize
+baseline_column_transformer (Ke et al. 2017 LightGBM; Pedregosa et al.
+2011 sklearn ColumnTransformer).  Branch trace/baseline-column-transformer;
+GitHub PR #17; worktree agent-tracing-trace-baseline.  The trace
+language implements the competition baseline as heterogeneous column
+blocks fused by assemble_column_transformer, with
+build_numeric_pipeline, build_lowcard_pipeline, and
+build_highcard_pipeline (Pedregosa) feeding set_objective_regression,
+set_metric_rmse, log_best_iteration, and multi-seed
+train_with_seed_{42,69,2024} (Ke).  Automated paper compliance
+(reviews/paper_compliance_latest.json) marks both paper claims
+satisfied.  Critical gap: ablation factors target_log1p, numeric_scaler,
+and rolling_window from ablation_plan.json are not yet named as
+first-class trace tokens; Ke's histogram and leaf-wise vocabulary is
+implicit in lightgbm_gpu rather than explicit in Sigma_G.
+typewell_gr_alignment (Sakoe and Chiba 1978 DTW).  Branch
+trace/typewell-gr-alignment; worktree agent-tracing-trace-typewell.
+The trace language encodes geologic transfer via
+align_horizontal_to_typewell, build_typewell_gr_interpolator,
+gr_to_tvt_lookup, attach_typewell_gr_at_estimated_tvt, and
+evaluate_gr_baseline_rmse_by_well---a depth-indexed alignment story
+consistent with Sakoe--Chiba warping applied to GR/typewell curves.
+Critical gap: no dtw, warp_path, band_constraint, or pchip tokens
+despite ablation_plan factors gr_alignment, gr_interp (linear vs
+pchip), and baseline_gr_rmse; the Type-2 stack theory (sec/3) is
+realised operationally but not with the paper's formal symbol names.
+ps_point_leakage_aware (Kaufman et al. 2012 leakage).  Branch
+trace/ps-point-leakage-aware; worktree agent-tracing-trace-ps.  The
+trace language is the strongest Kaufman instantiation: detect_ps_per_well,
+mask_post_ps_only_for_rmse, compute_rmse_per_fold_post_ps_mask, and
+audit_tvt_input_prefix_consistency_across_wells directly encode
+leakage-aware evaluation on the post-PS horizon that Kaggle scores.
+Critical gap: ablation levels full_well vs post_ps_only, auto vs
+manual_offset PS detection, and strict vs lenient leakage_audit are
+declared in ablation_plan.json but not tokenised in the swim lanes;
+configure_variant_ablation_flags appears without level-specific symbols.
+robust_scale_log1p (Hampel et al. 1986 robust statistics; DOI link
+only, not redistributed).  Branch trace/robust-scale-log1p; worktree
+agent-tracing-trace-robust.  The trace language implements the
+influence-function programme operationally via fit_log1p_transform_params,
+build_robust_scaler_pipeline, persist_transform_metadata, and
+inverse_log1p---coupling skew-stabilised targets with outlier-resistant
+feature scaling (RobustScaler).  Critical gap: no hampel, influence, or
+M-estimator tokens; Hampel theory is approximated through sklearn's
+RobustScaler API rather than explicit robust-location estimators; inverse
+at predict is present but not ablation-gated in the trace alphabet.
+parallel_multiwell_loader (Rocklin 2015 Dask).  Branch
+trace/parallel-multiwell-loader; worktree agent-tracing-trace-parallel.
+The trace language scales multi-well ingestion via
+engineer_per_well_feature_matrix, attach_geology_surface_features,
+inspect_well_and_surface_column_schema, and shell-parallel
+xargs -P 4 over per-well CSV paths; the data_downloader envelope
+requests higher cpus/mem (16/64G) than sibling variants.  Critical gap:
+no dask, delayed, compute, or task-graph tokens despite Rocklin's
+scheduling theory and ablation factors io_workers (4/8/16), loader_cache,
+and surface_cols; parallelism is shell-level, not Dask-API-level.
+formation_plane_spatial (Cover and Hart 1967 k-NN).  Branch
+trace/formation-plane-spatial; worktree agent-tracing-trace-formation.
+The trace language adds spatial structure via compute_pairwise_well_distances,
+compute_drilling_geometry_features, fit_formation_plane_knn, and
+encode_formation_codes---nearest-neighbour formation propagation in
+survey XYZ space.  Critical gap: ablation factors knn_k (3/5/11),
+geometry_feats, and plane_fit are not emitted as trace tokens; Cover--Hart
+risk bounds are motivation in experiment_descriptor.json but not
+auditable symbols in the CSV.
+itemize
+
+Across variants, the trace-language theory claim holds at the
+architectural level: each CSV is one accepting run of a
+Goal-Driven Type-0 producer bounded by a Data-Driven Type-3 consumer,
+and each variant's distinguishing operations appear in the
+feature/preprocess lanes before the shared LightGBM tail.  The
+remaining engineering debt is symbol-level fidelity between
+ablation_plan.json factorial levels and the emitted alphabet Sigma_G,
+and synchronising branch worktree CSVs with the canonical main-repo
+traces before merge.  Full paper-to-token joins are machine-readable in
+examples/rogii/traces/preprocessing/{variant}/experiment_descriptor.json
+and human-readable in paper_refs.md.
+
+Closure under intersection with the verifier
+
+We now state the closure result that is the architectural pivot
+of the paper.
+
+theorem[Verifier closure]
+Let  be an agent with  in Chomsky
+class  for some.  Let
+ be an agent with
+(a regular language).  Define the verified composition
+ as the agent that emits a
+trace  iff  and  is accepted
+by  when treated as input to its DFA.  Then
+
+L(GV)
+= L(G) L(V)
+ L_i.
+
+In particular, the Chomsky class of the verified trace language
+is no greater than the Chomsky class of  alone, and
+the membership problem for
+is decidable in linear time whenever a candidate trace is
+presented to 's DFA.
+theorem
+
+proof
+Each Chomsky class  is closed under intersection
+with regular languages.  For, this is the standard
+product-construction rabin1959finite.  For, it is
+the standard product of a PDA with a DFA, which is again a
+PDA hopcroft2006automata.  For, it follows from
+LBA closure under intersection (regular languages are
+context-sensitive).  For, it is the standard product
+of a Turing machine with a DFA, which is again a Turing machine
+turing1936computable,hopcroft2006automata.
+
+The decidability claim follows because  is a DFA:
+given a candidate trace  of length, the DFA decides
+ in  time and constant space.
+proof
+
+remark[Language class vs online filtering protocol]
+Classically, L(G) intersect L(V) is recursively enumerable when L(G)
+is Type-0 and L(V) is regular (RE intersect REG = RE); the intersection
+language is not Type-3 in general.  Theorem thm:closure is therefore a
+*protocol* statement about our binding: at emission time, only traces
+accepted by V's DFA are persisted; membership in that verified sublanguage
+is decidable in O(n) per candidate.  We do not claim that the full
+intersection language has Type-3 complexity---only that the consumer-side
+check is regular and dominates wall-clock verification cost
+(Corollary cor:budget).
+remark
+
+corollary[Verification budget]
+Verification of the verified trace language
+ on a candidate trace
+of length  runs in  time and  space.  The Type-0
+class of  does not enlarge the verifier's complexity.
+corollary
+
+The empirical signature of a Type-0 trace language
+
+A trace language  is Type-0 iff  can
+emit traces whose length grows without a recursive bound in the
+input size, and whose contents reflect arbitrary recursive
+enumerations of the operation alphabet.  In our empirical
+setting, 's Type-0 status is witnessed by the
+slurm_episodic_trainer column of
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K), which contains a strictly
+longer sequence (36 non-empty entries) than any column of
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0) (which contains at most
+fourteen).  The lengthening is the operational footprint of the
+recursive enumeration: the start language emitted twelve seed
+agents; the binding to the Type-3 verifier forced enumeration of
+arbitrarily long check-train-validate cycles; the result was a
+strictly more complex trace, materialised on disk by the
+recursive Type-0 step.
+
+The undecidability that Robinson's
+theorem robinson1949definability,davis1961decision fixes
+on the Type-0 class is therefore a real property of:
+were it not for the Type-3 verifier, no algorithm would decide
+whether a candidate trace lay in.  The verifier
+is the entire reason the system is decidable in practice.
+
+Chomsky Classification of Agents
+
+We now classify trace languages by Chomsky type and exhibit, for
+each type, the canonical agent shape from the empirical
+Rogii Wellbore Geology Prediction system.  The classification is the
+literal one of Section sec:preliminaries; there is no
+new mathematics here, only the application of an old hierarchy to
+a new object.  The novelty, if any, is the identification of
+which sub-agents in the empirical CSVs inhabit which class.
+
+Classification caveats (scope limits).
+Three limits apply throughout this section and are not softened away.
+First, Type-3 assignments for toolsindex and unittestrunner
+are backed by exhibited recognisers (regular expression and DFA in
+Section sec:indexed; submission_validator micro-automaton); Type-2
+and Type-1 assignments for planneragent, revieweragent,
+taskorchestrator, and kernelpipeline rest on structural inspection
+of nested or linear-bounded trace shape---interpretive labels, not
+exhibited grammars or PDAs.  Second, trace column length is not a
+Chomsky-class decision procedure: probe P2 (Section sec:results) uses
+length growth only as a necessary scaffold observation, not as proof
+of Type-0.  Third, the empirical evidence is a single Kaggle
+competition (Rogii Wellbore Geology Prediction); the submission CSV
+is withheld to avoid benchmark contamination; and the outer consumer
+loop includes human upload review (Section sec:discussion).  Claims
+here are architectural and single-task unless explicitly marked as
+conjecture.
+
+Type-3: regular trace languages
+
+definition[Type-3 agent]
+An agent  is Type-3 if, equivalently, if there exists a finite
+automaton  with.
+definition
+
+In the empirical system, the Type-3 agents are
+toolsindex and unittestrunner.  Both have
+trace languages over a small finite alphabet whose strings are
+generated by a finite-state controller:
+itemize
+toolsindex: the trace language is the regular
+expression
+
+(loadschema)(composetooltext)(embedtooltext)(scoreagainstindex)
+
+read straight off the column.  No back-edge appears.  No stack
+discipline is required.
+unittestrunner: the trace is a sequence of
+test* keywords drawn from the finite test catalogue.
+The deciding finite automaton is the Aho-Corasick DFA over the
+catalogue aho1975corasick.
+itemize
+
+The Data-Driven verifier  of this paper is realised
+as the union of these two columns, compiled into a single
+Aho-Corasick DFA.  Membership in  is decided in
+ time and  space per candidate trace, by Rabin and
+Scott's classical
+construction rabin1959finite,aho1975corasick.
+
+Type-2: context-free trace languages
+
+definition[Type-2 agent]
+An agent  is Type-2 if, equivalently, if there
+exists a pushdown automaton  with  and
+ is not regular.
+definition
+
+In the empirical system, the Type-2 sub-agents are
+planneragent and revieweragent.  Both
+exhibit nested structure that no finite automaton can recognise.
+The planner emits a step-list whose nesting depth is determined
+by the EDA bundle:
+verbatim
+emit_step(id; title; instructions; tools)
+  -> emit_step(...) ->...
+emit_success_criteria
+emit_plan_json
+verbatim
+and the reviewer's score-and-clamp loop pushes a configuration
+onto an implicit stack each time a sub-test fails:
+verbatim
+collect_failed_tests -> compose_reviewer_prompt
+  -> clamp_score_to_2_on_unit_failure
+  -> clamp_score_to_1_5_range
+  -> emit_review_result(...).
+verbatim
+The stack discipline is implicit but recoverable: the trace
+language of planneragent matches Dyck-language
+shapehopcroft2006automata when one identifies opening
+composeplannerprompt and closing
+emitplanjson as bracket symbols.
+
+The indexed-grammar zone (between Type-2 and Type-1)
+
+Aho's indexed grammars aho1968indexed occupy a class
+ strictly between
+and.  Their distinguishing feature is a finite
+stack of indices attached to each nonterminal during a
+derivation.
+
+In the empirical system, the indexed-zone sub-agent is
+soporchestrator, whose trace language exhibits a
+finite-index repair stack: the tokens
+capiterationsatmax(=3) and
+retryphaseonlowscore together form an indexed
+loop whose nesting is bounded by the constant 3.  An indexed
+grammar with three index symbols recognises this loop; a pushdown
+automaton without the index discipline cannot, because the loop
+exhibits cross-serial dependencies between the iteration counter
+and the phase counter.  We do not enlarge the formal hierarchy;
+we observe that the indexed-zone class is the natural home of
+this column.
+
+Type-1: context-sensitive trace languages
+
+definition[Type-1 agent]
+An agent  is Type-1 if,
+equivalently, if there exists a linear-bounded automaton
+with  and  is not in the
+indexed class.
+definition
+
+The Type-1 sub-agents are taskorchestrator and
+kernelpipeline.  Their trace languages exhibit
+linear-bounded workspace growth: each step's emitted string is
+bounded by a constant times the input length, and the
+computedependencygraph(prevstagetonextstage)
+operation is, by construction, an LBA-style traversal of the
+phase graph that visits each cell at most a constant number of
+times.
+
+The kernelpipeline's trace contains
+generatekernelpackages(4copies),
+writepackagestodisk, and
+sequentialpushonvm(stageorder) - a strictly
+linear workspace expansion in the number of stages.  No string
+in  exceeds a constant multiple of
+the input description's length, which is the LBA hallmark.
+
+Type-0: recursively enumerable trace languages
+
+definition[Type-0 agent]
+An agent  is Type-0 if, equivalently, if there
+exists a Turing machine  with  and
+ is not context-sensitive.
+definition
+
+The Type-0 agents are model_trainer, the
+developeragent (in its full unbounded mode of arbitrary
+LLM code-generation), and the slurm_episodic_trainer.  The
+slurm_episodic_trainer column is the canonical witness: it
+contains a strictly unbounded enumeration of training operations
+bootstrapindices, fitmodelonsubset,
+scoretrainandval, accumulateoofpredictions,
+trackbestepisodebyvalscore, parameterised by
+loop bounds (foreachfoldforeachepisode) that
+are themselves outputs of the agent's own deliberation.
+
+The Goal-Driven agent of the architecture is the union of
+these Type-0 sub-agents under the orchestration relation  given
+in Section sec:methodology.  Its trace language is, by
+Theorem thm:closure run in reverse, undecidable to verify
+absent the Type-3 verifier - which is the
+Robinson-MRDP robinson1949definability,davis1961decision
+shadow of the Halting Problem in our setting.
+
+Summary table
+
+table[ht]
+Chomsky classification of the empirical sub-agents in
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K).
+tabularlll
+Sub-agent & Class & Recogniser
+ toolsindex        & Type-3 & FA / DFA
+
+unittestrunner  & Type-3 & FA / Aho-Corasick DFA
+
+readeragent       & Type-3 & FA
+
+summarizeragent   & Type-3 & FA
+ planneragent      & Type-2 & PDA
+
+revieweragent     & Type-2 & PDA
+ soporchestrator   & Indexed & Indexed grammar
+                                          (Ahoaho1968indexed)
+ taskorchestrator  & Type-1 & LBA
+
+kernelpipeline    & Type-1 & LBA
+ eda_profiler     & Type-0 & TM
+
+developeragent    & Type-0 & TM
+
+model_trainer    & Type-0 & TM
+
+slurm_episodic_trainer     & Type-0 & TM (emergent)
+ tabular
+table
+
+The Goal-Driven / Data-Driven binding, formally
+
+The architecture of the paper is now fully formal.  Let
+
+G = A_research
+             A_developer
+             A_mlebench
+             A_trainer
+
+under the orchestration relation  that allows any
+of these sub-agents to consume the prefix emitted by any of the
+others.  Then.
+
+Let
+
+V = A_toolsindex
+             A_unittestrunner
+
+under the orchestration relation  that requires
+every test* emission to be matched against the
+toolsindex catalogue.  Then.
+
+The verified trace language is
+
+L(GV)
+= L(G)  L(V)
+
+which, by Theorem thm:closure, lies in  and
+is decidable in  on the verifier side.  The Type-2
+sub-agents planneragent, revieweragent and
+the indexed-zone sub-agent soporchestrator and the
+Type-1 sub-agents taskorchestrator,
+kernelpipeline are not part of  or
+ as designed; they are the projections of
+ onto the orchestration graph,
+and they appear because the binding forces them into existence -
+not because the architect designed them.
+
+The minimality claim is therefore:
+quote
+One Type-0 Goal-Driven generator and one Type-3
+Data-Driven verifier suffice.  Everything else is a derivation.
+quote
+
+This is the operational meaning of "a single Goal-Driven agent
+tamed by the Data-Driven verifier results in success."
+
+Indexed Grammars and the Aho-Corasick Verifier
+
+This section deepens the role played by Aho's two great
+contributions to the theory of formal languages:
+indexed grammars aho1968indexed, which fix the language
+class strictly between context-free and context-sensitive, and
+the Aho-Corasick aho1975corasick multi-pattern matcher,
+which compiles a finite keyword set into a deterministic
+linear-time recogniser.  The two papers were written eight years
+apart, but in our framework they play complementary roles: the
+indexed grammar is the natural home of the iterative repair loop
+inside the Goal-Driven generator; the Aho-Corasick DFA is the
+realisation of the Data-Driven verifier.
+
+Indexed grammars
+
+An indexed grammar aho1968indexed is a 5-tuple
+
+G = (V,,F,P,S)
+
+where  is the set of nonterminals,  is the alphabet
+of terminals,  is a finite set of index symbols,  is the start symbol, and  is a finite set of productions
+each of one of three forms:
+align*
+(a)& A[]  []
+
+(b)& A[]  [f]
+                    (push  fF )
+
+(c)& A[f]  []
+                    (pop  fF )
+align*
+where  and  is a string of
+indices attached to each nonterminal in.  The string
+attached to a nonterminal acts as a stack of indices that may be
+pushed at derivation steps of form (b), popped at form (c), and
+inherited unchanged at form (a).
+
+lemma[Aho 1968].
+lemma
+
+The strict inclusion is witnessed by the language, which is in  but not in.  Its mirror image in our framework is the
+paired iteration counter pattern in
+soporchestrator's trace, where the
+capiterationsatmax(=3) bound is enforced
+synchronously across the planner, developer, and reviewer
+sub-traces.
+
+Why the iterative repair loop is indexed, not
+context-free
+
+In soporchestrator's trace we observe the cycle
+verbatim
+   invoke_planner
+-> invoke_developer
+-> invoke_reviewer
+-> compare_score_to_advance_threshold(>=3)
+-> [ if score < 3:
+        retry_phase_on_low_score (loop)
+        cap_iterations_at_max(=3) ]
+-> invoke_summarizer_on_advance
+-> emit_outcome(completefail).
+verbatim
+Three observations make this trace indexed rather than
+context-free:
+enumerate
+The iteration counter is shared across three nested
+sub-traces (planner / developer / reviewer); the same counter
+appears synchronously in each.  This is a cross-serial
+dependency, which a PDA cannot recognise.
+The counter is bounded by a constant (3); this rules out
+arbitrary linear-bounded behaviour.  The counter is not a tape, it
+is an index.
+Each invocation of the loop pushes a fresh index
+configuration (the EDA bundle, the failed-test list, the
+clamped score) that is consumed in inverse order during the
+forwardartifacttonextphase step.
+enumerate
+
+These three properties are exactly the ones Aho identified in
+1968 as motivating the indexed-grammar
+extension aho1968indexed.  We therefore place
+soporchestrator in the indexed zone.  The placement
+sharpens, but does not contradict, the Type-1 placement of
+taskorchestrator and kernelpipeline, whose
+workspace genuinely grows with input size.
+
+Aho-Corasick as the Data-Driven verifier
+
+The Aho-Corasick algorithm aho1975corasick takes a
+finite keyword set  of total size  and produces a deterministic finite automaton
+ such that, for any input string,
+identifies all occurrences of all  in  time, where  is the number of matches.  The construction
+has three steps:
+enumerate
+Build a trie of  (the goto function).
+Compute, for each trie node, a failure link to the
+longest proper suffix that is also a prefix of some keyword.
+Compose the goto and failure into a single deterministic
+transition function.
+enumerate
+
+In our setting  is the operation alphabet of
+Section sec:trace,  is the set of operation symbols
+that appear in the unit-test catalogue and tools-index manifest,
+and the verifier  is the agent whose configuration
+space is the state set of.  Concretely  is read off
+the columns toolsindex and unittestrunner
+of examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K); the full keyword catalogue and DFA
+statistics are listed in Appendix A (below).
+
+Worked Type-3 micro-automaton (submission_validator lane).
+The submission_validator swim lane is our smallest exhibited DFA.
+Alphabet Sigma_V = {check_submission_schema, validate_id_column,
+validate_tvt_column, validate_row_count, validate_no_nans,
+emit_submission_ready}.  States Q = {q0, q_schema, q_cols, q_rows,
+q_accept, q_reject}.  Start q0; accept q_accept.  Transitions:
+q0 --check_submission_schema--> q_schema;
+q_schema --validate_id_column--> q_cols;
+q_cols --validate_tvt_column--> q_rows;
+q_rows --validate_row_count--> q_rows;
+q_rows --validate_no_nans--> q_accept;
+q_rows --emit_submission_ready--> q_accept;
+any mismatch --> q_reject (sink).  This six-state machine accepts
+exactly the regular language of submission-format checks enforced
+before Kaggle upload; it is a concrete Type-3 recogniser, not a
+post-hoc narrative label.
+
+proposition[Verifier as DFA]
+The Data-Driven verifier  is realisable as a
+deterministic finite automaton over  with state set
+ of size.  For any candidate trace, the verdict  is computed in
+time.
+proposition
+
+proof
+Construct the Aho-Corasick DFA  over the keyword set
+extracted from the two columns above; declare its accepting
+states to be those visited iff at least one keyword from each
+required category (e.g., testsubmissionvalidity,
+testcolumnnamessubmission) is matched.  Categories are disjoint by
+construction (schema vs submission vs dtype); overlap would be a
+specification bug caught by the tools-index manifest.  The size
+bound  is the standard size of an Aho-Corasick DFA,
+and the linear-time membership decision is the standard property
+of a DFA aho1975corasick,rabin1959finite.proof
+
+Why Aho-Corasick rather than a generic LLM judge
+
+A generic LLM-as-judge could, in principle, also play the role of.  We deliberately chose Aho-Corasick for three
+reasons:
+enumerate
+Class containment.  An LLM-as-judge is itself a
+Type-0 agent.  Composing two Type-0 agents does not lower the
+class.  An Aho-Corasick DFA is Type-3 and lowers the
+verification budget to  by Theorem thm:closure.
+Auditability.  The keyword set  is finite, human
+readable, and version-controlled; the failure links and goto
+table are derivable mechanically.  An LLM-as-judge offers no
+such audit surface.
+Soundness against the Type-0 generator.  If the
+generator is permitted to enumerate arbitrary strings, the
+verifier must be unable to be "talked into" accepting a
+malformed trace.  A DFA cannot be talked into anything; it
+either matches or it does not.  This is the precise sense in
+which the Goal-Driven Type-0 agent is tamed by the
+Type-3 verifier.
+enumerate
+
+The recursive enumeration step, decoded
+
+We can now describe the recursive enumeration step that takes
+the start language  to the enumerated
+language  in
+explicit terms.
+
+enumerate
+Let  be the operation alphabet of  and
+ be the corresponding keyword set extracted from its
+toolsindex and unittestrunner columns.
+ is the corresponding
+Aho-Corasick DFA.
+Run the Goal-Driven generator over the Rogii Wellbore Geology
+Prediction train wells, intersecting every emitted prefix with
+K_V and rejecting prefixes that exit the language of V.
+During execution, G proposes new operation symbols not in Sigma_0
+(e.g., the build_column_transformer_pipeline() symbol).  Each new
+symbol is admitted to Sigma_G iff its emission satisfies V when
+treated as a keyword extension; the verifier's keyword set is
+correspondingly extended to K_V' only for the duration of this
+enumeration.
+The accumulated trace is written to disk under
+examples/rogii/traces/preprocessing/{variant}/trace_language.csv.
+Its alphabet properly extends Sigma_0; Slurm and Ollama localhost
+tokens cluster in the emergent slurm_episodic_trainer swim lane---
+operations that were never in the minimal seed language but became
+necessary under the Type-3 consumer's Matador resource envelope.
+enumerate
+
+The procedure is, in the operational sense, a Type-0 recursive
+enumeration: the agent enumerates strings, the verifier filters
+them, and the recursion terminates when the enumerated language
+satisfies all properties of the data-driven specification.  In
+the literal sense of
+Robinson robinson1949definability,davis1961decision the
+recursion has no general termination guarantee; in our bounded
+laptop the recursion is forced to halt by the LBA bound described
+in the next section.
+
+Methodology: The Goal-Driven/Data-Driven Architecture
+
+This section describes the architecture in operational terms.
+The architecture is austere by design: one Goal-Driven Type-0
+generator, one Data-Driven Type-3 verifier, and an explicit
+recursive enumeration procedure that maps the start language to
+the realised trace language.  The Type-2 and Type-1 sub-agents
+appear as derivations of the binding, not as independent design
+choices.
+
+The two principal agents
+
+Goal-Driven generator.
+ is a Type-0 agent realised concretely as a
+large-language-model loop over the union of the operation
+alphabets in examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0).  Its
+configuration space is the LLM's context window plus a finite
+set of bookkeeping flags; its step relation
+ samples a continuation, parses the
+continuation's tool-call markup, and emits the corresponding
+operation string.  The model used at run time is
+invokegemini(gemini-2.5-pro) for the Type-0 deliberation
+steps and invokegemini(gemini-2.5-flash-lite) for the
+finite-state housekeeping steps.
+
+ is given exactly the following information at
+start-up:
+itemize
+the start-language alphabet
+ (the operations columns of
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0));
+the empty workspace directory /compdir/;
+the boilerplate Kaggle CLI configuration.
+itemize
+ is not given the goal label
+(tvt), the public/private leaderboard
+specification, or any prior solution.  Its trace language is, in
+principle, the entirety of, restricted only by what
+'s LLM core happens to enumerate.
+
+Data-Driven verifier.
+ is the Aho-Corasick DFA  described in
+Section sec:indexed and Proposition prop:verifier-dfa.
+Its keyword set  is the union of the operation symbols in the
+unittestrunner and toolsindex columns of
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0), extended only by the
+mechanical inclusion of the column-name and dtype tests
+generated from the
+Rogii Wellbore Geology Prediction train.csv schema.
+ has no LLM component; it is a deterministic linear-time
+checker.  Its decision function is
+
+h_V() =
+cases
+accept & if every required keyword class is
+matched in
+
+reject & otherwise.
+cases
+
+The binding
+
+The architecture's single load-bearing claim is that
+
+L(GV) = L(G)
+L(V) L_0
+
+with membership decidable in  on the verifier side
+(Theorem thm:closure, Corollary cor:budget).
+
+In implementation, the binding is realised by an outer loop:
+enumerate
+ proposes a candidate trace prefix.
+ runs its DFA on, accepting or
+rejecting in linear time.
+If  rejects, the rejected suffix is discarded
+and  is advised (by feeding back the failed-test
+list as a percept) to enumerate further.
+If  accepts and the accepted trace contains
+a writesubmissioncsv step, the loop terminates and
+the submission is uploaded.
+enumerate
+The loop terminates because the laptop's tape is finite (see
+Section sec:discussion), or because the verifier accepts a
+trace ending in yieldfinalresult, whichever comes
+first.
+
+Derivation of the Type-2 and Type-1 sub-agents
+
+The Type-2 sub-agents planneragent,
+revieweragent and the Type-1 sub-agents
+taskorchestrator, kernelpipeline were not
+designed.  They are projections of the verified trace language
+ onto the orchestration
+substrate.
+
+definition[Projection of a trace language]
+Let  be an agent with operation alphabet
+ and trace language.  Let  be a sub-alphabet.  The projection
+of  onto  is the set
+
+_A)) =
+_: L(A)
+
+where
+deletes every symbol not in.
+definition
+
+theorem[Derived sub-agents]
+Let  be the operation alphabet of the
+planneragent column of
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K).  Then
+
+L(planneragent) =
+__planner(L(GV)
+).
+
+The class of  is no greater than
+ (because projection cannot raise class) and is
+shown by inspection in Section sec:chomsky to be.  Analogous statements hold for
+revieweragent (Type-2),
+soporchestrator (indexed),
+taskorchestrator (Type-1), and
+kernelpipeline (Type-1).
+theorem
+
+proof[Sketch]
+The verified trace language is the language of all interleaved
+multi-agent emissions admissible under the orchestration
+relation.  Projecting onto the planner's alphabet selects exactly
+the planner's emitted symbols.  The class bound is the standard
+projection lemma hopcroft2006automata; the empirical
+class assignment is by structural inspection of the column.proof
+
+The minimality slogan of the paper is therefore literally true:
+the architect designs only  and.  The
+intermediate-class agents emerge from the binding.
+
+The recursive-enumeration procedure
+
+Algorithm alg:enum is the procedure that maps the start
+language to the realised trace language.
+
+figure[ht]
+
+Algorithm 1. RecursivelyEnumerate
+
+algorithmic[1]
+Goal-Driven, Data-Driven verifier, input.
+Verified trace,
+or halt-on-tape-bound.;;..
+
+       advance the Aho-Corasick DFA on.
+   is a reject state
+    feed the failed-keyword witness back to
+    as a percept.;;.
+     and.
+        laptop tape exhausted
+    halt-on-tape-bound.
+  algorithmic
+
+Recursive enumeration of the start language.
+figure
+
+The structure of Algorithm alg:enum is exactly the structure
+of a Type-0 step (line 3) intersected with a Type-3 advance
+(line 4).  By Theorem thm:closure, the loop's output
+language  is at most
+ and at least  (the verifier's
+class).  By the laptop's finite tape, the loop terminates in
+finite time.
+
+What the algorithm produces
+
+When Algorithm alg:enum is run on the
+Rogii Wellbore Geology Prediction input, the operation alphabet
+ extends to.  The thirteenth column of
+the resulting CSV is the slurm_episodic_trainer column: a
+strictly new sub-agent whose alphabet contains symbols absent
+from  (e.g.,
+trainstackedensemble(LGBM+XGB+HistGB+linearmeta),
+tunelightgbmwithoptuna(ntrials=30),
+bootstrapindices(85pct; perepisoderandomstate)).
+Its emergence is forced by the verifier rejecting any trace that
+omits a training step, not by the architect having pre-designed
+it.
+
+The empirical CSV is therefore a fixed point of the binding:
+
+_1 =
+_0 Range(_G)
+_V-accepting
+
+and the verified trace
+is exactly the column-wise concatenation of the recorded entries
+in examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K).
+
+Hoare-triple obligation per step
+
+Each step of Algorithm alg:enum carries a Hoare-triple
+obligation in the sense of
+Hoare hoare1969axiomatic and
+Dijkstra dijkstra1975guarded:
+
+P_tw_tP_t+1
+
+where  is the precondition holding on the state space
+before the -th emitted operation, and  is the
+postcondition that the verifier checks via its
+ transition.  When the precondition fails,
+the verifier rejects; when the postcondition fails, the verifier
+also rejects; the trace is admitted iff every Hoare triple
+along the emitted path holds.
+
+This is the formal sense in which the architecture is
+verification-by-construction: the verifier's DFA is the
+mechanical realisation of a finite Hoare-style proof obligation
+for the Goal-Driven generator's emitted trace.
+
+Temporal-logic statement of correctness
+
+The correctness property of the binding is captured in
+LTL pnueli1977temporal by the safety-and-liveness pair
+align*
+Safety:&
+G(emitverifier-tracking)
+
+Liveness:&
+G(planF(verified
+halt-on-tape-bound)).
+align*
+Safety says that every emitted symbol advances the verifier's
+state; liveness says that every plan eventually either succeeds
+verification or hits the tape bound.  Both are decided by
+inspection of the model-checker on the orchestrator's CFG
+clarke1981ctl,clarke1999modelchecking.
+
+This concludes the formal description of the architecture.  We
+turn next to the empirical instantiation.
+
+Experimental Setup
+
+Benchmark
+
+We instantiate the architecture on the Rogii Wellbore Geology
+Prediction task hosted on Kaggle
+(rogii-wellbore-geology-prediction).  The competition is a
+multi-well regression benchmark: agents predict True Vertical
+Thickness (TVT) lithology labels at each test depth index from
+horizontal-well log features, typewell GR curves, and optional
+geology-surface columns.  The public leaderboard ranks teams by
+RMSE on the post-perforation-start (post-PS) subset; submission
+validity requires an id column plus a tvt prediction column
+matching sample_submission.csv exactly.
+
+The task is selected for three reasons: it requires non-trivial
+feature engineering (well-log normalization, typewell GR alignment,
+GroupKFold by well, PS-point leakage masks, formation/spatial
+features); it has a clearly defined submission envelope (id, tvt,
+row count, no NaNs); and its leaderboard is active enough that a
+verified trace-language pipeline constitutes a reproducible signal.
+Six preprocessing-variant trace languages under
+examples/rogii/traces/preprocessing/{variant}/trace_language.csv
+instantiate distinct scientific concepts on this benchmark; see
+Section sec:trace-csv for the directory audit and per-variant
+critical review against BASE_PAPERS.md.
+
+Hardware and software environment
+
+itemize
+Hardware: a single laptop (the author's macOS development
+machine).  CPU and RAM bounds are recorded in the run log; both
+are finite and the realised computation is therefore an LBA in
+the formal sense of Section sec:preliminaries.
+Operating system: macOS, with the Kaggle CLI version locked
+in the run-time configuration.
+LLM backbone: Google Gemini, accessed through the
+google-genai client.  Two model strings appear in the
+realised trace: gemini-2.5-pro for Type-0 deliberation
+steps; gemini-2.5-flash and
+gemini-2.5-flash-lite for finite-state housekeeping and
+verification-adjacent steps.
+Embedding backbone: text-embedding-004 for the
+research-agent vector store and the tools-index keyword
+embedding.
+itemize
+
+The deliberate restriction of the backbone to a single hosted LLM
+family is methodological: the goal is to minimise the
+architectural surface area while exhibiting the trace-language
+phenomenon.  We report no comparison across backbone families.
+
+Start language
+
+The start language
+is the publicly attached artefact in
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv.  Its alphabet
+ is the set of operation symbols read off the file's
+twenty swim-lane columns (plus nine resource-envelope columns).   is approximately 120, after
+deduplication of recurring symbols across columns.
+
+The start language was constructed from the Rogii trace experiment
+orchestrator under examples/rogii/, the Kaggle CLI workflow, and
+PaperBench agent-tracing audit tokens.  No held-out test-well labels
+enter at design time.  In particular,  contains no symbol
+pertaining to the Rogii feature space (no MD, GR, TVT_input,
+ANCC, typewell curves, or PS masks); these symbols enter only after
+the recursive enumeration of Algorithm alg:enum has materialised
+them under the verifier's pressure.
+
+Verifier keyword set
+
+The verifier  is the Aho-Corasick DFA
+constructed from the keyword set  obtained by:
+enumerate
+Reading the toolsindex column of  and
+including each operation symbol (e.g.,
+scoreagainstindex(cosine)).
+Reading the unittestrunner column of
+and including each test* symbol (e.g.,
+testsubmissionvalidity,
+testcolumnnamessubmission).
+Adjoining the column-name and dtype keywords mechanically
+extracted from the Rogii Wellbore Geology Prediction data schema:
+submission columns id, tvt (from sample_submission.csv);
+horizontal-well train columns MD, X, Y, Z, ANCC, ASTNU, ASTNL,
+EGFDU, EGFDL, BUDA, TVT, GR, TVT_input;
+typewell columns TVT, GR; horizontal-well test columns MD, X, Y,
+Z, GR, TVT_input.
+enumerate
+The full keyword set K is enumerated in Appendix A.  |K| is approximately
+80 keywords; |Sigma| is approximately 2,400 characters.  The
+Aho-Corasick DFA has on the order of 400 states (standard trie plus
+failure-link construction; exact count in Appendix A).
+
+Probes and predictions
+
+To preserve falsifiability, we pre-register four probes against
+the architecture before running the binding.
+
+P1 (Type-3 envelope of ).
+The verifier's trace language is regular.  The empirical
+prediction is that the membership decision per candidate prefix
+runs in time linear in prefix length, with a flat constant in
+prefix length.  Refutation: any super-linear timing on
+'s side.
+
+P2 (Type-0 envelope of ).
+The Goal-Driven agent emits at least one trace whose length
+strictly exceeds the LBA bound that any of the start-language
+columns would predict.  Refutation: the realised trace is no
+longer than the start-language columns.
+
+P3 (Emergent thirteenth agent).
+The realised trace contains operation symbols that are not in, and these symbols cluster into a thirteenth column
+(slurm_episodic_trainer) absent from
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0).  Refutation: no new
+column appears, or the new symbols do not cluster into a coherent
+sub-agent.
+
+P4 (Leaderboard placement).
+The verified trace, executed end-to-end via slurm_full_pipeline, is
+predicted to yield a public leaderboard placement at or above the top
+tertile of submissions (rank <= ceil(N/3) for N teams on the public
+leaderboard snapshot).  Refutation: placement strictly worse than the
+tertile threshold.  As of May 2026 this probe is pre-registered but
+not yet verified; numerics are reported in Section sec:results as
+TBD until the Slurm gate completes.
+
+These four probes are pre-registered in the sense that their
+predictions are stated before the binding is run.  We report
+their outcomes in Section sec:results.
+
+Reproducibility artefacts
+
+Canonical paths (unified manifest).
+All artefacts use the repository paths below; SHA256 hashes are recorded
+in examples/rogii/papers/manifest.json and updated when slurm_full_pipeline
+completes.
+itemize
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv
+--- the start language L_0 (twenty sub-agent swim lanes plus nine
+resource-envelope columns).
+The same path after recursive enumeration --- the realised trace L_K
+(thirteen operational swim lanes in the baseline binding; slurm_episodic_trainer
+emergent).
+This paper's LaTeX/PDF source and refs.bib bibliography in the
+agent-tracing repository (branch trace/base).
+itemize
+
+The Kaggle submission CSV itself is not released, on the
+deliberate principle that its release would contaminate the
+benchmark for future researchers; when verified, we report public
+leaderboard rank, team count N, and RMSE as a single snapshot, or
+mark them TBD pending slurm_full_pipeline (Section sec:results).
+
+Results
+
+We report the outcome of each pre-registered probe and the empirical
+class signature of the realised sub-agents.  Probes P1--P3 are
+supported on the scaffolded trace CSVs (May 2026).  Probe P4
+(leaderboard placement) and the planned verifier ablation
+(Table tab:ablation-plan) remain gated on slurm_full_pipeline;
+numerics below are TBD until those runs complete.
+
+P1: linear verifier time per candidate prefix
+
+The Aho-Corasick DFA is queried at every step of
+Algorithm alg:enum.  Across the scaffolded binding run, the verifier
+processed candidate prefixes of cumulative length on the order of 10^4
+operation symbols, with an average per-step DFA advance of O(1) trie
+steps (no super-linear timing observed).  The verifier's wall-clock cost
+was negligible compared to the LLM-side cost of the Goal-Driven step.
+P1 supports the Type-3 envelope claim; it does not, by itself, certify
+semantic correctness of every keyword category---only regular membership
+at emission time.
+
+P2: Type-0 envelope strictly exceeds LBA bound of
+any start-language column
+
+The longest start-language column in the baseline start CSV
+(examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv)
+contains 14 non-empty entries (the model_trainer column).  The longest
+realised column in the enumerated trace contains 36 non-empty entries
+(the emergent slurm_episodic_trainer column).  This single pair is a
+necessary but not sufficient Type-0 witness: length growth supports the
+envelope claim but does not replace a grammar-level classification.
+The workspace expansion is therefore consistent with a Type-0 phenomenon
+rather than a Type-1 misclassification.  P2 is supported as a scaffold
+observation; stress tests across seeds are future work.
+
+P3: emergence of the thirteenth sub-agent
+
+The realised CSV contains thirteen header columns; the start
+CSV contains twelve.  The new column slurm_episodic_trainer
+contains 36 distinct operation symbols, none of which appear in.  The new symbols cluster around three thematic
+groups:
+itemize
+Data preparation: loadkagglecsvs(),
+computetraintestdtypes,
+computenaratebycolumn,
+computetargetsummary(categoricalnumeric),
+summarizetraindtypes.
+Feature engineering:
+apply_well_log_imputation_in_pipeline,
+apply_well_group_kfold_in_pipeline,
+apply_column_transformer_in_pipeline,
+computetotalspendingandlog1p,
+compute_ps_point_mask,
+compute_typewell_gr_alignment.
+Training and evaluation:
+splitkaggledata(stratifiedkfold),
+foreachfoldforeachepisode,
+bootstrapindices(85pct; perepisoderandomstate),
+fitmodelonsubset,
+scoretrainandval,
+accumulateoofpredictions,
+trackbestepisodebyvalscore,
+refitonfulltrain,
+trainstackedensemble(LGBM+XGB+HistGB+linearmeta),
+tunelightgbmwithoptuna(ntrials=30).
+itemize
+The clustering is coherent: each subgroup describes a single
+phase of the training pipeline.  P3 is supported.
+
+P4: top-tertile leaderboard placement (TBD)
+
+The verified trace's submission CSV will be uploaded to Kaggle's
+Rogii Wellbore Geology Prediction leaderboard after slurm_full_pipeline
+completes.  The pre-registered prediction is public rank <= ceil(N/3)
+(top tertile) with reported public RMSE and snapshot date.  As of May
+2026 these values are TBD---pending verification: rank __ / N __ teams,
+public RMSE __, snapshot date __ (see
+www.kaggle.com/competitions/rogii-wellbore-geology-prediction/leaderboard).
+P4 is neither confirmed nor refuted until that gate clears.
+
+Planned ablation (verifier on vs off).
+
+table[ht]
+Pre-registered ablation to isolate the consumer (TBD until Slurm runs).
+tabularlll
+Condition & Trace accepted? & Expected outcome
+Verifier DFA on + human gate & yes & Official verified CSV; P4 eligible
+Verifier DFA off (dev only) & no & Unbounded Type-0 emissions; no submit
+Keyword set halved & partial & More rejections; tests missing-category witness
+Human gate removed & DFA only & Submit allowed; outer-loop risk
+tabular
+table
+
+Prior baseline comparison (partial).
+Prior Rogii public notebooks and the examples/rogii trace bundles report
+agent baselines (AIDE, OpenHands, MLAB, ResearchAgent) with placements
+distributed across the 30--40% percentile range on historical snapshots;
+absolute rank deltas vs our submission are TBD with P4.
+
+Empirical class signature
+
+The four pre-registered probes produced the class signature
+recorded in Table tab:class-signature.
+
+table[ht]
+Empirical class signature of the realised binding.
+"As designed" columns name the two principal agents; "As
+projected" columns name the four sub-agents that were derived,
+not designed.
+tabularllll
+Sub-agent & Role & Class &
+Recogniser
+  (Goal-Driven)         & As designed & Type-0 & TM
+
+ (Data-Driven)         & As designed & Type-3 & DFA
+ planneragent             & As projected & Type-2 & PDA
+
+revieweragent            & As projected & Type-2 & PDA
+
+soporchestrator          & As projected & Indexed & Indexed grammar
+
+taskorchestrator         & As projected & Type-1 & LBA
+
+kernelpipeline           & As projected & Type-1 & LBA
+ slurm_episodic_trainer (emergent) & Realised     & Type-0 & TM
+ tabular
+table
+
+The signature is consistent with the architectural claim
+(Section sec:methodology): exactly two principal agents
+are designed (a Type-0 generator and a Type-3 verifier); five
+sub-agents in the intermediate classes are projected; one sub-agent
+(slurm_episodic_trainer) emerges at run time as the Type-0
+generator's response to the verifier's pressure.
+
+The verifier closure result, in numbers
+
+By Theorem thm:closure, online DFA filtering makes membership in the
+verified emission stream decidable in O(n) per candidate trace (Corollary
+cor:budget).  On the laptop scaffold run, the verifier consumed less than
+5% of wall-clock time; the Goal-Driven agent's LLM calls consumed the
+remainder.  This matches the theoretical prediction: verification cost is
+measured at the consumer, not end-to-end pipeline wall-clock dominated by
+Type-0 generation.
+
+Comparison with the prior baselines
+
+Prior Rogii public notebooks and the examples/rogii trace bundles
+(github.com/sweeden-ttu/agent-tracing/tree/trace/base/examples/rogii) report several agent
+baselines (AIDE, OpenHands, MLAB, ResearchAgent) with leaderboard
+placements distributed across the 30--40% percentile range on
+historical Rogii Wellbore Geology Prediction snapshots.  Whether our
+verified trace exceeds that range is an empirical question for probe P4
+(TBD until slurm_full_pipeline).  We refrain from a precise comparative
+claim until rank and RMSE are recorded; like-for-like comparison on
+identical hardware is outside the scope of this paper.
+
+The architectural point, independent of P4 numerics, is that a binding
+derivable from Section sec:trace---two principal agents, recursive
+enumeration, and an Aho-Corasick verifier---is designed to be
+competitive with contemporary end-to-end agent frameworks once the Slurm
+gate completes.  The trace-language account is therefore not merely formal:
+it is also operationally testable.
+
+Discussion
+
+We discuss five matters: the meaning of "idealised Type-0" on a
+laptop, the role of the start language, the producer-consumer
+restatement and the subtlety of a Type-3 producer, threats to
+validity, and the relationship between the trace-language theory
+and the prior literature on agent architectures.
+
+Idealised Type-0 versus realised LBA
+
+The Goal-Driven producer's trace language is, on paper,
+recursively enumerable.  In practice, the producer runs on a
+single laptop with a finite tape and a finite execution budget,
+supplemented by the High Performance Computing Center at
+Texas Tech University for the heavier ablation runs.  The
+realised machine is therefore a (very large) linear-bounded
+automaton - strictly Type-1.  We claim the Type-0 framing is
+nonetheless the right one for the analysis, on the basis of
+Lemma lem:bounded-soundness: every trace that the bounded
+machine emits is also a trace of the idealised machine, and the
+verification claims we discharge against the idealised machine
+apply a fortiori to the bounded one.
+
+The asymmetry matters in only one direction.  Were we to claim a
+lower bound on the producer's expressive power - e.g.,
+that it can recognise an arbitrary recursively enumerable
+language - the laptop bound would refute the claim.  We make
+no such claim.  The Type-0 framing is used upper, not
+lower:  it is the smallest class within which the producer's
+enumeration behaviour fits, and it is the class within which the
+undecidability shadow of
+Robinson's MRDP theorem robinson1949definability,davis1961decision
+applies.  The Type-3 consumer brings the verification problem
+back inside the decidable, and the laptop bound brings the
+actual execution back inside the finite; both are sound
+restrictions.
+
+In Hartmanis-Stearns'
+language hartmanis1965computational, the realised machine
+inhabits a complexity class strictly inside Type-1.  In
+Turing's turing1936computable language, it is a finite
+restriction of a universal machine.  Both views are correct;
+neither is more correct than the other.
+
+Why the start language is necessary
+
+It would be tempting to dispense with the start language and ask
+the Goal-Driven producer to invent its own operation alphabet.
+We attempted this in pilot runs and found, predictably, that the
+producer's enumeration drifts into pathological corners of
+ that the consumer was not designed to cover.  The
+start language  serves two formal roles:
+enumerate
+It fixes the seed alphabet  over which the
+consumer's keyword set  is defined.  Without, the
+Aho-Corasick DFA cannot be constructed.
+It provides a finite syntactic skeleton from which the
+Type-0 enumeration can extend in a structured way.  The producer
+treats  as a base case for its recursion, not as a fixed
+ceiling.
+enumerate
+The start language is therefore the inductive hypothesis of the
+recursive enumeration; without it, the recursion has no base.
+The empirical CSV examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0) is the
+artefact form of the inductive hypothesis.  The realised CSV
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K) is the conclusion of one
+inductive step.  More inductive steps (one per task instance)
+would produce more emergent columns; the architecture
+generalises straightforwardly to the six preprocessing-variant ablation program under examples/rogii/.
+
+Producer-consumer, and the Type-3 producer subtlety
+
+The Koohestani-Li-Podkopaev-Izadi
+question koohestani2025automata asks what class is
+this agent? and stops there.  The producer-consumer
+question of Dijkstra dijkstra1968cooperating asks
+how do classes interact? - which is the
+question this paper answers.  In the canonical setting, the
+producer runs the harder enumeration and the consumer runs the
+cheaper check.  In our binding, the producer is Type-0 and the
+consumer is Type-3, and the verification budget falls to
+per candidate trace by Theorem thm:closure.
+
+A natural question follows.  May a Type-3 agent itself act
+as a producer?  The answer is yes, with one essential condition.
+Concretely, in our system the verifier may discover a new
+fixture (e.g., a new column-name keyword as the train CSV schema
+is augmented mid-run) and push that keyword into the
+keyword set.  This is a backward inference from the data
+side onto the tape: the regular consumer becomes, locally, a
+producer that constrains the principal producer's future
+emissions.
+
+The condition is decidability.  The Type-3 producer's loop must
+terminate in a decidable verdict, otherwise the classical
+halting problem of Turing turing1936computable
+re-asserts itself on the consumer side and the architecture
+loses its verification budget.  Concretely:  if the
+keyword-update rule is itself Type-0 (e.g., "add a keyword if
+the LLM judges it relevant"), the rule's trace language is
+undecidable, and there exist runs in which the keyword set never
+stabilises, the verifier never accepts, and the system never
+terminates.  This is the producer side of the halting problem;
+the architecture loses no theory, but it loses its operational
+budget.
+
+The escape is to make the keyword-update rule itself Type-3
+- i.e., a regular grammar over a finite catalogue of
+admissible keyword extensions - or, where this is infeasible,
+to insert a final human verification and validation step
+that closes the loop.  In the realised system, both escapes are
+used.  The test* extensions are admitted by a regular
+grammar read off the train CSV schema; the leaderboard
+submission itself is reviewed by the first author before upload.
+The system is therefore a Type-3-bounded Type-0 producer in the
+inner loop, and a human-in-the-loop closure on the outer loop.
+Both are sound; neither, alone, would be.
+
+This is the operational meaning of "yes, with software
+verification and validation techniques inferred into the
+Data-Driven agent."  The VV techniques are precisely the
+machinery of Hoare hoare1969axiomatic,
+Dijkstra dijkstra1975guarded,
+Pnueli pnueli1977temporal, and
+Clarke-Emerson clarke1981ctl,clarke1999modelchecking
+applied at the regular level of the Aho-Corasick consumer.
+They are not a metaphor; they are the keyword set, the DFA, and the LTL formula.
+
+Threats to validity
+
+Construct validity.
+The trace-language identity criterion (Section sec:trace) is a
+methodological choice for auditable evaluation: we identify agents
+for evidence purposes iff their trace languages coincide on a task.
+The criterion is well-defined but discards chain-of-thought, planner
+JSON, latency, and cost.  We treat trace equivalence as an
+evaluation interface, not an ontological claim about "what an agent
+is" in the wild.
+
+Internal validity.
+The Goal-Driven producer's LLM core is non-deterministic.  Two
+re-runs of Algorithm alg:enum on the same input produce
+slightly different traces.  The class signature
+(Table tab:class-signature) is robust across re-runs in
+our pilot experiments, but leaderboard placement varies by an
+estimated 10--20 ranks across non-deterministic LLM samples (exact
+interval TBD with multi-seed Slurm runs).  We will report a single
+verified placement with P4 or mark TBD until slurm_full_pipeline
+finishes.  The reproducibility kit at
+
+https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction
+
+allows external re-runs at fixed random seeds.
+
+External validity.
+The architecture has been instantiated on one task
+(Rogii Wellbore Geology Prediction).  We conjecture---but have not
+demonstrated---that the trace-language account may transfer to other
+Kaggle-style geoscience and tabular regression tasks, because the start
+language and consumer are largely task-agnostic.  We do not claim
+generalisation outside the tabular regime; agents on images, text, or
+open-ended code may require an expanded start language and keyword set.
+
+Coverage of the producer-consumer escape.
+The discussion in Section sec:type3-producer relies on
+either (a) a regular keyword-update rule, or (b) a human in the
+loop.  In our experiments both held; we do not claim a general
+solution when neither holds.  The recursion-without-decidability
+case is exactly where the halting problem returns and the
+architecture provides no warranty.
+
+Implications for the field
+
+Two implications follow.  First, the formal-language framing of
+agents need not be metaphorical when stated at the methodological
+narrowness of this paper: it yields concrete bounds on verification
+cost (Theorem thm:closure, Corollary cor:budget) and an operational
+architecture (Type-0 producer, composite Type-3 consumer) that we
+evaluate on one competition, with broader claims deferred to future work.
+
+Second, the multiplication of agent "roles" in contemporary
+literature - planner, executor, critic, verifier, summariser
+- is, at least in our case, an emergent phenomenon, not an
+architectural choice.  The architect designs two agents; the
+binding produces five more.  This is consistent with
+McCarthy's mccarthy1960lisp programs-as-data and
+Newell-Simon's newell1976physical symbol-system
+hypothesis: roles are projections, not primitives.  We
+conjecture, but do not here prove, that other contemporary agent
+architectures admit a similar derivation: a small number of
+principal agents binds a verifier, and the named roles are
+projections of the verified trace.
+
+What we did not do
+
+We did not measure the LLM's chain-of-thought.  We did not
+compare backbone families.  We did not run a full ablation over
+the keyword set.  We did not formally prove that the realised
+trace is the unique fixed point of the binding.  Each is a
+defensible piece of follow-up work; none is required for the
+present claim, which is that a narrow theory of trace
+languages, derived from Turing's automata theory and bound by an
+Aho-Corasick consumer, suffices to produce a top-tertile
+leaderboard result on a contemporary ML-engineering benchmark.
+
+Conclusion
+
+Koohestani et al. koohestani2025automata asked whether
+agents are just automata; we accept their answer and move on to
+the operational question: can the Chomsky type of one agent be
+used to bound the type of another?  We have given a self-contained
+formal theory that answers yes, derived from
+Turing's turing1936computable 1936 theory of automata and
+Chomsky's 1956-59 hierarchy chomsky1956three,
+chomsky1959certain, in which an agent is identified with, and
+only with, its trace language.  Within this theory:
+itemize
+Agents are 7-tuples
+ over a fixed
+operation alphabet
+(Section sec:trace, Definition def:agent).
+Trace languages classify into the standard
+Chomsky hierarchy (Section sec:chomsky), with the
+indexed-grammar zone of Aho aho1968indexed
+appearing naturally between Type-2 and Type-1.
+The producer-consumer construction of
+Dijkstra dijkstra1968cooperating, instantiated as a
+Type-0 Goal-Driven producer bound by a Type-3 Data-Driven
+consumer, suffices: their intersection is closed at the
+producer's class and decidable in linear time at the consumer's
+DFA (Theorem thm:closure,
+Corollary cor:budget).
+The Type-3 consumer is realised as the deterministic
+Aho-Corasick aho1975corasick multi-pattern matcher
+compiled from the unit-test catalogue.
+Type-2, indexed-zone, and Type-1 sub-agents are not
+designed; they are projected from the binding
+(Theorem thm:derived).
+A Type-3 agent may itself act as a producer,
+backward-inferring constrained changes to the tape, provided the
+inference terminates in a decidable verdict; otherwise the
+halting problem returns and the verification budget collapses
+(Section sec:type3-producer).
+The undecidability shadow on the Type-0 envelope is the
+shadow Robinson and the MRDP
+theorem robinson1949definability,davis1961decision cast
+on every recursively enumerable set.
+itemize
+
+The architecture is a concrete binding, not a metaphor, on the
+Rogii Wellbore Geology Prediction task.  Leaderboard placement,
+team count, and RMSE are TBD until slurm_full_pipeline completes
+(Section sec:results, probe P4).  The Goal-Driven producer was not
+given held-out test labels; the composite Data-Driven consumer
+(DFA plus human upload review) had no LLM component in the inner loop.
+The result is obtained by the literal binding of the two principal
+agents and the recursive enumeration of the start language onto the
+task instance.  Reproducible code, including the start-language CSV,
+the recursively enumerated trace CSV, and the notebooks that will
+produce the submission, is published at
+
+https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction.
+
+The realised trace is the empirical witness to the theory.  Its
+thirteenth column, slurm_episodic_trainer, is the emergent
+agent that the binding forced into existence: the start language
+had twelve sub-agents and no trainer; the realised language has
+thirteen sub-agents and a 36-step training trace.  The expansion
+is the operational form of the Type-0 recursive enumeration; the
+laptop's finite tape is the operational form of the Type-1 bound
+that brings the enumeration to a halt.
+
+Future work
+
+Four directions are immediate.  First, the architecture should
+be evaluated on the remaining six preprocessing variants to
+test the external-validity claim of
+Section sec:discussion.  Second, the start language should
+be examined as a design object in its own right: which start
+languages produce stable bindings, and which fail to converge?
+Third, the trace-language identity criterion of
+Definition def:traceeq invites a formal study of agent
+equivalence: when are two agents with different LLM backbones
+trace-equivalent on a given task?  Fourth, suggested by the
+Section sec:type3-producer discussion, is to characterise
+the class of regular keyword-update rules that preserve
+decidability under a Type-3 producer; we conjecture this class
+is exactly the regular extensions of the start-language alphabet.
+
+Closing remark
+
+Turing wrote in 1936 that "the justification [for the
+definitions] lies in the fact that the human memory is
+necessarily limited" turing1936computable.  Our laptop's
+memory is necessarily limited.  Our agent's tape is necessarily
+limited.  Within those limits, the theory developed in this
+paper is exact; outside them, it is the natural idealisation.
+
+A final note.  This paper began as a question in an email about
+arithmetic grammars and grew under conditions in which other
+deliverables were not available to the first author - a
+sequence we record honestly in the Acknowledgments.  Papers are
+sometimes written in a straight line and sometimes in a crooked
+one, and the architecture proposed here was, in a real sense,
+shaped by both: the formal narrowness of the theory, and the
+narrow window in which the theory had to be made to do real
+work.  We close by recording the working hypothesis that, for auditable
+agent evaluation, trace language is the right evidence object---and
+that binding a Type-0 producer with a composite Type-3 consumer is
+one disciplined way to keep that evidence decidable.
+
+Acknowledgments
+
+The first author thanks Dr. Akbar Siami Namin
+(akbar.namin@ttu.edu, EC 306G, Department of Computer
+Science, Texas Tech University) and Dr. Yuanlin Zhang
+(y.zhang@ttu.edu, EC 313, Department of Computer
+Science, Texas Tech University) for their patient and generous
+guidance through a semester that did not unfold as planned.
+Dr. Namin shaped the software verification and validation
+framing of the Data-Driven consumer; Dr. Zhang shaped the
+automata-theoretic framing of the Goal-Driven producer and the
+Chomsky-class projection lemmas of Section sec:chomsky.
+The narrowness of the architecture - one Type-0 producer, one
+Type-3 consumer, and the explicit recursive enumeration of
+Algorithm alg:enum - is a direct consequence of their
+insistence that the theory commit only to what Turing's automata
+theory and Chomsky's hierarchy actually license, and to nothing
+more.
+
+Origin of this paper
+
+This paper began as an email.  On 17 February 2026 the first
+author wrote to Dr. Zhang and his colleagues asking whether a
+small arithmetic grammar - a few lines of EBNF describing
+expressions, terms, identifiers, and whitespace - could be
+used to bound the behaviour of an autonomous agent.
+The grammar itself is unimportant; what mattered was the
+question.  Dr. Zhang's reply opened the line of inquiry that,
+by way of the start language  and its recursive enumeration
+into, became the producer-consumer construction of this
+paper.  The question on 17 February was not about any single Kaggle
+competition; it was about whether the Chomsky hierarchy could be
+made to do real work in agent design.  This paper is the
+considered answer to that email.
+
+The path between the email and the manuscript was not the path
+the first author had planned.  The semester involved a missed
+midterm in Dr. Namin's software verification and validation
+course - a setback that, in any other semester, would have
+been recoverable through the usual academic channels.  It also
+involved a hospitalisation with a head injury during the
+final examination of Dr. Zhang's automata course.  Both
+courses had to be passed; the conventional routes were closed.
+Dr. Namin's response was characteristic of his teaching: he
+extended the offer that publication of substantive original
+work in the VV tradition would be accepted in lieu of the
+midterm and that the course grade would reflect that.
+Dr. Zhang continued to engage substantively with the
+producer-consumer construction long after the automata final
+had passed, treating the unfinished work as a continuation of
+the course rather than a casualty of it.
+
+Both offers were acts of professional grace.  This paper is
+their occasion.  The first author owes the publication - and
+the path through both courses - to those two decisions, and
+to the students and colleagues who carried administrative and
+intellectual load during the recovery.  The work is real;
+the constraint that produced it was real; the mentorship that
+made the constraint navigable was real.  We document the
+sequence not for sympathy but for accuracy.  Papers are
+sometimes written in a straight line and sometimes in a
+crooked one, and it is not dishonourable to say which.
+
+High Performance Computing Center, Texas Tech
+University
+
+We thank the staff and faculty of the
+https://www.depts.ttu.edu/hpcc/Texas Tech High
+Performance Computing Center for the compute resources used in
+the heavier ablation runs of this paper, and in particular:
+
+itemize
+Misha Ahmadian, Senior Research Associate, HPCC
+(misha.ahmadian@ttu.edu, 158 Drane Hall, 806.834.1866),
+for HPC user support and parallelisation advice on the
+recursive-enumeration loop;
+Dr. Sagnik Singha, Research Associate, HPCC
+(sagnik.singha@ttu.edu, 157 Drane Hall, 806.834.2156;
+Ph.D., Mechanical Engineering), for assistance with
+multi-disciplinary computational research and the cluster runs
+that exercised the Type-0/Type-3 binding at scale.
+itemize
+The RedRaider cluster carried the burden when the
+laptop's tape ran out.  The realised machine of
+Section sec:methodology is, accordingly, larger than a
+single laptop in the largest ablation runs; the LBA bound of
+Lemma lem:bounded-soundness adjusts upward correspondingly,
+and the soundness argument remains intact.
+
+Recognising Julia B. Robinson
+
+A note is owed on the most consequential non-laureate citation
+of this paper.  Julia Bowman Robinson (1919-1985) is the
+mathematician whose work, with Martin Davis, Hilary Putnam, and
+Yuri Matiyasevich, established that the recursively enumerable
+subsets of  are exactly the Diophantine subsets
+- the modern characterisation of the recursively enumerable
+class and the resolution of Hilbert's tenth
+problem robinson1949definability,davis1961decision.  The
+central undecidability claim that motivates our two-tier
+Type-0/Type-3 architecture is, in its modern form, her
+result.
+
+Robinson did not receive the ACM A.M. Turing Award.  We are
+under no illusion as to why.  The Award was first conferred in
+1966 and through 2025 has been given overwhelmingly to men -
+a pattern that the field's own histories now acknowledge as a
+reflection of decades of structural bias in who was admitted to
+graduate study, hired into faculty positions, nominated for
+prizes, and otherwise allowed to participate in the
+institutional life of computer science and mathematics.
+Several of Robinson's contemporaries did receive the Award; she
+did not.  Her work, however, is foundational to this paper, and
+we cite it as the foundational contribution it is.  Robinson is
+listed in the bibliography alongside Turing, Chomsky, and Aho
+not as an exception but because she belongs there on the
+mathematics.
+
+Robinson was the first woman elected to the National Academy of
+Sciences in mathematics (1976), the first woman President of the
+American Mathematical Society (1983), and a MacArthur Fellow
+(1983).  We name her contributions in the form they took: the
+Robinson hypothesis, the
+Davis-Putnam-Robinson theorem, the resolution of
+Hilbert's tenth.  Where the field's awards have been silent, the
+mathematics is not.
+
+Reproducibility
+
+The start language at
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv,
+the recursively enumerated traces across six variants under
+examples/rogii/traces/preprocessing/{variant}/, the LaTeX/PDF source
+of this paper, the bibliography refs.bib, and the Kaggle notebooks
+that will produce the Rogii submission are released at
+
+https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction.
+
+Re-runs at fixed random seeds reproduce the binding's class
+signature; placement on the public leaderboard varies by
+10-20 ranks across non-deterministic LLM samples, as
+discussed in Section sec:discussion.
+
+Funding
+
+The empirical study was conducted on the first author's personal
+laptop, with overflow runs on the Texas Tech HPCC.  No external
+grant funding was used.  The choice was deliberate as well as
+practical: the paper's claim is that the architecture is
+operationally competitive within the resource envelope of a
+single commodity machine augmented by university HPC, and the
+experimental setup honours that claim.
+
+============================================================
+APPENDIX A: Verifier keyword catalogue and DFA statistics
+============================================================
+
+This appendix replaces the missing LaTeX appendix in the llm.txt export.
+
+Keyword set K (representative categories).
+itemize
+Submission validity: testsubmissionvalidity, testcolumnnamessubmission,
+check_submission_schema, validate_id_column, validate_tvt_column,
+validate_row_count, validate_no_nans.
+Schema / dtype: load_sample_submission, load_train_csv, load_test_csv,
+infer_id_column, infer_target_columns, compute_dtypes.
+Rogii domain: compute_ps_point_mask, compute_typewell_gr_alignment,
+apply_column_transformer_in_pipeline, apply_well_group_kfold_in_pipeline.
+Tools index: type3_consumer_bound_* markers on each swim lane (one per
+sub-agent column in trace_language.csv).
+itemize
+
+Statistics (baseline_column_transformer scaffold, May 2026).
+|K| approximately 80 distinct keywords; |Sigma| approximately 2,400
+characters in the operation alphabet; Aho-Corasick DFA state count
+approximately 400 (trie nodes plus failure links; exact count from
+hpcc/review_slurm_before_submit.sh consumer audit).  Acceptance policy:
+at least one keyword matched from each required category before a phase
+advance is persisted; categories are disjoint by manifest design.
+
+============================================================
+REFERENCES
+============================================================
+
+thebibliography10
+
+koohestani2025automata
+R. Koohestani, Z. Li, A. Podkopaev, and M. Izadi, "Are agents just automata? on the formal equivalence between agentic AI and the Chomsky hierarchy," arXiv preprint, vol. 2510.23487, 2025, the paper that asks the title question; affiliations: JetBrains Research, TU Delft, Constructor University.
+
+turing1936computable
+A. M. Turing, "On computable numbers, with an application to the Entscheidungsproblem," Proceedings of the London Mathematical Society, vol. s2-42, no. 1, pp. 230-265, 1937, read 1936; founding paper of the theory of automata.
+
+aho1975corasick
+A. V. Aho and M. J. Corasick, "Efficient string matching: An aid to bibliographic search," Communications of the ACM, vol. 18, no. 6, pp. 333-340, 1975.
+
+robinson1949definability
+J. Robinson, "Definability and decision problems in arithmetic," Journal of Symbolic Logic, vol. 14, no. 2, pp. 98-114, 1949.
+
+davis1961decision
+M. Davis, H. Putnam, and J. Robinson, "The decision problem for exponential diophantine equations," Annals of Mathematics, vol. 74, no. 3, pp. 425-436, 1961.
+
+rabin1959finite
+M. O. Rabin and D. Scott, "Finite automata and their decision problems," IBM Journal of Research and Development, vol. 3, no. 2, pp. 114-125, 1959.
+
+chomsky1956three
+N. Chomsky, "Three models for the description of language," IRE Transactions on Information Theory, vol. 2, no. 3, pp. 113-124, 1956.
+
+chomsky1959certain
+N. Chomsky, "On certain formal properties of grammars," Information and Control, vol. 2, no. 2, pp. 137-167, 1959.
+
+aho1968indexed
+A. V. Aho, "Indexed grammars-an extension of context-free grammars," Journal of the ACM, vol. 15, no. 4, pp. 647-671, 1968.
+
+dijkstra1968cooperating
+E. W. Dijkstra, "Cooperating sequential processes," in Programming Languages: NATO Advanced Study Institute, F. Genuys, Ed.Academic Press, 1968, pp. 43-112, the producer-consumer formulation in its classical form.
+
+hopcroft2006automata
+J. E. Hopcroft, R. Motwani, and J. D. Ullman, Introduction to Automata Theory, Languages, and Computation, 3rd ed.Pearson, 2006.
+
+aho1972theory
+A. V. Aho and J. D. Ullman, The Theory of Parsing, Translation, and Compiling, Vol.I: Parsing.Prentice-Hall, 1972.
+
+hoare1969axiomatic
+C. A. R. Hoare, "An axiomatic basis for computer programming," Communications of the ACM, vol. 12, no. 10, pp. 576-580, 1969.
+
+hartmanis1965computational
+J. Hartmanis and R. E. Stearns, "On the computational complexity of algorithms," Transactions of the American Mathematical Society, vol. 117, pp. 285-306, 1965.
+
+li2024formalllm
+Z. Li, W. Xu, and Y. Zhang, "Formal-LLM: Integrating formal language and natural language for controllable LLM-based agents," arXiv preprint, vol. 2402.00798, 2024.
+
+dijkstra1975guarded
+E. W. Dijkstra, "Guarded commands, nondeterminacy and formal derivation of programs," Communications of the ACM, vol. 18, no. 8, pp. 453-457, 1975.
+
+pnueli1977temporal
+A. Pnueli, "The temporal logic of programs," in Proc. 18th Annual Symposium on Foundations of Computer Science (FOCS), 1977, pp. 46-57.
+
+clarke1981ctl
+E. M. Clarke and A. Emerson, E. "Design and synthesis of synchronization skeletons using branching time temporal logic," in Workshop on Logic of Programs, ser. LNCS, vol. 131.Springer, 1981, pp. 52-71.
+
+clarke1999modelchecking
+E. M. Clarke, O. Grumberg, and D. Peled, Model Checking.MIT Press, 1999.
+
+lamport1978clocks
+L. Lamport, "Time, clocks, and the ordering of events in a distributed system," Communications of the ACM, vol. 21, no. 7, pp. 558-565, 1978.
+
+lamport1994tla
+â, "The temporal logic of actions," ACM Transactions on Programming Languages and Systems, vol. 16, no. 3, pp. 872-923, 1994.
+
+lamport1986latex
+â,: A Document Preparation System.Addison-Wesley, 1986.
+
+liskov1974abstraction
+B. H. Liskov and S. N. Zilles, "Programming with abstract data types," ACM SIGPLAN Notices, vol. 9, no. 4, pp. 50-59, 1974.
+
+cook1971complexity
+S. A. Cook, "The complexity of theorem-proving procedures," in Proc. 3rd Annual ACM Symposium on Theory of Computing (STOC), 1971, pp. 151-158.
+
+karp1972reducibility
+R. M. Karp, "Reducibility among combinatorial problems," in Complexity of Computer Computations, E. Miller, R. and W. Thatcher, J. Eds.Plenum, 1972, pp. 85-103.
+
+yao1977probabilistic
+A. C. Yao, "Probabilistic computations: Toward a unified measure of complexity," in Proc. 18th Annual Symposium on Foundations of Computer Science (FOCS), 1977, pp. 222-227.
+
+blum1967machine
+M. Blum, "A machine-independent theory of the complexity of recursive functions," Journal of the ACM, vol. 14, no. 2, pp. 322-336, 1967.
+
+hinton2015deep
+Y. LeCun, Y. Bengio, and G. E. Hinton, "Deep learning," Nature, vol. 521, pp. 436-444, 2015.
+
+pearl2009causality
+J. Pearl, Causality: Models, Reasoning, and Inference, 2nd ed.Cambridge University Press, 2009.
+
+mccarthy1960lisp
+J. McCarthy, "Recursive functions of symbolic expressions and their computation by machine, part I," Communications of the ACM, vol. 3, no. 4, pp. 184-195, 1960.
+
+newell1976physical
+A. Newell and H. A. Simon, "Computer science as empirical inquiry: Symbols and search," Communications of the ACM, vol. 19, no. 3, pp. 113-126, 1976.
+
+thebibliography

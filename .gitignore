@@ -5,3 +5,4 @@
 *.bbl
 .DS_Store
 *.pdf
+!examples/rogii/papers/**/*.pdf

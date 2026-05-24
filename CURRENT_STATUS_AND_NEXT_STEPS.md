@@ -1,243 +1,184 @@
-# Current Status and Next Steps - Agent Tracing Framework
-## Synchronized with GitHub Repository: https://github.com/sweeden-ttu/agent-tracing
+# Current Status and Next Steps — Agent Tracing / Rogii Trace Experiments
 
-## 📊 CURRENT STATUS (as of May 23, 2026)
-
-### ✅ Completed Milestones:
-
-#### Milestone 0: Repository Setup & Initial Commit
-- **Status**: COMPLETED
-- **GitHub**: Repository initialized and pushed
-- **Files**: 
-  - Repository structure created (docs/, src/, tests/, examples/, scripts/)
-  - Initial commit with README.md
-  - GitHub remote configured: https://github.com/sweeden-ttu/agent-tracing.git
-
-#### Milestone 1: Research Paper Integration (Week 1 Foundation)
-- **Status**: COMPLETED
-- **Location**: PaperBench dataset integrated
-- **Files Created**:
-  - `~/frontier-evals/project/paperbench/data/papers/a-trace-language-theory-of-agents/`
-  - `config.yaml` - Paper identification
-  - `addendum.md` - Brief description
-  - `paper.md` - Full paper content (llm.txt)
-  - `rubric.json` - Trace language verification requirements
-  - `assets/` - Supporting materials directory
-
-#### Milestone 2: Core Framework Scaffolding (Week 1)
-- **Status**: COMPLETED (Scaffolding Phase Only)
-- **Files Created** (One-time scaffolding allowed):
-  - `src/trace_language/core/chomsky_classifier.py`
-  - `src/trace_language/validator/trace_validator.py`
-  - `src/trace_language/recorder/trace_recorder.py`
-  - `src/trace_language/rubric/trace_rubric.py`
-  - `data/trace_language_rogii.csv`
-  - `tests/test_chomsky_classifier.py`
-  - `tests/test_trace_validator.py`
-
-### 📋 NEXT STEPS & MILESTONES
-
-## 🎯 WEEK 2: FOUNDATION & CORE FRAMEWORK IMPLEMENTATION
-**Duration**: May 24 - May 31, 2026
-**Constraint**: After initial scaffolding - ONLY read/update/modify/debug/evaluate/understand EXISTING files
-**No new file creation permitted**
-
-### ✅ Task 2.1: Chomsky Hierarchy Classifier Implementation
-- **File**: `src/trace_language/core/chomsky_classifier.py` (MODIFY EXISTING)
-- **Actions**:
-  - Implement ChomskyClassifier class with Type-0 through Type-3 classification
-  - Add regex pattern matching for each Chomsky level
-  - Implement classification logic with confidence scoring
-  - Add witness reporting for file:line evidence
-  - Implement get_type_description() method
-  - Add basic unit test scaffolding in tests/
-  
-### ✅ Task 2.2: Trace Language Validator Interface
-- **File**: `src/trace_language/validator/trace_validator.py` (MODIFY EXISTING)
-- **Actions**:
-  - Define abstract base class TraceValidator
-  - Implement validate_preconditions() method (Type-3 syntactic)
-  - Implement validate_postconditions() method (Type-2 structural)  
-  - Implement validate_trace_consistency() method (Type-1 semantic)
-  - Add validate_behavioral_completeness() method (Type-0 semi-decidable)
-  - Include proper error handling and logging
-
-### ✅ Task 2.3: Agent Trace Recorder
-- **File**: `src/trace_language/recorder/trace_recorder.py` (MODIFY EXISTING)
-- **Actions**:
-  - Implement TraceRecorder class
-  - Add record_action(agent, verb, args, outcome) method
-  - Implement get_trace() and get_trace_as_string() methods
-  - Add trace validation against specification
-  - Implement trace export to JSON/CSV formats
-  - Add synchronization point detection
-
-### ✅ Task 2.4: Quality Rubric with Recursively Enumerable Properties
-- **File**: `src/trace_language/rubric/trace_rubric.py` (MODIFY EXISTING)
-- **Actions**:
-  - Implement TraceLanguageRubric class
-  - **Syntactic Validity (Type-3 - Decidable)**:
-    - validate_csv_format()
-    - validate_agent_column_alignment()
-    - validate_action_token_recognition()
-  - **Structural Coherence (Type-2 - Decidable)**:
-    - validate_phase_transitions()
-    - validate_synchronization_points()
-    - validate_resource_bounds()
-  - **Semantic Consistency (Type-1 - Decidable)**:
-    - validate_variable_scoping()
-    - validate_data_flow_consistency()
-    - validate_agent_interaction_protocols()
-  - **Behavioral Completeness (Type-0 - Semi-decidable)**:
-    - implement_enumerator_for_valid_traces()
-    - check_goal_achievement_semi_decidable()
-    - generate_counter_examples_for_invalid_traces()
-
-### ✅ Task 2.5: Trace Language Specification for ROGII
-- **File**: `data/trace_language_rogii.csv` (MODIFY EXISTING)
-- **Actions**:
-  - Define agent columns matching ROGII workflow agents
-  - Populate primitive actions as regex-matchable cells
-  - Include synchronization markers (wait/lock indicators)
-  - Add parallelization and sequencing indicators
-  - Ensure CSV format matches frontier-evals specification
-
-### ✅ Task 2.6: Unit Tests Development
-- **Files**: `tests/test_chomsky_classifier.py`, `tests/test_trace_validator.py` (MODIFY EXISTING)
-- **Actions**:
-  - Implement test cases for each Chomsky type classification
-  - Test validator methods with mock trace languages
-  - Test recorder functionality with sample actions
-  - Test rubric evaluation with known good/bad specifications
-  - Add edge case and error condition testing
-
-## 🎯 WEEK 3: INTEGRATION & HPCC SETUP
-**Duration**: June 1 - June 15, 2026
-
-### ✅ Milestone 3: HPCC Environment Setup
-- **Files**: `scripts/setup_env.sh` (CREATE NEW - Week 2 allows one-time scaffatting for scripts)
-- **Actions**:
-  - Create environment setup with miniforge activation
-  - Add module loading: gcc, python, cuda
-  - Configure conda environment for trace_lang_env
-  - Set up directory structure variables
-  - Add environment validation checks
-
-### ✅ Milestone 4: SLURM Batch Templates
-- **Files**: `scripts/run_trace_language.sbatch` (CREATE NEW - Week 2 allows one-time scaffatting)
-- **Actions**:
-  - Create SLURM template for matador partition
-  - Configure resource requests (CPUs, memory, GPU, time)
-  - Set up output/error logging to /lustre/research/
-  - Add environment setup sourcing
-  - Configure experiment execution command
-  - Add resource tracking directives
-
-### ✅ Milestone 5: Experimental Validation Setup
-- **Files**: `src/` and `tests/` (MODIFY EXISTING - Week 3+)
-- **Actions**:
-  - Create experiment execution scripts (modifying existing files)
-  - Implement baseline run configuration (no trace language)
-  - Implement enhanced run configuration (with trace language)
-  - Add result collection and comparison logic
-  - Implement statistical significance testing
-  - Add visualization preparation scripts
-
-## 🎯 WEEK 4: EVALUATION & DOCUMENTATION
-**Duration**: June 16 - June 30, 2026
-
-### ✅ Milestone 6: Baseline vs Enhanced Comparison
-- **Files**: `src/` and `tests/` (MODIFY EXISTING)
-- **Actions**:
-  - Run baseline experiments (Week 3)
-  - Run enhanced experiments (Week 3)
-  - Compare competition performance metrics
-  - Analyze trace language validation results
-  - Measure security improvement metrics
-  - Quantify task breakdown clarity improvements
-
-### ✅ Milestone 7: Documentation Completion
-- **Files**: `docs/` (MODIFY EXISTING)
-- **Actions**:
-  - Update PROJECT_PLAN.md with results
-  - Complete API documentation
-  - Create usage examples and tutorials
-  - Document HPCC execution procedures
-  - Create troubleshooting guide
-  - Update README with implementation status
-
-## 📈 EXPECTED OUTCOMES BY JUNE 30, 2026
-
-### 🔬 Experimental Results:
-1. **Baseline Performance**: ROGII competition score without trace language constraints
-2. **Enhanced Performance**: ROGII competition score with trace language specification
-3. **Improvement Metrics**:
-   - Expected 15-25% improvement in competition score
-   - Expected 40-60% reduction in security violations
-   - Expected 30-50% improvement in task breakdown clarity
-   - Expected 20-40% better resource utilization efficiency
-
-### 📄 Documentation Deliverables:
-1. Updated PROJECT_PLAN.md with results and conclusions
-2. Complete API documentation for all trace language components
-3. Usage examples for integrating with frontier-evals agents
-4. HPCC execution guide with SLURM templates
-5. Troubleshooting and FAQ document
-6. Updated README with badges and installation instructions
-
-### 🧪 Validation Achievements:
-1. Chomsky hierarchy classifier correctly identifies agent types
-2. Trace language validator enforces behavioral constraints
-3. Quality rubric demonstrates recursively enumerable properties
-4. Framework shows measurable improvements in agent safety and reliability
-5. Results ready for AAAI 2027 submission preparation
-
-## 🔄 SYNCHRONIZATION WITH GITHUB
-
-### Current Branch: `main`
-### Last Commit: `a27a745` - "Add AAAI 2027 submission plan"
-### Files Tracked:
-- All files in `~/agent-tracing/` are tracked
-- PaperBench integration is in separate frontier-evals repository
-- Regular commits recommended after each task completion
-
-### Next Git Operations:
-```bash
-# After modifying existing files (Week 2+ tasks):
-git add <modified_file>
-git commit -m "Descriptive commit message following conventional format"
-git push origin main
-```
-
-## ⚠️ IMPORTANT CONSTRAINTS REMINDER
-
-### ✅ PERMITTED (After Initial Scaffolding):
-- READ any file (cat, less, head, tail, grep, etc.)
-- UPDATE/MODIFY existing files (using editors on existing files only)
-- DEBUG by examining existing file contents
-- EVALUATE existing file functionality
-- UNDERSTAND existing code through reading
-- MODIFY existing configuration files
-
-### ❌ STRICTLY PROHIBITED:
-- CREATE any new files after initial scaffotting phase (except in designated weeks for scripts)
-- CREATE new directories after initial scaffotting phase
-- CREATE new CSV specifications after initial phase
-- CREATE new test files after initial phase (modify existing ones only)
-- CREATE new SLURM templates after initial phase (modify existing ones only)
-
-## 📅 TIMELINE SUMMARY
-
-| Week | Dates | Focus | Key Deliverables |
-|------|-------|-------|------------------|
-| 0 | May 20-23 | Setup | Repository, PaperBench integration |
-| 1 | May 24-31 | Foundation | Core framework scaffolding (one-time allowed) |
-| 2 | Jun 1-15 | Implementation | Modify existing files: classifier, validator, recorder, rubric |
-| 3 | Jun 16-30 | Integration | HPCC setup, SLURM templates, experimental validation |
-| 4 | Jul 1-15 | Evaluation | Baseline/enhanced comparison, results analysis |
-| 5 | Jul 16-31 | Documentation | Final documentation, AAAI 2027 preparation |
+**Repository:** https://github.com/sweeden-ttu/agent-tracing  
+**GitHub Project:** [trace_language_experiments (#13)](https://github.com/users/sweeden-ttu/projects/13)  
+**Last updated:** May 24, 2026 (evening)  
+**Active branch:** `trace/base` — synced with `origin/trace/base` @ [`310f4ee`](https://github.com/sweeden-ttu/agent-tracing/commit/310f4ee)  
+**Umbrella PR:** [#16](https://github.com/sweeden-ttu/agent-tracing/pull/16) · variant PRs [#17–#22](https://github.com/sweeden-ttu/agent-tracing/pulls)
 
 ---
-**Last Updated**: May 23, 2026  
-**Repository**: https://github.com/sweeden-ttu/agent-tracing  
-**Status**: Ready for Week 2 implementation (modifying existing files only)  
+
+## Executive summary
+
+All six Rogii trace variants are **95% scaffolded** and **committed on `trace/base`**. PaperBench descriptors, ablation manifests, Slurm consumer-review gates, per-pipeline conda envs, and **six open-access base-paper PDFs** are in the repo. The remaining gap is **full GPU Slurm pipeline execution** (`slurm_full_pipeline=not_started` on every variant).
+
+| Area | Status |
+|------|--------|
+| Six variant trace bundles on GitHub | ✅ Done — [`examples/rogii/`](examples/rogii/) on `trace/base` |
+| Experiment descriptors + dual base papers (baseline) | ✅ Done |
+| Subdivision manifests | ✅ Done |
+| Ablation run manifests (`rogii/ablation_runs/`) | ✅ Initialized (rogii repo, local) |
+| Base scientific papers (PDFs + links) | ✅ Done — [`BASE_PAPERS.md`](examples/rogii/BASE_PAPERS.md) (6 PDFs + 1 DOI-only) |
+| Slurm Ollama consumer review rule + script | ✅ Done |
+| Per-pipeline conda `environment.yml` (×6) | ✅ Done |
+| HPCC Slurm scripts (module load + conda + Ollama) | ✅ All 5 scripts consumer PASS |
+| Cursor agent rules (Slurm pipeline + consumer review) | ✅ Done — [`.cursor/rules/`](.cursor/rules/) |
+| Rogii artifacts pushed to remote | ✅ Done on `trace/base` (commits through `310f4ee`) |
+| Baseline merge to `main` | ⚠️ PR #17 open; local FF merge in `agent-tracing-main` not pushed |
+| Matador Slurm jobs submitted | ⚠️ 2 pending (`24317863` enrich, `24317864` vague_spec) — awaiting resources |
+| Full ablation / training pipeline per variant | ❌ Not started |
+| Conda envs created on compute nodes | ❌ Not verified on Matador |
+
+---
+
+## Recent commits (`trace/base`)
+
+| Commit | Summary |
+|--------|---------|
+| [`310f4ee`](https://github.com/sweeden-ttu/agent-tracing/commit/310f4ee) | Open-access base paper PDFs under `examples/rogii/papers/` |
+| [`0762c0b`](https://github.com/sweeden-ttu/agent-tracing/commit/0762c0b) | `BASE_PAPERS.md`, `papers/manifest.json` |
+| [`8802fa9`](https://github.com/sweeden-ttu/agent-tracing/commit/8802fa9) | Rogii trace bundles, Slurm rules, conda envs, llm_review |
+| [`085c8a2`](https://github.com/sweeden-ttu/agent-tracing/commit/085c8a2) | Prior status doc refresh |
+
+---
+
+## Agent accomplishments (May 23–24, 2026)
+
+### PaperBench / experiment design (`frontier-evals`)
+
+- **`paperbench/trace_pipeline/experiment_descriptor.py`** — variant base papers; baseline has co-equal `base_papers[]` (Ke 2017 LightGBM + Pedregosa 2011 ColumnTransformer); branch + `github_pr: "17"` metadata.
+- **`paperbench/trace_pipeline/subdivision.py`** — train-data fold subdivision; manifests per variant.
+- **`write_experiment_descriptors.py`**, **`write_subdivision_manifests.py`** — batch writers.
+- **Unit tests:** `test_experiment_descriptor.py`, `test_subdivision.py` (passing locally).
+
+### Agent-tracing repo (`examples/rogii/`)
+
+- **Six variant directories** under `traces/preprocessing/{variant}/` with enriched `trace_language.csv` (29 cols), `experiment_descriptor.json`, `paper_refs.md`, `ablation_plan.json`, `subdivision_manifest.json`, `mle_plan.json`.
+- **`ablation_tracking_status.csv`** — all six variants at **95% / partial** (`slurm_full_pipeline=not_started`).
+- **`MERGE_PATH.md`** — merge order baseline → formation; PR mapping #17–#22.
+- **`BASE_PAPERS.md`** + **`papers/`** — Ke, Pedregosa, Sakoe–Chiba, Kaufman, Rocklin, Cover–Hart PDFs; Hampel 1986 DOI link only.
+- **`docs/llm_review/`** — sectioned critical reviews of trace-theory paper (`llm.txt`).
+- **Per-pipeline `environment.yml`** (conda-forge; env name = variant slug).
+
+### Rogii HPCC (`/lustre/work/sweeden/rogii/`)
+
+- **`hpcc/review_slurm_before_submit.sh`** — Type-3 consumer: log triage, `module load gcc/cuda/python`, per-variant conda, Ollama localhost, interactive preflight markers.
+- **`hpcc/load_matador_modules.sh`**, **`hpcc/_variant_conda_env.sh`**, **`hpcc/_matador_ollama_env.sh`** — shared Matador setup.
+- **Slurm scripts (all consumer PASS):** `run_ablation_variant.slurm`, `train_tcn.slurm`, `train_tcn_episodic.slurm`, `vague_spec_batch_matador.slurm`, `enrich_readme_matador.slurm`.
+- **`scripts/run_ablation_suite.py`**, **`scripts/paper_implementation_reviewer.py`** — ablation init + paper compliance audit.
+- **Ablation manifests** under `ablation_runs/{variant}/` (12/8/8/8/12/12 runs per variant).
+
+### Cursor agent rules
+
+- **`.cursor/rules/slurm-ollama-consumer-review.mdc`** — mandatory pre-`sbatch` review (TTU Ollama guide, interactive preflight, log triage).
+- **`.cursor/rules/slurm-pipeline-execution.mdc`** — one active job per variant; cross-links consumer review.
+
+### Git / worktrees
+
+| Path | Branch | Notes |
+|------|--------|-------|
+| `agent-tracing` | `trace/base` | Clean; synced with origin |
+| `agent-tracing-main` | `main` | Local FF merge of baseline (not pushed) |
+| `agent-tracing-trace-{baseline,…}` | per variant | Six worktrees for PR #17–#22 |
+
+---
+
+## Six-variant tracking matrix
+
+| Variant | Issue | PR | Branch | Overall | Blocker |
+|---------|-------|-----|--------|---------|---------|
+| baseline_column_transformer | [#10](https://github.com/sweeden-ttu/agent-tracing/issues/10) | [#17](https://github.com/sweeden-ttu/agent-tracing/pull/17) | trace/baseline-column-transformer | 95% | `slurm_full_pipeline` |
+| typewell_gr_alignment | [#11](https://github.com/sweeden-ttu/agent-tracing/issues/11) | [#18](https://github.com/sweeden-ttu/agent-tracing/pull/18) | trace/typewell-gr-alignment | 95% | `slurm_full_pipeline` |
+| ps_point_leakage_aware | [#12](https://github.com/sweeden-ttu/agent-tracing/issues/12) | [#19](https://github.com/sweeden-ttu/agent-tracing/pull/19) | trace/ps-point-leakage-aware | 95% | `slurm_full_pipeline` |
+| robust_scale_log1p | [#13](https://github.com/sweeden-ttu/agent-tracing/issues/13) | [#20](https://github.com/sweeden-ttu/agent-tracing/pull/20) | trace/robust-scale-log1p | 95% | `slurm_full_pipeline` |
+| parallel_multiwell_loader | [#14](https://github.com/sweeden-ttu/agent-tracing/issues/14) | [#21](https://github.com/sweeden-ttu/agent-tracing/pull/21) | trace/parallel-multiwell-loader | 95% | `slurm_full_pipeline` |
+| formation_plane_spatial | [#15](https://github.com/sweeden-ttu/agent-tracing/issues/15) | [#22](https://github.com/sweeden-ttu/agent-tracing/pull/22) | trace/formation-plane-spatial | 95% | `slurm_full_pipeline` |
+
+Detail: [`examples/rogii/ablation_tracking_status.csv`](examples/rogii/ablation_tracking_status.csv)
+
+---
+
+## GitHub project board (#13) — May 24 snapshot
+
+| Status | Item |
+|--------|------|
+| **Done** | [#4](https://github.com/sweeden-ttu/agent-tracing/issues/4) Resource envelope columns |
+| **Done** | [#5](https://github.com/sweeden-ttu/agent-tracing/issues/5) Commit Rogii trace artifacts → `trace/base` pushed |
+| **In Progress** | [#6](https://github.com/sweeden-ttu/agent-tracing/issues/6) typewell_aligner / ps_detector swim lanes |
+| **In Progress** | [#8](https://github.com/sweeden-ttu/agent-tracing/issues/8) Link traces to automata paper sections |
+| **In Progress** | [#9](https://github.com/sweeden-ttu/agent-tracing/issues/9) Episodic training + Kaggle publish |
+| **In Progress** | [#10–#15](https://github.com/sweeden-ttu/agent-tracing/issues/10) Full MLE pipeline (×6) @ 95% |
+| **Todo** | [#7](https://github.com/sweeden-ttu/agent-tracing/issues/7) CI rubric validation |
+
+Project readme: [base papers + status links](https://github.com/users/sweeden-ttu/projects/13)
+
+---
+
+## Matador queue (last checked May 24)
+
+| Job ID | Name | State | Script |
+|--------|------|-------|--------|
+| 24317863 | rogii_enr | PD (Resources) | `hpcc/enrich_readme_matador.slurm` |
+| 24317864 | rogii_vag | PD (Resources) | `hpcc/vague_spec_batch_matador.slurm` |
+
+No variant ablation jobs (`run_ablation_variant.slurm`) submitted yet.
+
+---
+
+## Next steps (priority order)
+
+### 1. Review and merge PRs
+
+- Review umbrella [#16](https://github.com/sweeden-ttu/agent-tracing/pull/16) and baseline [#17](https://github.com/sweeden-ttu/agent-tracing/pull/17) first.
+- Follow merge order in [`examples/rogii/MERGE_PATH.md`](examples/rogii/MERGE_PATH.md) (#17 → #18 → … → #22).
+
+### 2. Interactive preflight + variant ablation Slurm (one job per variant)
+
+```bash
+cd /lustre/work/sweeden/rogii
+alias interactive='/etc/slurm/scripts/interactive'
+# Match #SBATCH resources; run setup through LONG_RUNNING_START, then kill.
+
+for v in baseline_column_transformer typewell_gr_alignment ps_point_leakage_aware \
+         robust_scale_log1p parallel_multiwell_loader formation_plane_spatial; do
+  bash hpcc/review_slurm_before_submit.sh hpcc/run_ablation_variant.slurm "$v" && \
+  VARIANT="$v" sbatch hpcc/run_ablation_variant.slurm
+done
+```
+
+Training jobs require `VARIANT`:
+
+```bash
+VARIANT=baseline_column_transformer sbatch hpcc/train_tcn_episodic.slurm
+```
+
+After each successful run, set `slurm_full_pipeline=done` in [`ablation_tracking_status.csv`](examples/rogii/ablation_tracking_status.csv).
+
+### 3. Create per-pipeline conda envs on Matador (first interactive session)
+
+```bash
+for v in baseline_column_transformer typewell_gr_alignment ps_point_leakage_aware \
+         robust_scale_log1p parallel_multiwell_loader formation_plane_spatial; do
+  mamba env create -f /lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/$v/environment.yml -y
+done
+```
+
+### 4. Remaining engineering
+
+- Triage `logs/rogii_vague_spec.e24259983` before next vague_spec retry.
+- Add `CONSUMER_REVIEW: YYYY-MM-DD` headers to Slurm scripts after interactive preflight.
+- Automate trace CSV rubric validation in CI ([#7](https://github.com/sweeden-ttu/agent-tracing/issues/7)).
+- Push `frontier-evals` descriptor/subdivision changes to its remote.
+- Close variant issues #10–#15 when `slurm_full_pipeline` completes and SMRE/checkpoints land.
+
+---
+
+## Key references
+
+| Resource | Link |
+|----------|------|
+| Base papers catalog | [`examples/rogii/BASE_PAPERS.md`](examples/rogii/BASE_PAPERS.md) |
+| Rogii experiment README | [`examples/rogii/README.md`](examples/rogii/README.md) |
+| TTU Ollama on Matador | https://www.depts.ttu.edu/hpcc/userguides/application_guides/ollama.php |
+| Umbrella PR | https://github.com/sweeden-ttu/agent-tracing/pull/16 |
+| GitHub project #13 | https://github.com/users/sweeden-ttu/projects/13 |
