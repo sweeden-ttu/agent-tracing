@@ -1,0 +1,63 @@
+\section{A Four-Level Hierarchy of Agent Schemata}
+\label{sec:hierarchy}
+
+We classify agent schemata by constraints on $S$ and $\mathcal{W}$. The analogy to the Chomsky hierarchy is \emph{structural}: each level matches the memory pattern of the corresponding automaton class.
+
+\subsection{Type-3 (regular) agent schemata}
+
+\begin{definition}[Regular agent schema]
+\label{def:type3}
+A schema $\mathcal{A}$ is \emph{regular} if $\mathcal{W}$ is drawn from a finite set (equivalently $\lVert \mathcal{W} \rVert$ is bounded by a constant independent of interaction length) and $\delta$ uses only this finite workspace.
+\end{definition}
+
+\textbf{Interpretation:} The controller cannot remember an unbounded history except through a finite summary; behavior is Markovian over $(s,\mathcal{W})$. This models fixed prompt templates with bounded counters, finite state machines wrapped around an LLM call, or policies that discard raw history after hashing to a finite codebook.
+
+\subsection{Type-2 (pushdown-style) agent schemata}
+
+\begin{definition}[Pushdown agent schema]
+\label{def:type2}
+A schema is \emph{pushdown-style} if $\mathcal{W}$ is a stack over a finite set of \emph{stack terminals} (the push/pop vocabulary fixed by a finite grammar of stack cells), with push/pop determined by $\delta$, and $|S| < \infty$.
+\end{definition}
+
+\textbf{Interpretation:} Nested subgoals (e.g., call a tool, then resume parent plan) are first-class. This aligns with hierarchical task networks and nested ReAct-style loops where the depth of the call stack is the salient memory resource \citep{react2023}.
+
+\subsection{Type-1 (linear-bounded) agent schemata}
+
+\begin{definition}[Linear-bounded agent schema]
+\label{def:type1}
+Fix an encoding of past observations into a tape of symbols. A schema is \emph{linear-bounded} if, after $n$ steps, $\lVert \mathcal{W} \rVert \le c n + c_0$ for constants $c,c_0$, and $\delta$ never expands the workspace beyond this bound relative to the recorded interaction length $n$.
+\end{definition}
+
+\textbf{Interpretation:} The agent may use scratch space proportional to task size (e.g., storing the full observation transcript over a fixed finite observation vocabulary) but not superlinear growth without external resources.
+
+\subsection{Type-0 (Turing-complete) agent schemata}
+
+\begin{definition}[Turing agent schema]
+\label{def:type0}
+A schema is \emph{Turing-complete} if $\mathcal{W}$ may include an unbounded read/write store (or an oracle equivalent to unbounded external memory) such that the family of transition relations simulates an arbitrary Turing machine on some encoding of inputs.
+\end{definition}
+
+\textbf{Interpretation:} Arbitrary files, growing vector stores, or unconstrained scratch pads make the overall system capable of general computation over finite encodings of observations.
+
+\begin{definition}[Shortcuts and strategies (physical Type-0 models)]
+\label{def:shortcuts}
+No physical implementation provides truly unbounded memory. We therefore distinguish the \emph{idealized} Type-0 schema from \emph{deployed} agents that approximate unbounded recall using:
+\begin{itemize}
+  \item \textbf{Shortcuts:} morphisms that map long traces or histories to compact handles (chunk identifiers, hashes, pointers into an external store) so that $\delta$ can depend on data not carried in the LLM buffer.
+  \item \textbf{Strategies:} a family of policies over such shortcuts together with retrieval rules (when to read, merge, or refresh external material) that realize effective read/write to an external store within finite per-step time budgets.
+\end{itemize}
+Formally, fix an external store $\mathcal{E}$ with update and query operations. A \emph{shortcut} is a pair $(\mathrm{key},\mathrm{fetch})$ where $\mathrm{key}$ maps a finite summary of history into a finite locator for $\mathcal{E}$, and $\mathrm{fetch}$ retrieves a finite fragment into $\mathcal{W}_{\mathrm{ctx}}$ under a chosen context policy (Definition~\ref{def:ctx-policies}). A \emph{strategy} is a schedule of shortcut applications and $\delta$-steps subject to resource bounds.
+\end{definition}
+
+\begin{remark}
+Accordingly, empirical claims of ``Type-0 behavior'' should state which external $\mathcal{E}$ and which shortcut/strategy layer are assumed; the idealized hierarchy in Theorem~\ref{thm:strict} is about schemata, while deployed systems are always finite at any instant.
+\end{remark}
+
+\begin{theorem}[Strict inclusion (idealized)]
+\label{thm:strict}
+Under standard encodings and assuming nontrivial terminal vocabularies for observations and actions, the families of trace languages definable by regular, pushdown-style, linear-bounded, and Turing agent schemata form a strict hierarchy (each class strictly contains the previous for suitable trace encodings).
+\end{theorem}
+
+\begin{remark}
+Proof sketches follow classical strict inclusions for regular $\subset$ context-free $\subset$ context-sensitive $\subset$ recursively enumerable languages, lifted to trace encodings; full proofs are standard and omitted for brevity.
+\end{remark}

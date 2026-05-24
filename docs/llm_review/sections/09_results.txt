@@ -1,0 +1,158 @@
+# Section 09: Results
+
+Source: llm.txt lines 1730–1882
+
+---
+
+Results
+
+We report the outcome of each pre-registered probe, the
+leaderboard placement, and the empirical class signature of the
+realised sub-agents.  No probe is refuted; the leaderboard
+placement falls into the predicted top tertile.
+
+P1: linear verifier time per candidate prefix
+
+The Aho-Corasick DFA is queried at every step of
+Algorithm alg:enum.  Across the run, the verifier processed
+candidate prefixes of cumulative length on the order of
+ operation symbols, with an average per-step DFA
+advance of.  No super-linear timing was observed on the
+verifier side; the verifier's wall-clock cost was negligible
+compared to the LLM-side cost of the Goal-Driven step.  P1 is
+supported.
+
+P2: Type-0 envelope strictly exceeds LBA bound of
+any start-language column
+
+The longest start-language column in
+tracelanguageoriginal.csv contains 14 non-empty
+entries (the mlebenchsolver column).  The longest
+realised column in tracelanguagekaggle.csv contains
+36 non-empty entries (the emergent kaggletrainer
+column).  The realised trace length is strictly greater than any
+linear bound in the start-language column lengths; the workspace
+expansion is therefore a genuine Type-0 phenomenon, not a Type-1
+phenomenon misclassified.  P2 is supported.
+
+P3: emergence of the thirteenth sub-agent
+
+The realised CSV contains thirteen header columns; the start
+CSV contains twelve.  The new column kaggletrainer
+contains 36 distinct operation symbols, none of which appear in.  The new symbols cluster around three thematic
+groups:
+itemize
+Data preparation: loadkagglecsvs(),
+computetraintestdtypes,
+computenaratebycolumn,
+computetargetsummary(categoricalnumeric),
+summarizetraindtypes.
+Feature engineering:
+applycabindecompositioninpipeline,
+applypassengergroupextractioninpipeline,
+applyspaceshipfeatureengineerinpipeline,
+computetotalspendingandlog1p,
+computecryosleepanomaly,
+computegroupmodalhomeplanet.
+Training and evaluation:
+splitkaggledata(stratifiedkfold),
+foreachfoldforeachepisode,
+bootstrapindices(85pct; perepisoderandomstate),
+fitmodelonsubset,
+scoretrainandval,
+accumulateoofpredictions,
+trackbestepisodebyvalscore,
+refitonfulltrain,
+trainstackedensemble(LGBM+XGB+HistGB+linearmeta),
+tunelightgbmwithoptuna(ntrials=30).
+itemize
+The clustering is coherent: each subgroup describes a single
+phase of the training pipeline.  P3 is supported.
+
+P4: top-tertile leaderboard placement
+
+The verified trace's submission CSV was uploaded to Kaggle's
+Spaceship Titanic leaderboard.  The result, recorded
+on www.kaggle.com/competitions/spaceship-titanic/leaderboard,
+is rank  out of  teams (, top
+tertile, public leaderboard).  The asterisk on the rank reflects
+Kaggle's standard "no team" notation for individual
+submissions; the rank itself is unambiguous.
+
+The pre-registered prediction was placement at or above.  The realised placement is.  P4 is
+supported.
+
+The placement also represents a - absolute placement
+improvement over the prior published agent baselines reported on
+github.com/openai/mle-bench.
+
+Empirical class signature
+
+The four pre-registered probes produced the class signature
+recorded in Table tab:class-signature.
+
+table[ht]
+Empirical class signature of the realised binding.
+"As designed" columns name the two principal agents; "As
+projected" columns name the four sub-agents that were derived,
+not designed.
+tabularllll
+Sub-agent & Role & Class &
+Recogniser
+  (Goal-Driven)         & As designed & Type-0 & TM
+
+ (Data-Driven)         & As designed & Type-3 & DFA
+ planneragent             & As projected & Type-2 & PDA
+
+revieweragent            & As projected & Type-2 & PDA
+
+soporchestrator          & As projected & Indexed & Indexed grammar
+
+taskorchestrator         & As projected & Type-1 & LBA
+
+kernelpipeline           & As projected & Type-1 & LBA
+ kaggletrainer (emergent) & Realised     & Type-0 & TM
+ tabular
+table
+
+The signature is consistent with the architectural claim
+(Section sec:methodology): exactly two principal agents
+are designed (a Type-0 generator and a Type-3 verifier); five
+sub-agents in the intermediate classes are projected; one sub-agent
+(kaggletrainer) emerges at run time as the Type-0
+generator's response to the verifier's pressure.
+
+The verifier closure result, in numbers
+
+By Theorem thm:closure, the verified trace language is
+ (because ).  By
+Corollary cor:budget, membership in the verified language
+is decidable in  time per candidate trace, because the
+verifier's DFA is the bottleneck.  In wall-clock terms, on the
+laptop, the verifier consumed less than  of the run-time;
+the Goal-Driven agent's LLM calls consumed the rest.  This
+matches the theoretical prediction: the verifier's class is the
+binding cost, and the verifier's class is Type-3.
+
+Comparison with the prior baselines
+
+The OpenAI MLE-bench repository
+(github.com/openai/mle-bench) reports several agent
+baselines (AIDE, OpenHands, MLAB, ResearchAgent) with leaderboard
+placements distributed across the 30-40% percentile range on
+Spaceship Titanic.  Our verified trace places at the
+top of that range and modestly improves upon the best previously
+reported.  We refrain from a precise comparative claim because
+the baselines were run by different teams under different
+hardware budgets; the like-for-like comparison would require a
+controlled re-run on identical hardware, which is outside the
+scope of this paper.
+
+The point of the comparison is not the magnitude of the
+improvement.  The point is that an architecture derivable
+entirely from the theory of Section sec:trace -
+two principal agents, a recursive enumeration, an Aho-Corasick
+verifier - meets and exceeds the leaderboard performance of
+several recent end-to-end agent frameworks.  The trace-language
+account of agents is therefore not merely formal: it is also
+operationally competitive.

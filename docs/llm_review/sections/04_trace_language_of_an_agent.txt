@@ -1,0 +1,259 @@
+# Section 04: Trace Language of an Agent
+
+Source: llm.txt lines 672–925
+
+---
+
+The Trace Language of an Agent
+
+This section is the formal core of the paper.  We define an agent
+as a tuple of seven objects, three of which are derivative.  We
+then define the agent's trace language and prove that the
+definition satisfies the Chomsky hierarchy verbatim.  The
+construction is austere and self-contained; nothing beyond
+Section sec:preliminaries is assumed.
+
+Operation alphabet
+
+definition[Operation alphabet]
+An operation alphabet is a finite, non-empty set
+whose elements  each denote an effectful
+computation name, called an operation symbol.
+Each  is associated with a (possibly partial) computable
+function
+acting on a state space  and producing a successor state in, so that the abstract symbol carries an effect when
+executed.  The function  is fixed once
+and for all by the runtime environment and is not a property of
+the agent.
+definition
+
+For the empirical instantiation in
+Section sec:expsetup,  is the union of the column
+entries of tracelanguagekaggle.csv.  Examples include
+loadvectordb(geminiembeddings.json),
+composeplannerprompt,
+invokegemini(gemini-2.5-flash-lite),
+runphaseunittests(phase; compdir), and
+trainstackedensemble(LGBM+XGB+HistGB+linearmeta).
+The operation symbol is the name plus its parenthesised
+argument list as written in the source; two invocations of the
+same name with different arguments are different operation
+symbols, exactly as Liskov's abstract data types prescribe for
+parameterised operations liskov1974abstraction.
+
+Agent
+
+definition[Agent]
+An agent is a 7-tuple
+
+A = (_A,
+                       Q_A,
+                       q_0^A,
+                       X_A,
+                       _A,
+                       F_A,
+                       h_A)
+
+where
+itemize
+ is the agent's
+operation alphabet;
+ is a (possibly countably infinite)
+configuration space;
+ is the initial
+configuration;
+ is the (computable) input domain;
+ is the
+agent's step relation: at configuration  on input
+it returns a successor configuration  together with a finite
+string of operation symbols emitted by the step;
+ is the halting
+set;
+ is the halting verdict.
+itemize
+
+The objects
+are derivative:  is determined by  and the
+runtime environment;  is the agent's
+program; and  is fixed by the convention
+that a configuration in  accepts iff it carries
+the post-condition for which the trace was emitted.
+definition
+
+remark
+The 7-tuple is the minimal one that lets us speak of an emitted
+string per step.  A 5-tuple of the
+ Hopcroft-Ullman hopcroft2006automata
+form would force  to emit a single symbol per step, which
+is too restrictive: a single "call to the planner" in our
+empirical agent emits a structured prompt-build sequence that we
+prefer to record as a string of three or four operation symbols.
+The choice of  rather than
+in the codomain of  is therefore essential.
+remark
+
+Run, trace, and trace language
+
+definition[Run]
+A run of  on input  is a
+finite or infinite sequence
+
+= ((q_0, w_0), (q_1, w_1), (q_2, w_2),
+)
+
+with,, and for each,  defined.
+The run is halting if it is finite and its last
+configuration  lies in; it is
+accepting if additionally.
+definition
+
+definition[Trace]
+The trace of a run  is the concatenation
+
+() = w_0 w_1 w_n
+_A^*.
+
+We write  for the trace of the run of
+ on  when that run is unique.
+definition
+
+definition[Trace language]
+The trace language of  is
+
+L(A) =
+():  is an accepting run of
+A  on some  xX_A
+ _A^*.
+
+definition
+
+Trace-equivalence
+
+definition[Trace equivalence]
+Two agents  over a common alphabet
+ are trace-equivalent, written, iff.
+definition
+
+The austerity claim of the paper, in two lines, is:
+An agent is its trace language, and only its trace
+language.  Trace-equivalent agents are the same agent.  The
+internal architecture (LLM, neural network, hand-coded controller,
+mixture of all three) is irrelevant to the identity criterion.
+
+Multi-agent systems
+
+definition[Multi-agent system]
+A multi-agent system is a finite tuple  where each
+ is an agent and  is an orchestration relation
+specifying which agent's emission, on which prefix, may be
+consumed by which other agent.
+definition
+
+The trace language of  is the set of strings over the
+common alphabet  that
+are obtainable by the orchestrated shuffle: pick an accepting run
+of each, then interleave their traces in any order
+consistent with.  Formally,
+
+L(M) =
+_(_1,, _k)
+        L(A_1)L(A_k)
+shuffle_R(_1,, _k)
+
+where  is the standard interleaving
+restricted by  hopcroft2006automata.
+
+The CSV files are languages
+
+We make explicit the empirical correspondence used throughout the
+sequel.  The header row of tracelanguagekaggle.csv
+names the sub-agents:
+
+A_1 = researchagent,,A_13 = kaggletrainer.
+
+For, the -th column of the file (skipping empty
+cells) is a single string.
+This string is one accepting run of  on the
+Spaceship Titanic input.  The trace language
+ contains, in principle, infinitely many other
+strings; the column records exactly the one that the
+recursive enumeration emitted.
+
+The same correspondence holds for
+tracelanguageoriginal.csv, with the difference that
+its header has only twelve columns (the start language has no
+kaggletrainer agent) and its row entries are
+substantially shorter.
+
+Closure under intersection with the verifier
+
+We now state the closure result that is the architectural pivot
+of the paper.
+
+theorem[Verifier closure]
+Let  be an agent with  in Chomsky
+class  for some.  Let
+ be an agent with
+(a regular language).  Define the verified composition
+ as the agent that emits a
+trace  iff  and  is accepted
+by  when treated as input to its DFA.  Then
+
+L(GV)
+= L(G) L(V)
+ L_i.
+
+In particular, the Chomsky class of the verified trace language
+is no greater than the Chomsky class of  alone, and
+the membership problem for
+is decidable in linear time whenever a candidate trace is
+presented to 's DFA.
+theorem
+
+proof
+Each Chomsky class  is closed under intersection
+with regular languages.  For, this is the standard
+product-construction rabin1959finite.  For, it is
+the standard product of a PDA with a DFA, which is again a
+PDA hopcroft2006automata.  For, it follows from
+LBA closure under intersection (regular languages are
+context-sensitive).  For, it is the standard product
+of a Turing machine with a DFA, which is again a Turing machine
+turing1936computable,hopcroft2006automata.
+
+The decidability claim follows because  is a DFA:
+given a candidate trace  of length, the DFA decides
+ in  time and constant space.
+proof
+
+corollary[Verification budget]
+Verification of the verified trace language
+ on a candidate trace
+of length  runs in  time and  space.  The Type-0
+class of  does not enlarge the verifier's complexity.
+corollary
+
+The empirical signature of a Type-0 trace language
+
+A trace language  is Type-0 iff  can
+emit traces whose length grows without a recursive bound in the
+input size, and whose contents reflect arbitrary recursive
+enumerations of the operation alphabet.  In our empirical
+setting, 's Type-0 status is witnessed by the
+kaggletrainer column of
+tracelanguagekaggle.csv, which contains a strictly
+longer sequence (36 non-empty entries) than any column of
+tracelanguageoriginal.csv (which contains at most
+fourteen).  The lengthening is the operational footprint of the
+recursive enumeration: the start language emitted twelve seed
+agents; the binding to the Type-3 verifier forced enumeration of
+arbitrarily long check-train-validate cycles; the result was a
+strictly more complex trace, materialised on disk by the
+recursive Type-0 step.
+
+The undecidability that Robinson's
+theorem robinson1949definability,davis1961decision fixes
+on the Type-0 class is therefore a real property of:
+were it not for the Type-3 verifier, no algorithm would decide
+whether a candidate trace lay in.  The verifier
+is the entire reason the system is decidable in practice.

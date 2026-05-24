@@ -1,0 +1,42 @@
+\documentclass[12pt]{article}
+\usepackage{geometry}
+\usepackage{hyperref}
+\geometry{margin=1in}
+
+\title{Peer Review Article\\\large Formalizing Agentic Programming via the Chomsky Hierarchy:\\\textit{Agentic Programs as Formal Automata} (Weeden, \today)}
+\author{Anonymous Referee}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Summary}
+
+The manuscript proposes a definitional framework in which \emph{agent schemata}---finite control modes paired with a workspace and a transition rule---generate \emph{trace languages} of observation--action sequences. By constraining the workspace to be finite, stack-like, linear-bounded in the interaction length, or Turing-complete, the author aligns four levels of agent designs with the classical Chomsky hierarchy (Types~3--0). The paper is primarily conceptual: it states definitions, sketches strict inclusion, and discusses evaluation pre-registration for mapping implementations to schemata.
+
+\section*{Strengths}
+
+\begin{itemize}
+  \item \textbf{Precision.} The main definitions of agent schema, regular/pushdown/linear-bounded/Turing agent schemata make informal claims about ``bounded memory'' and ``nested tools'' formally comparable to finite control, stacks, LBAs, and Turing stores.
+  \item \textbf{Honest scope.} The introduction and limitations explicitly disclaim identifying LLM natural-language generation with a grammar class; the object of study is the \emph{controller} and its traces under a fixed discretization.
+  \item \textbf{Evaluation alignment.} Section~4 connects the formalism to audit trails (control-state and memory audits, trace logging), consistent with reproducibility norms in multi-model evaluation.
+\end{itemize}
+
+\section*{Weaknesses and requests}
+
+\begin{itemize}
+  \item \textbf{Encoding dependence.} The morphism from traces to strings is hand-waved as ``injective encoding.'' The referee requests either a canonical construction or a theorem that hierarchy separations are invariant under injective re-encoding of a fixed trace set.
+  \item \textbf{Stochastic policies.} Real LLM agents are not deterministic $\delta$; a brief stochastic or distribution-over-traces extension would strengthen applicability.
+  \item \textbf{Examples.} Worked examples separating classes (e.g., a pushdown-only protocol that no finite-state wrapper captures on traces) would illustrate the claimed strict hierarchy.
+  \item \textbf{Related work.} Positions relative to prior formalizations of RL, POMDPs, and hierarchical RL should be expanded; citations beyond automata textbooks and ReAct are needed.
+\end{itemize}
+
+\section*{Recommendation}
+
+\textbf{Minor revision.} The core definitions are suitable for a short formal-methods note or workshop paper. Address encoding invariance and add at least one concrete separating example; expand related work before journal submission.
+
+\section*{Ethical note}
+
+Classifying agents by computational power does not address misuse of powerful tools; the discussion section should cross-reference safety literature if the work is positioned for practitioners.
+
+\end{document}

@@ -1,0 +1,149 @@
+# Section 08: Experimental Setup
+
+Source: llm.txt lines 1586–1729
+
+---
+
+Experimental Setup
+
+Benchmark
+
+We instantiate the architecture on the Spaceship Titanic
+task drawn from the publicly hosted MLE-bench suite
+(github.com/openai/mle-bench).
+Spaceship Titanic is a binary-classification competition
+in which the agent must predict, for each test passenger, whether
+they were transported to an alternate dimension during a fictional
+inter-stellar collision.  The competition is hosted on Kaggle as a
+"Getting Started" competition, has 2330 active teams as of the
+date of submission, and uses public-leaderboard accuracy as its
+ranking metric.
+
+The task is selected for three reasons: it requires non-trivial
+feature engineering (compound Cabin field decomposition,
+group-aware k-fold splitting, missingness-indicator generation);
+it has a clearly defined submission validity criterion (column
+names, row count, no missing predictions); and its leaderboard is
+sufficiently dense that a - placement improvement
+constitutes a reproducible, statistically meaningful signal.
+
+Hardware and software environment
+
+itemize
+Hardware: a single laptop (the author's macOS development
+machine).  CPU and RAM bounds are recorded in the run log; both
+are finite and the realised computation is therefore an LBA in
+the formal sense of Section sec:preliminaries.
+Operating system: macOS, with the Kaggle CLI version locked
+in the run-time configuration.
+LLM backbone: Google Gemini, accessed through the
+google-genai client.  Two model strings appear in the
+realised trace: gemini-2.5-pro for Type-0 deliberation
+steps; gemini-2.5-flash and
+gemini-2.5-flash-lite for finite-state housekeeping and
+verification-adjacent steps.
+Embedding backbone: text-embedding-004 for the
+research-agent vector store and the tools-index keyword
+embedding.
+itemize
+
+The deliberate restriction of the backbone to a single hosted LLM
+family is methodological: the goal is to minimise the
+architectural surface area while exhibiting the trace-language
+phenomenon.  We report no comparison across backbone families.
+
+Start language
+
+The start language
+is the publicly attached artefact in
+data/trace_language_original.csv.  Its alphabet
+ is the set of operation symbols read off the file's
+twelve columns.   is approximately 90, after
+deduplication of recurring symbols across columns.
+
+The start language was constructed by hand from the open-source
+MLE-bench agent stubs and from the standard Kaggle CLI
+documentation.  No competition-specific knowledge entered: the start language is task-agnostic.  In particular,
+ contains no symbol pertaining to the Spaceship
+Titanic feature space (no Cabin, no HomePlanet,
+no CryoSleep); these symbols enter only after the
+recursive enumeration of Algorithm alg:enum has materialised
+them under the verifier's pressure.
+
+Verifier keyword set
+
+The verifier  is the Aho-Corasick DFA
+constructed from the keyword set  obtained by:
+enumerate
+Reading the toolsindex column of  and
+including each operation symbol (e.g.,
+scoreagainstindex(cosine)).
+Reading the unittestrunner column of
+and including each test* symbol (e.g.,
+testsubmissionvalidity,
+testcolumnnamessubmission).
+Adjoining the column-name and dtype keywords mechanically
+extracted from the
+Spaceship Titanic train.csv schema:
+PassengerId, HomePlanet, CryoSleep,
+Cabin, Destination, Age,
+VIP, RoomService, FoodCourt,
+ShoppingMall, Spa, VRDeck,
+Name, Transported.
+enumerate
+The full  is enumerated in Appendix A.   is approximately
+54 keywords;  is approximately 1,200 characters.  The
+Aho-Corasick DFA has on the order of  states.
+
+Probes and predictions
+
+To preserve falsifiability, we pre-register four probes against
+the architecture before running the binding.
+
+P1 (Type-3 envelope of ).
+The verifier's trace language is regular.  The empirical
+prediction is that the membership decision per candidate prefix
+runs in time linear in prefix length, with a flat constant in
+prefix length.  Refutation: any super-linear timing on
+'s side.
+
+P2 (Type-0 envelope of ).
+The Goal-Driven agent emits at least one trace whose length
+strictly exceeds the LBA bound that any of the start-language
+columns would predict.  Refutation: the realised trace is no
+longer than the start-language columns.
+
+P3 (Emergent thirteenth agent).
+The realised trace contains operation symbols that are not in, and these symbols cluster into a thirteenth column
+(kaggletrainer) absent from
+tracelanguageoriginal.csv.  Refutation: no new
+column appears, or the new symbols do not cluster into a coherent
+sub-agent.
+
+P4 (Leaderboard placement).
+The verified trace, executed end-to-end, yields a public
+leaderboard placement at or above the top tertile of submissions
+(i.e., rank ).  Refutation: a
+placement strictly worse than.
+
+These four probes are pre-registered in the sense that their
+predictions are stated before the binding is run.  We report
+their outcomes in Section sec:results.
+
+Reproducibility artefacts
+
+The following artefacts are released with this paper:
+itemize
+data/trace_language_original.csv - the start
+language  with twelve sub-agent columns.
+data/trace_language_kaggle.csv - the recursively
+enumerated trace  with thirteen sub-agent columns.
+This paper's  source, including the
+refs.bib bibliography of Turing-laureate works, in
+ /agentic_chomsky_formalization/.
+itemize
+
+The Kaggle submission CSV itself is not released, on the
+deliberate principle that its release would contaminate the
+benchmark for future researchers; the leaderboard placement is
+reported as a single verified rank-out-of-N number.

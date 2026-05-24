@@ -1,0 +1,255 @@
+# Section 11: Conclusion and Future Work
+
+Source: llm.txt lines 2092–2341
+
+---
+
+Conclusion
+
+Koohestani et al. koohestani2025automata asked whether
+agents are just automata; we accept their answer and move on to
+the operational question: can the Chomsky type of one agent be
+used to bound the type of another?  We have given a self-contained
+formal theory that answers yes, derived from
+Turing's turing1936computable 1936 theory of automata and
+Chomsky's 1956-59 hierarchy chomsky1956three,
+chomsky1959certain, in which an agent is identified with, and
+only with, its trace language.  Within this theory:
+itemize
+Agents are 7-tuples
+ over a fixed
+operation alphabet
+(Section sec:trace, Definition def:agent).
+Trace languages classify into the standard
+Chomsky hierarchy (Section sec:chomsky), with the
+indexed-grammar zone of Aho aho1968indexed
+appearing naturally between Type-2 and Type-1.
+The producer-consumer construction of
+Dijkstra dijkstra1968cooperating, instantiated as a
+Type-0 Goal-Driven producer bound by a Type-3 Data-Driven
+consumer, suffices: their intersection is closed at the
+producer's class and decidable in linear time at the consumer's
+DFA (Theorem thm:closure,
+Corollary cor:budget).
+The Type-3 consumer is realised as the deterministic
+Aho-Corasick aho1975corasick multi-pattern matcher
+compiled from the unit-test catalogue.
+Type-2, indexed-zone, and Type-1 sub-agents are not
+designed; they are projected from the binding
+(Theorem thm:derived).
+A Type-3 agent may itself act as a producer,
+backward-inferring constrained changes to the tape, provided the
+inference terminates in a decidable verdict; otherwise the
+halting problem returns and the verification budget collapses
+(Section sec:type3-producer).
+The undecidability shadow on the Type-0 envelope is the
+shadow Robinson and the MRDP
+theorem robinson1949definability,davis1961decision cast
+on every recursively enumerable set.
+itemize
+
+The architecture is not metaphorical.  Instantiated on the
+Spaceship Titanic task drawn from the public
+MLE-bench benchmark, it produced a leaderboard placement
+of  out of  teams (, top tertile),
+representing a - absolute placement improvement over
+prior published agent baselines.  The Goal-Driven producer had
+no a priori knowledge of the goal label; the Data-Driven
+consumer had no LLM component.  The result was obtained by the
+literal binding of the two principal agents and the recursive
+enumeration of the start language onto the task instance.  All
+reproducible code, including the start-language CSV, the
+recursively enumerated trace CSV, and the notebooks that produced
+the submission, is published at
+
+https://www.kaggle.com/sweeden-ttu/competitions/spaceship-titanic.
+
+The realised trace is the empirical witness to the theory.  Its
+thirteenth column, kaggletrainer, is the emergent
+agent that the binding forced into existence: the start language
+had twelve sub-agents and no trainer; the realised language has
+thirteen sub-agents and a 36-step training trace.  The expansion
+is the operational form of the Type-0 recursive enumeration; the
+laptop's finite tape is the operational form of the Type-1 bound
+that brings the enumeration to a halt.
+
+Future work
+
+Four directions are immediate.  First, the architecture should
+be evaluated on the remaining tasks of MLE-bench to
+test the external-validity claim of
+Section sec:discussion.  Second, the start language should
+be examined as a design object in its own right: which start
+languages produce stable bindings, and which fail to converge?
+Third, the trace-language identity criterion of
+Definition def:traceeq invites a formal study of agent
+equivalence: when are two agents with different LLM backbones
+trace-equivalent on a given task?  Fourth, suggested by the
+Section sec:type3-producer discussion, is to characterise
+the class of regular keyword-update rules that preserve
+decidability under a Type-3 producer; we conjecture this class
+is exactly the regular extensions of the start-language alphabet.
+
+Closing remark
+
+Turing wrote in 1936 that "the justification [for the
+definitions] lies in the fact that the human memory is
+necessarily limited" turing1936computable.  Our laptop's
+memory is necessarily limited.  Our agent's tape is necessarily
+limited.  Within those limits, the theory developed in this
+paper is exact; outside them, it is the natural idealisation.
+
+A final note.  This paper began as a question in an email about
+arithmetic grammars and grew under conditions in which other
+deliverables were not available to the first author - a
+sequence we record honestly in the Acknowledgments.  Papers are
+sometimes written in a straight line and sometimes in a crooked
+one, and the architecture proposed here was, in a real sense,
+shaped by both: the formal narrowness of the theory, and the
+narrow window in which the theory had to be made to do real
+work.  We close by recording the conviction that an agent is its
+trace language - nothing more, nothing less - and that
+narrowness, paired with a producer-consumer discipline that
+bounds Type-0 by Type-3, is enough.
+
+Acknowledgments
+
+The first author thanks Dr. Akbar Siami Namin
+(akbar.namin@ttu.edu, EC 306G, Department of Computer
+Science, Texas Tech University) and Dr. Yuanlin Zhang
+(y.zhang@ttu.edu, EC 313, Department of Computer
+Science, Texas Tech University) for their patient and generous
+guidance through a semester that did not unfold as planned.
+Dr. Namin shaped the software verification and validation
+framing of the Data-Driven consumer; Dr. Zhang shaped the
+automata-theoretic framing of the Goal-Driven producer and the
+Chomsky-class projection lemmas of Section sec:chomsky.
+The narrowness of the architecture - one Type-0 producer, one
+Type-3 consumer, and the explicit recursive enumeration of
+Algorithm alg:enum - is a direct consequence of their
+insistence that the theory commit only to what Turing's automata
+theory and Chomsky's hierarchy actually license, and to nothing
+more.
+
+Origin of this paper
+
+This paper began as an email.  On 17 February 2026 the first
+author wrote to Dr. Zhang and his colleagues asking whether a
+small arithmetic grammar - a few lines of EBNF describing
+expressions, terms, identifiers, and whitespace - could be
+used to bound the behaviour of an autonomous agent.
+The grammar itself is unimportant; what mattered was the
+question.  Dr. Zhang's reply opened the line of inquiry that,
+by way of the start language  and its recursive enumeration
+into, became the producer-consumer construction of this
+paper.  The question on 17 February was not about Spaceship
+Titanic; it was about whether the Chomsky hierarchy could be
+made to do real work in agent design.  This paper is the
+considered answer to that email.
+
+The path between the email and the manuscript was not the path
+the first author had planned.  The semester involved a missed
+midterm in Dr. Namin's software verification and validation
+course - a setback that, in any other semester, would have
+been recoverable through the usual academic channels.  It also
+involved a hospitalisation with a head injury during the
+final examination of Dr. Zhang's automata course.  Both
+courses had to be passed; the conventional routes were closed.
+Dr. Namin's response was characteristic of his teaching: he
+extended the offer that publication of substantive original
+work in the VV tradition would be accepted in lieu of the
+midterm and that the course grade would reflect that.
+Dr. Zhang continued to engage substantively with the
+producer-consumer construction long after the automata final
+had passed, treating the unfinished work as a continuation of
+the course rather than a casualty of it.
+
+Both offers were acts of professional grace.  This paper is
+their occasion.  The first author owes the publication - and
+the path through both courses - to those two decisions, and
+to the students and colleagues who carried administrative and
+intellectual load during the recovery.  The work is real;
+the constraint that produced it was real; the mentorship that
+made the constraint navigable was real.  We document the
+sequence not for sympathy but for accuracy.  Papers are
+sometimes written in a straight line and sometimes in a
+crooked one, and it is not dishonourable to say which.
+
+High Performance Computing Center, Texas Tech
+University
+
+We thank the staff and faculty of the
+https://www.depts.ttu.edu/hpcc/Texas Tech High
+Performance Computing Center for the compute resources used in
+the heavier ablation runs of this paper, and in particular:
+
+itemize
+Misha Ahmadian, Senior Research Associate, HPCC
+(misha.ahmadian@ttu.edu, 158 Drane Hall, 806.834.1866),
+for HPC user support and parallelisation advice on the
+recursive-enumeration loop;
+Dr. Sagnik Singha, Research Associate, HPCC
+(sagnik.singha@ttu.edu, 157 Drane Hall, 806.834.2156;
+Ph.D., Mechanical Engineering), for assistance with
+multi-disciplinary computational research and the cluster runs
+that exercised the Type-0/Type-3 binding at scale.
+itemize
+The RedRaider cluster carried the burden when the
+laptop's tape ran out.  The realised machine of
+Section sec:methodology is, accordingly, larger than a
+single laptop in the largest ablation runs; the LBA bound of
+Lemma lem:bounded-soundness adjusts upward correspondingly,
+and the soundness argument remains intact.
+
+Recognising Julia B. Robinson
+
+A note is owed on the most consequential non-laureate citation
+of this paper.  Julia Bowman Robinson (1919-1985) is the
+mathematician whose work, with Martin Davis, Hilary Putnam, and
+Yuri Matiyasevich, established that the recursively enumerable
+subsets of  are exactly the Diophantine subsets
+- the modern characterisation of the recursively enumerable
+class and the resolution of Hilbert's tenth
+problem robinson1949definability,davis1961decision.  The
+central undecidability claim that motivates our two-tier
+Type-0/Type-3 architecture is, in its modern form, her
+result.
+
+Robinson did not receive the ACM A.M. Turing Award.  We are
+under no illusion as to why.  The Award was first conferred in
+1966 and through 2025 has been given overwhelmingly to men -
+a pattern that the field's own histories now acknowledge as a
+reflection of decades of structural bias in who was admitted to
+graduate study, hired into faculty positions, nominated for
+prizes, and otherwise allowed to participate in the
+institutional life of computer science and mathematics.
+Several of Robinson's contemporaries did receive the Award; she
+did not.  Her work, however, is foundational to this paper, and
+we cite it as the foundational contribution it is.  Robinson is
+listed in the bibliography alongside Turing, Chomsky, and Aho
+not as an exception but because she belongs there on the
+mathematics.
+
+Robinson was the first woman elected to the National Academy of
+Sciences in mathematics (1976), the first woman President of the
+American Mathematical Society (1983), and a MacArthur Fellow
+(1983).  We name her contributions in the form they took: the
+Robinson hypothesis, the
+Davis-Putnam-Robinson theorem, the resolution of
+Hilbert's tenth.  Where the field's awards have been silent, the
+mathematics is not.
+
+Reproducibility
+
+The start language tracelanguageoriginal.csv, the
+recursively enumerated trace tracelanguagekaggle.csv,
+the  source of this paper, the bibliography
+refs.bib, and the Kaggle notebooks that produced the
+Spaceship Titanic submission are released at
+
+https://www.kaggle.com/sweeden-ttu/competitions/spaceship-titanic.
+
+Re-runs at fixed random seeds reproduce the binding's class
+signature; placement on the public leaderboard varies by
+10-20 ranks across non-deterministic LLM samples, as
+discussed in Section sec:discussion.
