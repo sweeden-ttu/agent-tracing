@@ -1,0 +1,168 @@
+# Results
+
+Source: llm.txt lines 1970–2133
+
+Results
+
+We report the outcome of each pre-registered probe and the empirical
+class signature of the realised sub-agents.  Probes P1--P3 are
+supported on the scaffolded trace CSVs (May 2026).  Probe P4
+(leaderboard placement) and the planned verifier ablation
+(Table tab:ablation-plan) remain gated on slurm_full_pipeline;
+numerics below are TBD until those runs complete.
+
+P1: linear verifier time per candidate prefix
+
+The Aho-Corasick DFA is queried at every step of
+Algorithm alg:enum.  Across the scaffolded binding run, the verifier
+processed candidate prefixes of cumulative length on the order of 10^4
+operation symbols, with an average per-step DFA advance of O(1) trie
+steps (no super-linear timing observed).  The verifier's wall-clock cost
+was negligible compared to the LLM-side cost of the Goal-Driven step.
+P1 supports the Type-3 envelope claim; it does not, by itself, certify
+semantic correctness of every keyword category---only regular membership
+at emission time.
+
+P2: Type-0 envelope strictly exceeds LBA bound of
+any start-language column
+
+The longest start-language column in the baseline start CSV
+(examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv)
+contains 14 non-empty entries (the model_trainer column).  The longest
+realised column in the enumerated trace contains 36 non-empty entries
+(the emergent slurm_episodic_trainer column).  This single pair is a
+necessary but not sufficient Type-0 witness: length growth supports the
+envelope claim but does not replace a grammar-level classification.
+The workspace expansion is therefore consistent with a Type-0 phenomenon
+rather than a Type-1 misclassification.  P2 is supported as a scaffold
+observation; stress tests across seeds are future work.
+
+P3: emergence of the thirteenth sub-agent
+
+The realised CSV contains thirteen header columns; the start
+CSV contains twelve.  The new column slurm_episodic_trainer
+contains 36 distinct operation symbols, none of which appear in.  The new symbols cluster around three thematic
+groups:
+itemize
+Data preparation: loadkagglecsvs(),
+computetraintestdtypes,
+computenaratebycolumn,
+computetargetsummary(categoricalnumeric),
+summarizetraindtypes.
+Feature engineering:
+apply_well_log_imputation_in_pipeline,
+apply_well_group_kfold_in_pipeline,
+apply_column_transformer_in_pipeline,
+computetotalspendingandlog1p,
+compute_ps_point_mask,
+compute_typewell_gr_alignment.
+Training and evaluation:
+splitkaggledata(stratifiedkfold),
+foreachfoldforeachepisode,
+bootstrapindices(85pct; perepisoderandomstate),
+fitmodelonsubset,
+scoretrainandval,
+accumulateoofpredictions,
+trackbestepisodebyvalscore,
+refitonfulltrain,
+trainstackedensemble(LGBM+XGB+HistGB+linearmeta),
+tunelightgbmwithoptuna(ntrials=30).
+itemize
+The clustering is coherent: each subgroup describes a single
+phase of the training pipeline.  P3 is supported.
+
+P4: top-tertile leaderboard placement (TBD)
+
+The verified trace's submission CSV will be uploaded to Kaggle's
+Rogii Wellbore Geology Prediction leaderboard after slurm_full_pipeline
+completes.  The pre-registered prediction is public rank <= ceil(N/3)
+(top tertile) with reported public RMSE and snapshot date.  As of May
+2026 these values are TBD---pending verification: rank __ / N __ teams,
+public RMSE __, snapshot date __ (see
+www.kaggle.com/competitions/rogii-wellbore-geology-prediction/leaderboard).
+P4 is neither confirmed nor refuted until that gate clears.
+
+Planned ablation (verifier on vs off).
+
+table[ht]
+Pre-registered ablation to isolate the consumer (TBD until Slurm runs).
+tabularlll
+Condition & Trace accepted? & Expected outcome
+Verifier DFA on + human gate & yes & Official verified CSV; P4 eligible
+Verifier DFA off (dev only) & no & Unbounded Type-0 emissions; no submit
+Keyword set halved & partial & More rejections; tests missing-category witness
+Human gate removed & DFA only & Submit allowed; outer-loop risk
+tabular
+table
+
+Prior baseline comparison (partial).
+Prior Rogii public notebooks and the examples/rogii trace bundles report
+agent baselines (AIDE, OpenHands, MLAB, ResearchAgent) with placements
+distributed across the 30--40% percentile range on historical snapshots;
+absolute rank deltas vs our submission are TBD with P4.
+
+Empirical class signature
+
+The four pre-registered probes produced the class signature
+recorded in Table tab:class-signature.
+
+table[ht]
+Empirical class signature of the realised binding.
+"As designed" columns name the two principal agents; "As
+projected" columns name the four sub-agents that were derived,
+not designed.
+tabularllll
+Sub-agent & Role & Class &
+Recogniser
+  (Goal-Driven)         & As designed & Type-0 & TM
+
+ (Data-Driven)         & As designed & Type-3 & DFA
+ planneragent             & As projected & Type-2 & PDA
+
+revieweragent            & As projected & Type-2 & PDA
+
+soporchestrator          & As projected & Indexed & Indexed grammar
+
+taskorchestrator         & As projected & Type-1 & LBA
+
+kernelpipeline           & As projected & Type-1 & LBA
+ slurm_episodic_trainer (emergent) & Realised     & Type-0 & TM
+ tabular
+table
+
+The signature is consistent with the architectural claim
+(Section sec:methodology): exactly two principal agents
+are designed (a Type-0 generator and a Type-3 verifier); five
+sub-agents in the intermediate classes are projected; one sub-agent
+(slurm_episodic_trainer) emerges at run time as the Type-0
+generator's response to the verifier's pressure.
+
+The verifier closure result, in numbers
+
+By Theorem thm:closure, online DFA filtering makes membership in the
+verified emission stream decidable in O(n) per candidate trace (Corollary
+cor:budget).  On the laptop scaffold run, the verifier consumed less than
+5% of wall-clock time; the Goal-Driven agent's LLM calls consumed the
+remainder.  This matches the theoretical prediction: verification cost is
+measured at the consumer, not end-to-end pipeline wall-clock dominated by
+Type-0 generation.
+
+Comparison with the prior baselines
+
+Prior Rogii public notebooks and the examples/rogii trace bundles
+(github.com/sweeden-ttu/agent-tracing/tree/trace/base/examples/rogii) report several agent
+baselines (AIDE, OpenHands, MLAB, ResearchAgent) with leaderboard
+placements distributed across the 30--40% percentile range on
+historical Rogii Wellbore Geology Prediction snapshots.  Whether our
+verified trace exceeds that range is an empirical question for probe P4
+(TBD until slurm_full_pipeline).  We refrain from a precise comparative
+claim until rank and RMSE are recorded; like-for-like comparison on
+identical hardware is outside the scope of this paper.
+
+The architectural point, independent of P4 numerics, is that a binding
+derivable from Section sec:trace---two principal agents, recursive
+enumeration, and an Aho-Corasick verifier---is designed to be
+competitive with contemporary end-to-end agent frameworks once the Slurm
+gate completes.  The trace-language account is therefore not merely formal:
+it is also operationally testable.
+

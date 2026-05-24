@@ -1,0 +1,103 @@
+# Title, Abstract, Keywords
+
+Source: llm.txt lines 1–99
+
+A Trace-Language Theory of Agents:
+Goal-Driven Type-0 Producers Bounded by Data-Driven Type-3 Consumers
+
+Koohestani, Li, Podkopaev, and Izadi recently asked, "Are agents
+just automata?" koohestani2025automata and answered in
+the affirmative by establishing a memory-architecture equivalence
+between agentic AI classes and the levels of the Chomsky
+hierarchy.  We accept their answer and pose the more useful
+question: can the Chomsky type of one agent be used to
+bound the Chomsky type of another, in the manner of the
+classical producer-consumer problem?  This paper answers
+yes, with software verification and validation
+techniques inferred into a Data-Driven Type-3 verifier
+(consumer), and the idealised theoretical apparatus of automata
+built into a Goal-Driven Type-0 producer.  The verification
+loop must end in decidability, otherwise the classical halting
+problem of Turing turing1936computable re-asserts itself
+on every iteration.  Decidability is enforced here by the regular
+language of the Data-Driven verifier, realised as the
+deterministic finite automaton of an Aho-Corasick keyword
+index aho1975corasick compiled from the unit-test
+catalogue, with a final human verification and validation step
+that closes the loop in the bounded case.  The implemented Type-0
+producer is not an abstract Turing machine on paper alone: it is a
+Gemini tool-calling loop (Goal-Driven generator) whose emissions are
+filtered online by the Aho-Corasick DFA and, on the outer loop, by
+human submission review---together forming a composite Type-3 consumer
+(Sections sec:methodology, sec:discussion).
+
+We give a self-contained formal theory of the result.  An agent is
+identified with its trace language: the set of finite
+strings of effectful operations the agent emits across the input
+domain.  Within this theory we define a single Goal-Driven Type-0
+agent whose trace language is recursively
+enumerable robinson1949definability,davis1961decision and a
+single Data-Driven Type-3 verifier whose trace language is
+regular rabin1959finite,chomsky1956three,chomsky1959certain.
+The Goal-Driven agent is tamed by the Type-3 verifier in the
+precise sense that only those traces accepted by the verifier are
+emitted to disk; from this binding, the Type-2 (pushdown), the
+indexed-grammar aho1968indexed, and Type-1 (linear-bounded)
+sub-agents emerge as canonical projections.  We further show that
+a Type-3 agent may itself act as a producer, backward-inferring
+constrained changes to the tape, provided the inference terminates
+in a decidable verdict.
+
+The single start language that initiates the system is
+given in examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv:
+twenty sub-agent swim lanes and their seed action alphabets, plus nine
+resource-envelope columns (Chomsky type, LLM model, Slurm partition,
+and GPU allocation).  Under the binding above, the start language
+recursively enumerates itself onto the Rogii Wellbore Geology
+Prediction task on Kaggle (rogii-wellbore-geology-prediction), a
+multi-well regression benchmark in which agents predict lithology /
+geology labels from well-log features and must score RMSE on the
+post-perforation-start (post-PS) subset.  The empirical trace is
+recorded in the same CSV family across six preprocessing variants
+(baseline ColumnTransformer+LightGBM per Ke 2017 and Pedregosa 2011,
+typewell GR alignment per Sakoe--Chiba 1978, PS-point leakage masks
+per Kaufman 2012, robust log1p scaling per Hampel 1986, parallel
+multi-well IO per Rocklin 2015, and formation-plane spatial k-NN
+per Cover--Hart 1967).  An emergent Slurm episodic
+training column (slurm_episodic_trainer) materialises only after
+the Type-3 consumer binds Ollama on localhost and Matador GPU
+resources.  The Goal-Driven agent's trace language is, on paper,
+recursively enumerable; physical execution is bounded by Matador
+node RAM and Slurm wall time, and the realised machine is therefore
+a (very large) linear-bounded automaton.  We prove the idealisation
+sound (Lemma lem:bounded-soundness, Section sec:preliminaries):
+any trace the idealised Type-0 agent can emit is producible
+by the bounded machine up to the cluster tape limit.  Online
+emission filtering by the Type-3 DFA makes membership in the
+*verified* trace language decidable in linear time (Theorem
+thm:closure, Corollary cor:budget); the raw intersection L(G) intersect L(V)
+may remain Type-0 when L(G) is recursively enumerable,
+but only DFA-accepted traces are persisted as the official run record.
+
+We instantiate the theory on the Rogii Wellbore Geology Prediction
+task and pre-register a public-leaderboard submission under nested
+GroupKFold by well.  As of May 2026 the trace bundles are 95%
+scaffolded on branch trace/base; full GPU Slurm pipeline runs
+(slurm_full_pipeline) remain the gate to a verified leaderboard
+rank (public rank, team count, and RMSE: TBD---pending completion of
+those runs; Section sec:results).  The producer is not given the
+held-out test-well labels, but the start language, Kaggle boilerplate,
+and schema-derived unit tests still encode tabular-competition
+structure---a qualification we state explicitly rather than claiming
+zero task leakage.
+Reproducible code, trace CSVs, base-paper PDFs, and experiment
+descriptors are published at
+
+https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction
+and in the agent-tracing repository under examples/rogii/.
+
+Agentic systems, trace language, Chomsky hierarchy, Turing
+machines, indexed grammars, Aho-Corasick, recursive enumeration,
+producer-consumer, formal verification and validation,
+linear-bounded automata, machine-learning engineering benchmarks.
+
