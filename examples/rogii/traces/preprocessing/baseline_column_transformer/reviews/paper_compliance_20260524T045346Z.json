@@ -1,0 +1,44 @@
+{
+  "timestamp": "20260524T045346Z",
+  "manifest": {
+    "title": "LightGBM: A Highly Efficient Gradient Boosting Decision Tree",
+    "authors": "Ke, Meng, Finley, Wang, Chen, Ma, Ye, Liu",
+    "year": 2017,
+    "claims": [
+      "Histogram-based GBDT improves tabular regression speed and accuracy vs level-wise boosting.",
+      "Leaf-wise growth with regularization supports strong baselines on heterogeneous numeric features.",
+      "Pairs with heterogeneous column preprocessing (ColumnTransformer) on tabular well-log features."
+    ],
+    "paper_path": "/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/baseline_column_transformer",
+    "paper_exists": false
+  },
+  "audit": {
+    "variant": "baseline_column_transformer",
+    "trace_file": "/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv",
+    "gaps": [
+      {
+        "claim": "Ke et al. 2017 LightGBM histogram GBDT",
+        "required_tokens": [
+          "assemble_column_transformer",
+          "set_objective_regression",
+          "set_metric_rmse",
+          "log_best_iteration"
+        ],
+        "missing_tokens": [],
+        "satisfied": true
+      },
+      {
+        "claim": "Pedregosa et al. 2011 ColumnTransformer / Pipeline",
+        "required_tokens": [
+          "build_numeric_pipeline",
+          "build_lowcard_pipeline",
+          "build_highcard_pipeline",
+          "assemble_column_transformer"
+        ],
+        "missing_tokens": [],
+        "satisfied": true
+      }
+    ],
+    "all_satisfied": true
+  }
+}

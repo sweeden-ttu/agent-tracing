@@ -1,0 +1,119 @@
+---
+description: >-
+  Mid-trace resume gate — verify prior Slurm jobs completed and their outputs
+  are inputs before continuing from a trace_language.csv row.
+globs: "**/trace_language.csv,**/run_pipeline.sh,**/hpcc/*.slurm,**/ablation_runs/**"
+alwaysApply: false
+---
+
+# Mid-trace resume: Slurm completion + artifact handoff gate
+
+Apply this rule **whenever work resumes partway through a variant
+`trace_language.csv`** (a specific swim-lane row, Slurm step, or notebook
+phase) instead of from row 1. Complements
+`slurm-pipeline-execution.mdc` (one job per variant) and
+`slurm-ollama-consumer-review.mdc` (pre-submit review).
+
+**Do not** submit the next `sbatch`, run the next swim-lane command, or
+edit downstream rows until every prerequisite Slurm job for earlier rows
+has **COMPLETED** (not `PENDING`, `RUNNING`, `COMPLETING`, or `FAILED`) and
+its declared outputs exist and are wired as inputs.
+
+## 1. Locate resume point
+
+```bash
+VARIANT=baseline_column_transformer   # one of six slugs
+TRACE="/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/${VARIANT}/trace_language.csv"
+RUN_DIR=/lustre/work/sweeden/rogii
+```
+
+- Identify the **first row you intend to execute** (lane + row number).
+- Treat every **earlier row that contains `sbatch`** as a hard prerequisite
+  unless you have proof that job already finished successfully.
+- Read `experiment_descriptor.json` and `ablation_runs/${VARIANT}/manifest.json`
+  for the active `run_id`.
+
+## 2. Verify prerequisite Slurm jobs
+
+```bash
+# Active jobs for this variant — must be empty before starting the NEXT slurm step
+squeue -u "$USER" -o "%.18i %.30j %.8T %.10M %R" | grep -E 'rogii_|trace_|ablation|tcn'
+
+# Recent completion state (replace JOBID from run JSON or sbatch --parsable output)
+sacct -j JOBID --format=JobID,JobName,State,ExitCode,Elapsed -P
+```
+
+Accept only `State=COMPLETED` and `ExitCode=0:0`. On `FAILED`, `CANCELLED`,
+or `TIMEOUT`: triage `logs/*.eJOBID` per `slurm-ollama-consumer-review.mdc`
+and **re-run the failed step**; do not skip ahead.
+
+Job ids are recorded in:
+- `ablation_runs/${VARIANT}/run_*.json` → `slurm_job_id`, `status`
+- `ablation_runs/${VARIANT}/${RUN_ID}/result.json`
+- stdout from `sbatch --parsable` cells in the trace CSV
+
+## 3. Prerequisite chain (trace row order)
+
+| Resume at or after | Prior Slurm script(s) must be COMPLETED | Required outputs (inputs to next step) |
+|--------------------|------------------------------------------|----------------------------------------|
+| Rows after data/preprocess lanes | *(none — login-node OK)* | `data/` extracted CSVs; `sample_submission.csv` schema |
+| `run_ablation_variant.slurm` / orchestrator `--execute` | — | prior data + descriptor JSON |
+| `train_tcn_episodic.slurm` (model_trainer ~R104) | `run_ablation_variant` if ablation init not done | `ablation_runs/${VARIANT}/run_${RUN_ID}.json` with terminal status |
+| Checkpoint / predict rows (~R105–117) | **`train_tcn_episodic.slurm`** | `artifacts/checkpoints/episode_manifest.json`, `artifacts/checkpoints/fold_*.pkl` or `.safetensors` |
+| `vague_spec_batch_matador.slurm` (~R136) | **`train_tcn_episodic.slurm`** (+ checkpoints if trace implies) | episodic artifacts under `artifacts/checkpoints/` |
+| `train_tcn.slurm` (~R140) | **`train_tcn_episodic.slurm`** (and vague_spec if that row is present above resume point) | same checkpoint tree; no stale partial `artifacts/` from an aborted run |
+| OOF / submission rows (~R150+) | **`train_tcn.slurm`** (+ all earlier sbatch steps in CSV order) | trained weights; `generate_sample_submission_from_checkpoint` reads checkpoint paths |
+| Kaggle submit (~R181+) | full train + `submission.csv` built from **this run's** checkpoints | `submission.csv` aligned to `id,tvt`; not an old submission file |
+
+## 4. Artifact handoff checks (mandatory)
+
+Before executing the resume row:
+
+```bash
+cd "${RUN_DIR}"
+VARIANT=baseline_column_transformer
+RUN_ID="$(python - <<PY
+import json; m=json.load(open(f"ablation_runs/${VARIANT}/manifest.json"))
+print(m["runs"][-1]["run_id"] if m.get("runs") else "")
+PY
+)"
+
+# Ablation bootstrap finished
+test -f "ablation_runs/${VARIANT}/run_${RUN_ID}.json"
+python - <<PY
+import json, sys
+d=json.load(open("ablation_runs/${VARIANT}/run_${RUN_ID}.json"))
+ok=d.get("status","") in ("completed","completed_dry_run","completed_train")
+print("ablation status:", d.get("status"), "OK" if ok else "BLOCKED")
+sys.exit(0 if ok else 1)
+PY
+
+# Episodic training outputs (required before predict/submit resume)
+test -f artifacts/checkpoints/episode_manifest.json
+test -n "$(ls artifacts/checkpoints/fold_*.pkl 2>/dev/null || ls artifacts/checkpoints/*.safetensors 2>/dev/null)" 
+
+# Submission resume — must come from current artifacts, not a prior experiment
+test -f submission.csv && head -1 submission.csv | grep -q 'id'
+```
+
+**Reject** resume if:
+- Outputs exist but `slurm_job_id` / `completed_at` in run JSON belong to an
+  **older** run while a **newer** job is still `RUNNING`.
+- Checkpoint mtime is **older** than the last failed/restarted Slurm job start.
+- Downstream commands point at hardcoded paths that bypass `artifacts/checkpoints/`
+  from the completed upstream job.
+
+## 5. Proceed only after gate PASS
+
+1. Prerequisite jobs: `sacct` → `COMPLETED`, exit 0.
+2. Artifact paths: `test -f` / `ls` checks pass for the resume row's inputs.
+3. Run JSON / manifest: `status` matches the stage you are continuing from.
+4. Then run **one** next step (single swim-lane row or one `sbatch`), record new
+   job id in run JSON / trace notes, re-check `squeue` (still one job per variant).
+
+## Forbidden
+
+- Skipping `sbatch` rows because outputs "probably exist" without `sacct` proof.
+- Submitting `train_tcn.slurm` while `train_tcn_episodic` is still `RUNNING`.
+- Reusing `submission.csv` or checkpoints from a different `RUN_ID` / variant.
+- Resuming from row N while editing row N+k in the CSV without running N..N+k-1.

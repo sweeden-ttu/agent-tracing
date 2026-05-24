@@ -14,6 +14,8 @@ Six preprocessing/modeling approaches for [rogii-wellbore-geology-prediction](ht
 | `parallel_multiwell_loader` | `trace/parallel-multiwell-loader` | Rocklin 2015 Dask parallel IO | sec/7 Bayesian loop |
 | `formation_plane_spatial` | `trace/formation-plane-spatial` | Cover & Hart 1967 k-NN spatial | sec/3 Type-0 envelope |
 
+**Base papers (PDFs + links):** [`BASE_PAPERS.md`](BASE_PAPERS.md) — six variant primaries (+ Pedregosa co-primary for baseline); open-access PDFs in [`papers/`](papers/).
+
 Per-variant artifacts under `traces/preprocessing/{variant}/`:
 
 | File | Role |
