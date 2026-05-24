@@ -12,33 +12,33 @@
 
 | Field | Path or value |
 |-------|----------------|
-| **Worktree (this checkout)** | `/lustre/work/sweeden/agent-tracing-trace-baseline` |
+| **Worktree (this checkout)** | `/lustre/work/sweeden/agent-tracing-trace-robust` |
 | **Unified repo (canonical traces)** | `/lustre/work/sweeden/agent-tracing` |
-| **Git branch** | `trace/baseline-column-transformer` |
-| **GitHub PR** | [#17](https://github.com/sweeden-ttu/agent-tracing/pull/17) · Issue [#10](https://github.com/sweeden-ttu/agent-tracing/issues/10) |
-| **Variant slug** | `baseline_column_transformer` |
-| **Approach** | ColumnTransformer + LightGBM baseline |
-| **Base paper(s)** | Ke et al. 2017 LightGBM + Pedregosa et al. 2011 scikit-learn ColumnTransformer |
-| **Trace language CSV (canonical)** | `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv` |
-| **Trace bundle (this worktree)** | `/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/baseline_column_transformer/` |
-| **Experiment descriptor** | `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/baseline_column_transformer/experiment_descriptor.json` |
-| **Ablation plan** | `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/baseline_column_transformer/ablation_plan.json` |
-| **Conda env (`environment.yml`)** | `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/baseline_column_transformer/environment.yml` (env name = `baseline_column_transformer`) |
-| **HPCC ablation runs** | `/lustre/work/sweeden/rogii/ablation_runs/baseline_column_transformer/` |
+| **Git branch** | `trace/robust-scale-log1p` |
+| **GitHub PR** | [#20](https://github.com/sweeden-ttu/agent-tracing/pull/20) · Issue [#13](https://github.com/sweeden-ttu/agent-tracing/issues/13) |
+| **Variant slug** | `robust_scale_log1p` |
+| **Approach** | RobustScaler + log1p target |
+| **Base paper(s)** | Hampel et al. 1986 robust statistics (RobustScaler + log1p) |
+| **Trace language CSV (canonical)** | `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/robust_scale_log1p/trace_language.csv` |
+| **Trace bundle (this worktree)** | `/lustre/work/sweeden/agent-tracing-trace-robust/examples/rogii/traces/preprocessing/robust_scale_log1p/` |
+| **Experiment descriptor** | `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/robust_scale_log1p/experiment_descriptor.json` |
+| **Ablation plan** | `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/robust_scale_log1p/ablation_plan.json` |
+| **Conda env (`environment.yml`)** | `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/robust_scale_log1p/environment.yml` (env name = `robust_scale_log1p`) |
+| **HPCC ablation runs** | `/lustre/work/sweeden/rogii/ablation_runs/robust_scale_log1p/` |
 | **HPCC pipeline / Slurm** | `/lustre/work/sweeden/rogii/hpcc/` (`run_ablation_variant.slurm`, `train_tcn_episodic.slurm`, `train_tcn.slurm`) |
 | **Kaggle competition** | [rogii-wellbore-geology-prediction](https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction) |
-| **Trace-theory paper sections** | sec/2 agent schemata, sec/4 evaluation audit protocol |
+| **Trace-theory paper sections** | sec/3 Type-1 linear transcript |
 | **Merge order** | See `/lustre/work/sweeden/agent-tracing/examples/rogii/MERGE_PATH.md` (baseline merges first) |
 
 Submit Slurm jobs for **this variant only** (one active job per branch):
 
 ```bash
 cd /lustre/work/sweeden/rogii
-VARIANT=baseline_column_transformer bash hpcc/review_slurm_before_submit.sh hpcc/run_ablation_variant.slurm baseline_column_transformer
-VARIANT=baseline_column_transformer sbatch hpcc/run_ablation_variant.slurm
+VARIANT=robust_scale_log1p bash hpcc/review_slurm_before_submit.sh hpcc/run_ablation_variant.slurm robust_scale_log1p
+VARIANT=robust_scale_log1p sbatch hpcc/run_ablation_variant.slurm
 ```
 
-Mid-trace resume: follow `/lustre/work/sweeden/agent-tracing/.cursor/rules/trace-language-mid-resume-slurm-gate.mdc` — prior `sbatch` steps must be `COMPLETED` and `ablation_runs/baseline_column_transformer/` artifacts must match the resume row in `trace_language.csv`.
+Mid-trace resume: follow `/lustre/work/sweeden/agent-tracing/.cursor/rules/trace-language-mid-resume-slurm-gate.mdc` — prior `sbatch` steps must be `COMPLETED` and `ablation_runs/robust_scale_log1p/` artifacts must match the resume row in `trace_language.csv`.
 
 
 ## 1. Paper Overview
@@ -55,17 +55,17 @@ This submission presents a novel theoretical framework for agent verification an
 ## 2. Timeline for Completion (Now Until September 2026)
 
 ### Phase 1: Foundation Completion (May - June 2026)
-- [x] Complete trace language framework for `baseline_column_transformer` in `/lustre/work/sweeden/agent-tracing-trace-baseline` (branch `trace/baseline-column-transformer`)
+- [x] Complete trace language framework for `robust_scale_log1p` in `/lustre/work/sweeden/agent-tracing-trace-robust` (branch `trace/robust-scale-log1p`)
 - [x] Add research paper to PaperBench dataset as "a-trace-language-theory-of-agents"
 - [x] Implement Chomsky classifier, validator, recorder, and rubric components
-- [x] Create trace language specification: `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv`
+- [x] Create trace language specification: `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/robust_scale_log1p/trace_language.csv`
 
 ### Phase 2: Empirical Validation (July - August 2026)
-- [ ] Run Rogii ablation baseline cells for `baseline_column_transformer` via `/lustre/work/sweeden/rogii/hpcc/run_ablation_variant.slurm`
-- [ ] Run full Slurm pipeline (`train_tcn_episodic.slurm` → checkpoints → submit) per `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv`
+- [ ] Run Rogii ablation baseline cells for `robust_scale_log1p` via `/lustre/work/sweeden/rogii/hpcc/run_ablation_variant.slurm`
+- [ ] Run full Slurm pipeline (`train_tcn_episodic.slurm` → checkpoints → submit) per `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/robust_scale_log1p/trace_language.csv`
 - [ ] Measure improvements in security, task breakdown, and competition performance
 - [ ] Validate recursively enumerable properties of quality rubric
-- [ ] Compare `baseline_column_transformer` RMSE (post-PS) against other five variants under `examples/rogii/ablation_tracking_status.csv`
+- [ ] Compare `robust_scale_log1p` RMSE (post-PS) against other five variants under `examples/rogii/ablation_tracking_status.csv`
 
 ### Phase 3: Paper Writing and Refinement (September 2026)
 - [ ] Write full paper following AAAI format guidelines
@@ -108,7 +108,7 @@ Based on typical AAAI requirements (verify exact requirements from aaai.org/conf
 ### Connection to PaperBench:
 Our trace language framework has been integrated into the PaperBench dataset as a new research topic:
 - **Location**: `/lustre/work/sweeden/frontier-evals/project/paperbench/data/papers/agent-tracing/` (PaperBench bundle)
-- **Variant trace orchestrator**: `paperbench.trace_pipeline.orchestrator --variant baseline_column_transformer`
+- **Variant trace orchestrator**: `paperbench.trace_pipeline.orchestrator --variant robust_scale_log1p`
 - **Components**:
   - config.yaml: Paper identification and title
   - addendum.md: Brief description of contributions
@@ -116,8 +116,8 @@ Our trace language framework has been integrated into the PaperBench dataset as 
   - rubric.json: Trace language verification requirements with hierarchical subtasks
 
 ### Experimental Validation Plan:
-1. **Variant trace CSV**: Execute swim lanes in `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv` under Type-3 consumer bounds
-2. **Ablation factorial**: Grid from `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/baseline_column_transformer/ablation_plan.json`; manifests in `/lustre/work/sweeden/rogii/ablation_runs/baseline_column_transformer/`
+1. **Variant trace CSV**: Execute swim lanes in `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/robust_scale_log1p/trace_language.csv` under Type-3 consumer bounds
+2. **Ablation factorial**: Grid from `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/robust_scale_log1p/ablation_plan.json`; manifests in `/lustre/work/sweeden/rogii/ablation_runs/robust_scale_log1p/`
 3. **Comparison Metrics**:
    - Competition performance (RMSE for ROGII)
    - Trace language validation pass/fail rates
@@ -137,7 +137,7 @@ For running experiments on HPCC cluster to generate results for the paper:
 ### SLURM Job Template:
 ```bash
 #!/bin/bash
-#SBATCH --job-name=rogii_baseline_column_tran
+#SBATCH --job-name=rogii_robust_scale_log1p
 #SBATCH --partition=matador
 #SBATCH --cpus-per-task=8
 #SBATCH --mem-per-cpu=6000
@@ -153,26 +153,26 @@ init_slurm_modules
 source "${RUN_DIR}/hpcc/load_matador_modules.sh"
 load_matador_modules
 
-VARIANT=baseline_column_transformer
+VARIANT=robust_scale_log1p
 source "${RUN_DIR}/hpcc/_variant_conda_env.sh"
 matador_activate_variant_env
 
 # Experiment execution
 RUN_DIR=/lustre/work/sweeden/rogii
 cd "${RUN_DIR}"
-VARIANT=baseline_column_transformer bash hpcc/review_slurm_before_submit.sh hpcc/run_ablation_variant.slurm baseline_column_transformer
-VARIANT=baseline_column_transformer sbatch hpcc/run_ablation_variant.slurm
+VARIANT=robust_scale_log1p bash hpcc/review_slurm_before_submit.sh hpcc/run_ablation_variant.slurm robust_scale_log1p
+VARIANT=robust_scale_log1p sbatch hpcc/run_ablation_variant.slurm
 # Full train (after ablation bootstrap completes):
 # sbatch hpcc/train_tcn_episodic.slurm
-# Artifacts: ablation_runs/baseline_column_transformer/  artifacts/checkpoints/  submission.csv
+# Artifacts: ablation_runs/robust_scale_log1p/  artifacts/checkpoints/  submission.csv
 ```
 
 ### Directory Structure on HPCC:
 - **Theory + trace CSVs (canonical):** `/lustre/work/sweeden/agent-tracing/`
-- **This variant worktree:** `/lustre/work/sweeden/agent-tracing-trace-baseline/`
-- **Trace bundle:** `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/baseline_column_transformer/`
+- **This variant worktree:** `/lustre/work/sweeden/agent-tracing-trace-robust/`
+- **Trace bundle:** `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/robust_scale_log1p/`
 - **HPCC pipeline + data:** `/lustre/work/sweeden/rogii/` (`data/`, `artifacts/`, `logs/`)
-- **Ablation manifests:** `/lustre/work/sweeden/rogii/ablation_runs/baseline_column_transformer/`
+- **Ablation manifests:** `/lustre/work/sweeden/rogii/ablation_runs/robust_scale_log1p/`
 
 ## 6. Supplementary Materials for Submission
 
