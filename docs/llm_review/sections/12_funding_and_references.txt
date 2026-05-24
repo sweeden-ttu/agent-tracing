@@ -1,0 +1,127 @@
+# Section 12: Funding and References
+
+Source: llm.txt lines 2342–2462
+
+---
+
+Funding
+
+The empirical study was conducted on the first author's personal
+laptop, with overflow runs on the Texas Tech HPCC.  No external
+grant funding was used.  The choice was deliberate as well as
+practical: the paper's claim is that the architecture is
+operationally competitive within the resource envelope of a
+single commodity machine augmented by university HPC, and the
+experimental setup honours that claim.
+
+============================================================
+REFERENCES
+============================================================
+
+thebibliography10
+[1]#1
+url@samestyle
+[2]#2
+4
+plus
+3minus 4
+[2]
+l@#1** WARNING: IEEEtran.bst: No hyphenation pattern has been
+** loaded for the language '#1'. Using the pattern for
+** the default language instead.
+l@#1#2
+
+koohestani2025automata
+R. Koohestani, Z. Li, A. Podkopaev, and M. Izadi, "Are agents just automata? on the formal equivalence between agentic AI and the Chomsky hierarchy," arXiv preprint, vol. 2510.23487, 2025, the paper that asks the title question; affiliations: JetBrains Research, TU Delft, Constructor University.
+
+turing1936computable
+A. M. Turing, "On computable numbers, with an application to the Entscheidungsproblem," Proceedings of the London Mathematical Society, vol. s2-42, no. 1, pp. 230-265, 1937, read 1936; founding paper of the theory of automata.
+
+aho1975corasick
+A. V. Aho and M. J. Corasick, "Efficient string matching: An aid to bibliographic search," Communications of the ACM, vol. 18, no. 6, pp. 333-340, 1975.
+
+robinson1949definability
+J. Robinson, "Definability and decision problems in arithmetic," Journal of Symbolic Logic, vol. 14, no. 2, pp. 98-114, 1949.
+
+davis1961decision
+M. Davis, H. Putnam, and J. Robinson, "The decision problem for exponential diophantine equations," Annals of Mathematics, vol. 74, no. 3, pp. 425-436, 1961.
+
+rabin1959finite
+M. O. Rabin and D. Scott, "Finite automata and their decision problems," IBM Journal of Research and Development, vol. 3, no. 2, pp. 114-125, 1959.
+
+chomsky1956three
+N. Chomsky, "Three models for the description of language," IRE Transactions on Information Theory, vol. 2, no. 3, pp. 113-124, 1956.
+
+chomsky1959certain
+â, "On certain formal properties of grammars," Information and Control, vol. 2, no. 2, pp. 137-167, 1959.
+
+aho1968indexed
+A. V. Aho, "Indexed grammars-an extension of context-free grammars," Journal of the ACM, vol. 15, no. 4, pp. 647-671, 1968.
+
+dijkstra1968cooperating
+E. W. Dijkstra, "Cooperating sequential processes," in Programming Languages: NATO Advanced Study Institute, F. Genuys, Ed.Academic Press, 1968, pp. 43-112, the producer-consumer formulation in its classical form.
+
+hopcroft2006automata
+J. E. Hopcroft, R. Motwani, and J. D. Ullman, Introduction to Automata Theory, Languages, and Computation, 3rd ed.Pearson, 2006.
+
+aho1972theory
+A. V. Aho and J. D. Ullman, The Theory of Parsing, Translation, and Compiling, Vol.I: Parsing.Prentice-Hall, 1972.
+
+hoare1969axiomatic
+C. A. R. Hoare, "An axiomatic basis for computer programming," Communications of the ACM, vol. 12, no. 10, pp. 576-580, 1969.
+
+hartmanis1965computational
+J. Hartmanis and R. E. Stearns, "On the computational complexity of algorithms," Transactions of the American Mathematical Society, vol. 117, pp. 285-306, 1965.
+
+li2024formalllm
+Z. Li, W. Xu, and Y. Zhang, "Formal-LLM: Integrating formal language and natural language for controllable LLM-based agents," arXiv preprint, vol. 2402.00798, 2024.
+
+dijkstra1975guarded
+E. W. Dijkstra, "Guarded commands, nondeterminacy and formal derivation of programs," Communications of the ACM, vol. 18, no. 8, pp. 453-457, 1975.
+
+pnueli1977temporal
+A. Pnueli, "The temporal logic of programs," in Proc. 18th Annual Symposium on Foundations of Computer Science (FOCS), 1977, pp. 46-57.
+
+clarke1981ctl
+E. M. Clarke and A. Emerson, E. "Design and synthesis of synchronization skeletons using branching time temporal logic," in Workshop on Logic of Programs, ser. LNCS, vol. 131.Springer, 1981, pp. 52-71.
+
+clarke1999modelchecking
+E. M. Clarke, O. Grumberg, and D. Peled, Model Checking.MIT Press, 1999.
+
+lamport1978clocks
+L. Lamport, "Time, clocks, and the ordering of events in a distributed system," Communications of the ACM, vol. 21, no. 7, pp. 558-565, 1978.
+
+lamport1994tla
+â, "The temporal logic of actions," ACM Transactions on Programming Languages and Systems, vol. 16, no. 3, pp. 872-923, 1994.
+
+lamport1986latex
+â,: A Document Preparation System.Addison-Wesley, 1986.
+
+liskov1974abstraction
+B. H. Liskov and S. N. Zilles, "Programming with abstract data types," ACM SIGPLAN Notices, vol. 9, no. 4, pp. 50-59, 1974.
+
+cook1971complexity
+S. A. Cook, "The complexity of theorem-proving procedures," in Proc. 3rd Annual ACM Symposium on Theory of Computing (STOC), 1971, pp. 151-158.
+
+karp1972reducibility
+R. M. Karp, "Reducibility among combinatorial problems," in Complexity of Computer Computations, E. Miller, R. and W. Thatcher, J. Eds.Plenum, 1972, pp. 85-103.
+
+yao1977probabilistic
+A. C. Yao, "Probabilistic computations: Toward a unified measure of complexity," in Proc. 18th Annual Symposium on Foundations of Computer Science (FOCS), 1977, pp. 222-227.
+
+blum1967machine
+M. Blum, "A machine-independent theory of the complexity of recursive functions," Journal of the ACM, vol. 14, no. 2, pp. 322-336, 1967.
+
+hinton2015deep
+Y. LeCun, Y. Bengio, and G. E. Hinton, "Deep learning," Nature, vol. 521, pp. 436-444, 2015.
+
+pearl2009causality
+J. Pearl, Causality: Models, Reasoning, and Inference, 2nd ed.Cambridge University Press, 2009.
+
+mccarthy1960lisp
+J. McCarthy, "Recursive functions of symbolic expressions and their computation by machine, part I," Communications of the ACM, vol. 3, no. 4, pp. 184-195, 1960.
+
+newell1976physical
+A. Newell and H. A. Simon, "Computer science as empirical inquiry: Symbols and search," Communications of the ACM, vol. 19, no. 3, pp. 113-126, 1976.
+
+thebibliography
