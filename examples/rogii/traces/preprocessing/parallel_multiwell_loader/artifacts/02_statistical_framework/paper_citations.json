@@ -1,0 +1,14 @@
+{
+  "base_paper_title": "Dask: Parallel Computation with Blocked algorithms and Task Scheduling",
+  "claims": [
+    "Parallel blocked IO scales multi-well CSV ingestion beyond single-threaded loaders.",
+    "Worker count and on-disk cache are ablatable throughput\u2013memory tradeoffs.",
+    "Geology surface columns add Type-1 feature materialization cost testable via on/off ablation."
+  ],
+  "ablation_sections": [
+    "\u00a72 task graph",
+    "\u00a73 scheduling"
+  ],
+  "trace_csv": "traces/preprocessing/parallel_multiwell_loader/trace_language.csv",
+  "hypothesis": "Parallel IO + geology surfaces improves competition RMSE (post-PS) vs shared baseline under nested GroupKFold, as motivated by Rocklin (2015)."
+}

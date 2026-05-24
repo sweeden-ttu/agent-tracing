@@ -1,0 +1,78 @@
+{
+  "variant": "parallel_multiwell_loader",
+  "approach": "Parallel IO + geology surfaces",
+  "ablation_factors": [
+    {
+      "id": "io_workers",
+      "factor": "parallel_workers",
+      "levels": [
+        "4",
+        "8",
+        "16"
+      ]
+    },
+    {
+      "id": "surface_cols",
+      "factor": "geology_surfaces",
+      "levels": [
+        "off",
+        "on"
+      ]
+    },
+    {
+      "id": "loader_cache",
+      "factor": "cache",
+      "levels": [
+        "off",
+        "on"
+      ]
+    }
+  ],
+  "factorial_grid_size": 12,
+  "factorial_grid_sample": [
+    {
+      "io_workers": "4",
+      "surface_cols": "off",
+      "loader_cache": "off"
+    },
+    {
+      "io_workers": "4",
+      "surface_cols": "off",
+      "loader_cache": "on"
+    },
+    {
+      "io_workers": "4",
+      "surface_cols": "on",
+      "loader_cache": "off"
+    },
+    {
+      "io_workers": "4",
+      "surface_cols": "on",
+      "loader_cache": "on"
+    },
+    {
+      "io_workers": "8",
+      "surface_cols": "off",
+      "loader_cache": "off"
+    },
+    {
+      "io_workers": "8",
+      "surface_cols": "off",
+      "loader_cache": "on"
+    },
+    {
+      "io_workers": "8",
+      "surface_cols": "on",
+      "loader_cache": "off"
+    },
+    {
+      "io_workers": "8",
+      "surface_cols": "on",
+      "loader_cache": "on"
+    }
+  ],
+  "primary_metric": "rmse_post_ps",
+  "smre": "mean_rmse_plus_std_across_folds",
+  "episodic_training": true,
+  "slurm_single_job_per_branch": true
+}

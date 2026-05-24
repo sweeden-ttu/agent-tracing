@@ -1,0 +1,43 @@
+=== trace phase job ===
+variant:      parallel_multiwell_loader
+trace_phase:  05_evaluation
+partition:    matador
+node:         gpu-20-10
+variant_dir:  /lustre/work/sweeden/agent-tracing-trace-parallel/examples/rogii/traces/preprocessing/parallel_multiwell_loader
+conda_prefix: /lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+=== module load (gcc / cuda / python) ===
+CONDA_PREFIX=/lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+Python 3.11.15
+trace env deps OK
+=== preboot: verify prior-phase handoff ===
+PREBOOT OK: parallel_multiwell_loader / 05_evaluation
+=== GPU check (matador) ===
+SLURM_JOB_PARTITION=matador
+SLURM_GPUS_ON_NODE=1
+GPU 0: Tesla V100-PCIE-32GB (UUID: GPU-58970ac5-c412-dd19-212a-be8202317bfc)
+torch 2.8.0+cu128 cuda True
+=== execute phase ===
+=== run_phase 05_evaluation variant=parallel_multiwell_loader ===
+{
+  "variant": "parallel_multiwell_loader",
+  "phase": "05_evaluation",
+  "completed_at": "2026-05-24T10:24:49Z",
+  "prior_phase": "04_model_training",
+  "outputs": {
+    "metrics": "artifacts/05_evaluation/metrics.json",
+    "residuals": "artifacts/05_evaluation/residuals.csv"
+  },
+  "trace_steps_executed": 12,
+  "oof_rmse": 0.6463777638976427
+}
+=== post-run: verify phase manifest outputs ===
+POST-RUN OK: 05_evaluation outputs: ['metrics', 'residuals']
+=== done 05_evaluation @ 2026-05-24T05:24:50-05:00 ===
+total 14
+drwxr-xr-x 2 sweeden users   4096 May 24 05:24 .
+drwxr-xr-x 8 sweeden users   4096 May 24 01:57 ..
+-rw-r--r-- 1 sweeden users    371 May 24 01:57 PHASE_CONTRACT.json
+-rw-r--r-- 1 sweeden users    478 May 24 05:24 metrics.json
+-rw-r--r-- 1 sweeden users    349 May 24 05:24 phase_manifest.json
+-rw-r--r-- 1 sweeden users 259464 May 24 05:24 residuals.csv
+-rw-r--r-- 1 sweeden users    231 May 24 05:24 residuals_by_depth.json

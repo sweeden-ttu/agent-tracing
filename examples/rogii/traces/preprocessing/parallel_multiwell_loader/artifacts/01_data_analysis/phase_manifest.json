@@ -1,0 +1,17 @@
+{
+  "variant": "parallel_multiwell_loader",
+  "phase": "01_data_analysis",
+  "completed_at": "2026-05-24T10:24:02Z",
+  "prior_phase": null,
+  "outputs": {
+    "schema": "artifacts/01_data_analysis/schema.json",
+    "data_paths": "artifacts/01_data_analysis/data_paths.json",
+    "well_groups": "artifacts/01_data_analysis/well_groups.json",
+    "target_diagnosis": "artifacts/01_data_analysis/target_diagnosis.json",
+    "eda_summary": "artifacts/01_data_analysis/eda_summary.json",
+    "variant_scaffold": "artifacts/01_data_analysis/variant_scaffold.json"
+  },
+  "trace_steps_executed": 14,
+  "id_column": "id",
+  "target_column": "tvt"
+}
