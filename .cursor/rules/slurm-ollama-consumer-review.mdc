@@ -1,0 +1,147 @@
+---
+description: Before any sbatch — Ollama HPCC consumer review, interactive preflight, log triage (TTU guide).
+globs: "**/*.slurm,**/hpcc/**"
+alwaysApply: false
+---
+
+# Slurm Ollama consumer review (mandatory before `sbatch`)
+
+Every new or modified Slurm job that runs **agent code** or **LLM-backed pipelines** must pass the **Type-3 consumer agent** review below before submission. Complements `slurm-pipeline-execution.mdc` (one job per variant, matador only for GPU).
+
+**Reference:** [TTU HPCC — Running Ollama on RedRaider](https://www.depts.ttu.edu/hpcc/userguides/application_guides/ollama.php)
+
+## Consumer agent checklist (do not skip)
+
+### 0. Triage last logs (fix before retry)
+
+```bash
+cd /lustre/work/sweeden/rogii
+ls -lt logs/*.e* logs/*.o* logs/ollama_serve_* 2>/dev/null | head -20
+tail -80 logs/$(ls -t logs/*.e* 2>/dev/null | head -1)   # last stderr
+grep -iE 'error|fatal|cuda|ollama|oom|kill' logs/* 2>/dev/null | tail -30
+```
+
+Resolve errors from the **previous** run before editing the script or submitting again. Record fixes in the job script comment header.
+
+### 1. Module stack + per-pipeline conda (TTU + six variants)
+
+On **compute nodes** (interactive or batch), not login nodes:
+
+```bash
+source "${RUN_DIR}/hpcc/slurm_module_init.sh"
+init_slurm_modules
+source "${RUN_DIR}/hpcc/load_matador_modules.sh"
+load_matador_modules    # module load gcc, cuda, python
+```
+
+**Per-pipeline conda** (miniconda / conda-forge; env name = variant folder slug):
+
+| VARIANT | environment.yml |
+|---------|-----------------|
+| `baseline_column_transformer` | `examples/rogii/traces/preprocessing/baseline_column_transformer/environment.yml` |
+| `typewell_gr_alignment` | `.../typewell_gr_alignment/environment.yml` |
+| `ps_point_leakage_aware` | `.../ps_point_leakage_aware/environment.yml` |
+| `robust_scale_log1p` | `.../robust_scale_log1p/environment.yml` |
+| `parallel_multiwell_loader` | `.../parallel_multiwell_loader/environment.yml` |
+| `formation_plane_spatial` | `.../formation_plane_spatial/environment.yml` |
+
+```bash
+VARIANT=baseline_column_transformer   # required for variant pipeline jobs
+source "${RUN_DIR}/hpcc/_variant_conda_env.sh"
+matador_activate_variant_env          # creates env from yml if missing
+```
+
+Shared agent jobs (no VARIANT): `matador_activate_shared_env` → `kc-rogii-wellbore-geology-prediction`.
+
+Consumer **rejects** `python -m venv` and scripts missing `module load gcc`, `cuda`, and `python`.
+
+Review with variant:
+
+```bash
+bash hpcc/review_slurm_before_submit.sh hpcc/run_ablation_variant.slurm baseline_column_transformer
+```
+
+### 2. Ollama setup (TTU + project wrapper)
+
+On **compute nodes** (interactive or batch), not login nodes:
+
+- Install once in `~/ollama-latest/` per TTU guide (`wget` tarball, `tar -zxvf`, add `~/ollama-latest/bin` to PATH).
+- **Matador + CUDA:** `module load gcc/13.2.0 cuda/12.9.0 python/3.12.5` (or current matador stack).
+- **Minimum GPU:** matador `-g 1` (or `-g 2` only if justified); 1–20 CPUs per GPU per TTU.
+- In the Slurm script, **after** `cd "${RUN_DIR}"` and module load:
+
+```bash
+source "${RUN_DIR}/hpcc/_matador_ollama_env.sh"
+matador_start_ollama_for_job      # 127.0.0.1:$OLPORT, ollama serve in background
+matador_export_ollama_base_url    # OLLAMA_BASE_URL=http://127.0.0.1:$OLPORT
+```
+
+Consumer **rejects** scripts that call cloud LLM APIs without `OLLAMA_BASE_URL` pointing at **localhost** when trace envelopes declare on-prem Ollama/granite.
+
+### 3. Interactive preflight (same resources as batch)
+
+Define once per session:
+
+```bash
+alias interactive='/etc/slurm/scripts/interactive'
+```
+
+Extract `#SBATCH` flags from the target script (`-c`, `-g`, `-p`, `-t`, `--mem`) and request **identical** resources:
+
+```bash
+# Example — match your .slurm file exactly:
+interactive -c 8 -g 1 -p matador -t 04:00:00
+```
+
+Inside the allocation, run the **same commands as the batch script** in order:
+
+1. `init_slurm_modules` + `load_matador_modules` (gcc / cuda / python)
+2. `matador_activate_variant_env` or `matador_activate_shared_env`
+3. `source hpcc/_matador_ollama_env.sh` + `matador_start_ollama_for_job`
+3. `nvidia-smi -L`; `curl -sf "http://127.0.0.1:${OLPORT}/api/tags"`
+4. Short agent smoke test (one prompt / one dry-run orchestrator step)
+5. All setup **up to but not including** the long-running section (training loop, full CV, multi-hour pull)
+
+At the **long-running marker** (comment `# LONG_RUNNING_START` or first `train_tcn`, `sbatch` inner loop, `max_epochs` loop): **Ctrl-C / kill** the process. Note elapsed time; set `#SBATCH -t` to measured setup + estimated run + 20% buffer.
+
+Exit interactive when done (TTU: do not leave idle GPU sessions).
+
+### 4. Agent / trace fidelity audit
+
+Consumer verifies the Slurm body matches `trace_language.csv` and experiment descriptor:
+
+- Declared model tag (`QUIZ1_MODEL` / trace envelope) matches `ollama list`
+- Agent entrypoints use `OLLAMA_BASE_URL` or `ChatOllama(base_url=...)`, not hardcoded cloud keys
+- Commands under Slurm match trace swim-lane tokens (no undocumented shortcuts)
+- Run automated review when available:
+
+```bash
+cd /lustre/work/sweeden/rogii
+bash hpcc/review_slurm_before_submit.sh hpcc/YOUR_JOB.slurm
+```
+
+### 5. Submit only after consumer PASS
+
+```bash
+# Consumer must print PASS (exit 0)
+bash hpcc/review_slurm_before_submit.sh hpcc/YOUR_JOB.slurm && sbatch hpcc/YOUR_JOB.slurm
+```
+
+Record job id in trace CSV / ablation run JSON. Re-check `squeue` — still only **one active job per trace variant**.
+
+## Slurm script requirements
+
+Add near top of every agent/Ollama job:
+
+```bash
+# LONG_RUNNING_START marks where interactive preflight stops
+# OLLAMA: sources hpcc/_matador_ollama_env.sh (TTU localhost schedule)
+# CONSUMER_REVIEW: logs triaged YYYY-MM-DD; interactive preflight done
+```
+
+## Forbidden
+
+- `sbatch` without interactive preflight for new/changed scripts
+- Ollama on login nodes or without matador GPU (except tiny cpu smoke explicitly documented)
+- Shared/global `OLLAMA_HOST=0.0.0.0` — use **127.0.0.1:$OLPORT** only
+- Ignoring last `logs/*.e*` failures

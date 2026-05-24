@@ -1,0 +1,77 @@
+{
+  "variant": "robust_scale_log1p",
+  "approach": "RobustScaler + log1p target",
+  "ablation_factors": [
+    {
+      "id": "log1p_target",
+      "factor": "target_transform",
+      "levels": [
+        "off",
+        "on"
+      ]
+    },
+    {
+      "id": "robust_features",
+      "factor": "feature_scaler",
+      "levels": [
+        "standard",
+        "robust"
+      ]
+    },
+    {
+      "id": "inverse_at_predict",
+      "factor": "inverse_transform",
+      "levels": [
+        "off",
+        "on"
+      ]
+    }
+  ],
+  "factorial_grid_size": 8,
+  "factorial_grid_sample": [
+    {
+      "log1p_target": "off",
+      "robust_features": "standard",
+      "inverse_at_predict": "off"
+    },
+    {
+      "log1p_target": "off",
+      "robust_features": "standard",
+      "inverse_at_predict": "on"
+    },
+    {
+      "log1p_target": "off",
+      "robust_features": "robust",
+      "inverse_at_predict": "off"
+    },
+    {
+      "log1p_target": "off",
+      "robust_features": "robust",
+      "inverse_at_predict": "on"
+    },
+    {
+      "log1p_target": "on",
+      "robust_features": "standard",
+      "inverse_at_predict": "off"
+    },
+    {
+      "log1p_target": "on",
+      "robust_features": "standard",
+      "inverse_at_predict": "on"
+    },
+    {
+      "log1p_target": "on",
+      "robust_features": "robust",
+      "inverse_at_predict": "off"
+    },
+    {
+      "log1p_target": "on",
+      "robust_features": "robust",
+      "inverse_at_predict": "on"
+    }
+  ],
+  "primary_metric": "rmse_post_ps",
+  "smre": "mean_rmse_plus_std_across_folds",
+  "episodic_training": true,
+  "slurm_single_job_per_branch": true
+}
