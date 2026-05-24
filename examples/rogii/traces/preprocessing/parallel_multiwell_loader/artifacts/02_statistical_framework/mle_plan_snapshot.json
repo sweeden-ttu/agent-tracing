@@ -23,5 +23,52 @@
     "type3_consumer": "schema-sentinel"
   },
   "metric": "rmse",
+<<<<<<< HEAD:examples/rogii/traces/preprocessing/parallel_multiwell_loader/artifacts/02_statistical_framework/mle_plan_snapshot.json
   "smre": "mean_rmse_plus_std_across_folds"
 }
+=======
+  "smre": "mean_rmse_plus_std_across_folds",
+  "ablations": [
+    {
+      "id": "io_workers",
+      "factor": "parallel_workers",
+      "levels": [
+        "4",
+        "8",
+        "16"
+      ]
+    },
+    {
+      "id": "surface_cols",
+      "factor": "geology_surfaces",
+      "levels": [
+        "off",
+        "on"
+      ]
+    },
+    {
+      "id": "loader_cache",
+      "factor": "cache",
+      "levels": [
+        "off",
+        "on"
+      ]
+    }
+  ],
+  "experiment_descriptor": "experiment_descriptor.json",
+  "base_paper_role": "primary_experiment_descriptor",
+  "agent_implementation": "traces/preprocessing/parallel_multiwell_loader/trace_language.csv",
+  "experiment_design_architect": {
+    "agent": "experiment-design-architect",
+    "tokens": [
+      "write_mle_plan_json",
+      "define_statistical_framework",
+      "design_ablation_factorial_grid",
+      "configure_variant_ablation_flags",
+      "plan_episodic_training_schedule",
+      "define_episode_boundaries_by_well_or_fold",
+      "record_ablation_plan"
+    ]
+  }
+}
+>>>>>>> 5b44f64 (Refresh cross-variant MLE plans, ablation tracking, and submit scripts):examples/rogii/traces/preprocessing/parallel_multiwell_loader/mle_plan.json
