@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
+# Auto-generated from frontier.yaml — login-node dry-run gate for ps_point_leakage_aware.
 set -euo pipefail
-source ~/.bash_profile 2>/dev/null || source ~/.profile 2>/dev/null
-mamba activate kc-rogii-wellbore-geology-prediction 2>/dev/null || true
+export ROGII_ROOT="/lustre/work/sweeden/agent-tracing"
+export AGENT_TRACING_ROOT="/lustre/work/sweeden/agent-tracing"
 cd /lustre/work/sweeden/frontier-evals/project/paperbench
-uv run python -m paperbench.trace_pipeline.orchestrator --variant ps_point_leakage_aware --dry-run
+uv run python -m paperbench.trace_pipeline.orchestrator \
+  --variant ps_point_leakage_aware \
+  --trace-path "/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/ps_point_leakage_aware/trace_language.csv" \
+  --dry-run
 uv run python -m paperbench.scripts.implement_agent_tracing --validate-traces

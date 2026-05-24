@@ -51,7 +51,7 @@
     "ke2017_lightgbm",
     "pedregosa2011_sklearn"
   ],
-  "base_paper_role": "dual: model (LightGBM) + preprocessing (ColumnTransformer)",
+  "base_paper_role": "primary_experiment_descriptor",
   "agent_implementation": "traces/preprocessing/baseline_column_transformer/trace_language.csv",
   "experiment_design_architect": {
     "agent": "experiment-design-architect",

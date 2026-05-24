@@ -2,9 +2,11 @@
 
 **Approach:** PS-point detection + post-PS RMSE mask
 
-## Base paper (ablation / experiment design)
+## Base papers (ablation / experiment design)
 
-- **Title:** Leakage in Data Mining: Formulation, Detection, and Avoidance
+### 1. Leakage in Data Mining: Formulation, Detection, and Avoidance
+
+- **Role:** primary_experiment_descriptor
 - **Authors:** Kaufman, Rosset, Perlich, Stitelman
 - **Year / venue:** 2012 / ACM TKDD
 - **DOI:** 10.1145/2382575.2382577

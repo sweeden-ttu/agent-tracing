@@ -32,7 +32,7 @@
   },
   "agent_implementation": {
     "trace_language_csv": "traces/preprocessing/parallel_multiwell_loader/trace_language.csv",
-    "trace_language_csv_absolute": "/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/parallel_multiwell_loader/trace_language.csv",
+    "trace_language_csv_absolute": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/parallel_multiwell_loader/trace_language.csv",
     "resource_envelope_rows": "2-21",
     "governance_bootstrap_rows": "22-26",
     "chomsky_audit": "sec/4 evaluation audit protocol (Type-3 consumer bounds)",
@@ -72,5 +72,6 @@
         ]
       }
     ]
-  }
+  },
+  "paper_file": "../../../papers/parallel_multiwell_loader/rocklin2015_dask.pdf"
 }
