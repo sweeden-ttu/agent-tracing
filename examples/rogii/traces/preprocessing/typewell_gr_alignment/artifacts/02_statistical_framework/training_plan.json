@@ -1,0 +1,50 @@
+{
+  "factorial_runs": [
+    {
+      "gr_alignment": "off",
+      "gr_interp": "linear",
+      "baseline_gr_rmse": "report"
+    },
+    {
+      "gr_alignment": "off",
+      "gr_interp": "linear",
+      "baseline_gr_rmse": "skip"
+    },
+    {
+      "gr_alignment": "off",
+      "gr_interp": "pchip",
+      "baseline_gr_rmse": "report"
+    },
+    {
+      "gr_alignment": "off",
+      "gr_interp": "pchip",
+      "baseline_gr_rmse": "skip"
+    },
+    {
+      "gr_alignment": "on",
+      "gr_interp": "linear",
+      "baseline_gr_rmse": "report"
+    },
+    {
+      "gr_alignment": "on",
+      "gr_interp": "linear",
+      "baseline_gr_rmse": "skip"
+    },
+    {
+      "gr_alignment": "on",
+      "gr_interp": "pchip",
+      "baseline_gr_rmse": "report"
+    },
+    {
+      "gr_alignment": "on",
+      "gr_interp": "pchip",
+      "baseline_gr_rmse": "skip"
+    }
+  ],
+  "episodes_per_fold": 3,
+  "schedule": "well_or_fold_boundaries",
+  "recommended_baseline": {
+    "target_log1p": "none",
+    "cv_scheme": "kfold"
+  }
+}

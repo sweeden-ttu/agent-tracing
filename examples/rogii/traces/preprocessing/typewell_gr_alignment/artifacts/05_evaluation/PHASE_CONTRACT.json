@@ -1,0 +1,13 @@
+{
+  "variant": "typewell_gr_alignment",
+  "phase": "05_evaluation",
+  "status": "pending",
+  "prior_phase": "04_model_training",
+  "outputs": {
+    "metrics": "artifacts/05_evaluation/metrics.json",
+    "residuals": "artifacts/05_evaluation/residuals.csv"
+  },
+  "optional_outputs": {
+    "residuals_by_depth": "artifacts/05_evaluation/residuals_by_depth.json"
+  }
+}

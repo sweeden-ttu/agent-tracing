@@ -1,3 +1,19 @@
+# baseline_column_transformer — Ke 2017 LightGBM + Pedregosa 2011 ColumnTransformer
+#
+# Variant: ColumnTransformer + LightGBM baseline for Rogii TVT prediction
+# Branch: trace/baseline-column-transformer
+# Papers: ke2017_lightgbm, pedregosa2011_sklearn (see papers/manifest.json)
+#
+# Runtime on HPCC: mamba activate kc-rogii-wellbore-geology-prediction
+#   (canonical env at /lustre/work/sweeden/rogii/environment.yml)
+#
+# Canonical TVT runner (Ke + Pedregosa):
+#   cd /lustre/work/sweeden/rogii
+#   python train_predict.py --data-dir data --out submission.csv
+#
+# Key deps: scikit-learn (ColumnTransformer), lightgbm (LGBMRegressor)
+# Trace index: trace_row_index.csv (226 rows; regenerate via examples/rogii/scripts/write_trace_row_index.py)
+#
 name: baseline_column_transformer
 channels:
   - conda-forge
@@ -21,9 +37,9 @@ dependencies:
   - ipykernel
   - xgboost
   - scipy
+  - category-encoders
   - pytorch
   - pytorch-cuda=12.1
-  - category-encoders
   - pip:
       - openai>=1.40
       - lancedb

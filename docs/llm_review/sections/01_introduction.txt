@@ -1,0 +1,258 @@
+# Introduction
+
+Source: llm.txt lines 100–353
+
+Introduction
+
+The contemporary literature on autonomous
+software agents is rich in architectural diagrams and short on
+formal definitions.  An agent is variously described as "a
+system that perceives and acts", "a planner that calls tools",
+or "an LLM in a loop", and each definition is stated at a level
+of abstraction that admits neither a decision procedure nor a
+complexity bound.  The consequence is that two agents with
+radically different computational power are routinely compared
+as if they belonged to a single class, and verification claims
+about agentic systems are correspondingly difficult to falsify.
+
+We are not the first to ask whether the Chomsky hierarchy is the
+right scaffold for thinking about this problem.  In particular,
+Koohestani, Li, Podkopaev, and Izadi pose the question
+Are agents just automata? koohestani2025automata
+and answer affirmatively, establishing a memory-based equivalence
+between simple-reflex agents and finite automata, hierarchical
+task-decomposition agents and pushdown automata, and
+unrestricted-memory agents and Turing
+machines turing1936computable.  We accept their answer.
+Their question, however, is the preliminary one.  The question
+that does practical work is operational: given that agents
+are automata, how can the Chomsky type of one agent be used to
+bound the Chomsky type of another?  This is the
+producer-consumer problem of
+Dijkstra dijkstra1968cooperating re-stated in the language
+of formal grammars.  The present paper offers a methodology that
+answers it in the affirmative, with software verification and
+validation techniques inferred into the consumer side and the
+idealised theoretical apparatus of automata built into the
+producer side.
+
+Why a narrow definition
+
+We deliberately keep the definition of an agent narrow, taking
+only what is forced upon us by the theory of automata Turing
+introduced in 1936 turing1936computable and the language
+hierarchy Chomsky introduced in
+1956-59 chomsky1956three,chomsky1959certain.  An agent,
+for us, is an effectful machine that, when started on an
+admissible input, emits a finite string of operation symbols and
+then halts (or fails to halt).  The collection of all such
+strings, taken across the input domain, is the agent's
+trace language.  Two agents with the same trace language
+are, for evaluation purposes in this paper, treated as the same
+agent---an methodological identity criterion (Definition def:traceeq),
+not an ontological claim about latent state, cost, or safety.
+Whatever cannot be read off from the trace language is not used
+as evidence here; chain-of-thought, planner JSON, and hidden memory
+are discussed as out-of-scope in Section sec:discussion.
+
+The motivation for keeping the definition narrow is twofold.
+First, it gives a direct line from the agent to the Chomsky
+hierarchy and to the recognising automata.  An agent whose trace
+language is regular (Type-3) is realisable by a finite-state
+controller and admits decidable verification in linear
+time rabin1959finite.  An agent whose trace language is
+context-free (Type-2) is realisable by a pushdown controller and
+admits  membership hopcroft2006automata.  An agent
+whose trace language is recursively enumerable (Type-0) is, in
+the worst case, undecidable to verify - a fact whose
+modern statement we inherit from Robinson's resolution of
+Hilbert's tenth
+problem robinson1949definability,davis1961decision, which
+established that recursively enumerable sets are exactly the
+Diophantine sets and that the membership problem for them admits
+no general algorithm.
+
+Second, the narrow definition gives an empirical handle.  If the
+agent is its trace language, then the trace language can be
+recorded, stored, and compared; experiments produce strings, and
+those strings can be classified by the smallest grammar class
+that generates them.  This places the VV of agentic systems on
+the same footing as the VV of compilers, parsers, and protocol
+implementations aho1972theory,hoare1969axiomatic -
+domains in which the formal-language framing has, for half a
+century, been the foundation of decidable correctness.
+
+What we do not claim.
+We do not verify chain-of-thought or hidden planner state; we do not
+claim multi-benchmark state-of-the-art; we do not claim that trace
+length alone decides Chomsky class (Section sec:results, probe P2);
+and we do not release the final submission CSV, to avoid benchmark
+contamination (Section sec:expsetup).  Leaderboard numerics in
+Section sec:results are reported only after verified Slurm runs or
+marked TBD.
+
+The Goal-Driven producer and Data-Driven consumer
+
+Our central architectural claim is the producer-consumer
+restatement.  There is exactly one Goal-Driven producer
+agent.  Its trace language is Type-0: recursively enumerable
+and, in general, undecidable.  In practice it is realised as a
+large language model wrapped in a tool-calling loop, and the
+loop is permitted to enumerate any finite-length sequence of
+tool invocations from the union of the sub-agents' alphabets.
+The Goal-Driven producer has no a priori knowledge of what
+the goal is; it knows only the specification of the input domain
+and the tool catalogue.
+
+There is exactly one Data-Driven consumer in the architecture,
+but it is composite: (i) the Aho-Corasick DFA verifier whose trace
+language is Type-3---regular and, by Rabin and Scott's construction
+rabin1959finite, decidable in linear time---compiled from the
+competition's empirical fixtures (unit-test corpus, submission-validity
+tests, column-name checks, integrity tests on the
+train.csv/test.csv/samplesubmission.csv triple); and (ii) a final
+human verification and validation gate on submission upload that
+closes the outer loop when keyword extension or RMSE sanity checks
+exceed the regular envelope (Section sec:discussion).  Debug or
+off-path traces may be logged during development; only DFA-accepted
+segments that survive the binding protocol are treated as the official
+verified trace written to the release CSVs.
+
+The binding is the entirety of our architectural claim:
+quote
+A single Goal-Driven Type-0 producer, tamed by a single
+Data-Driven Type-3 consumer, results in success.
+quote
+Type-2 and Type-1 sub-agents are not designed; they are
+derived.  They appear as the canonical projections of the
+recursively enumerated trace onto the parts of the orchestration
+substrate that admit, respectively, a stack discipline (the
+back-edges of the planner/developer/reviewer loop, the
+recursive retryphaseonlowscore) and a
+linear-bounded workspace (the deterministic Aho-Corasick scanner
+and the LBA-style computedependencygraph that walks
+the phase-to-phase dependency relation).  We make these
+projections precise in Section sec:chomsky.
+
+A subtlety: nothing in the framework prevents a Type-3 agent from
+itself acting as a producer, in which case it backward-infers
+constrained changes onto the tape (e.g., updates to the keyword
+set  as new task fixtures arrive).  Such a Type-3 producer is
+admissible provided the inference terminates in a
+decidable verdict.  When it does not, the classical halting
+problem of Turing turing1936computable re-asserts itself
+on the Type-3 producer's loop and the architecture loses its
+verification budget.  We discuss the engineering consequence in
+Section sec:discussion: in the realised system, decidability
+is enforced by the regular envelope of the verifier and, where
+the data-driven side begins to drift, by a final human
+verification and validation step that closes the loop.
+
+The start language and its recursive enumeration
+
+The system is initialised with a single start language, given concretely in
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv.
+The start language contains twenty sub-agent swim lanes and their seed
+action alphabets---nothing else at design time.  The Goal-Driven Type-0
+producer, bound by the Data-Driven Type-3 consumer, then recursively
+enumerates onto the Rogii Wellbore Geology Prediction Kaggle task.
+The result is the trace language recorded across six preprocessing
+variants under examples/rogii/traces/preprocessing/{variant}/.
+Each variant shares the same twenty-lane orchestrator; preprocessing
+and model tokens differ according to the variant's base scientific
+paper---Ke et al. 2017 LightGBM and Pedregosa et al. 2011 ColumnTransformer
+(baseline), Sakoe--Chiba 1978 DTW (typewell GR alignment), Kaufman et al.
+2012 leakage (PS-point masks), Hampel et al. 1986 robust statistics
+(log1p + RobustScaler), Rocklin 2015 Dask (parallel multi-well IO),
+Cover--Hart 1967 k-NN (formation-plane spatial features).  A critical
+review of paper-concept fidelity in each trace_language.csv appears in
+Section sec:trace-csv (Variant trace languages and critical review).
+The Slurm episodic trainer is the emergent agent: it does not exist in
+the minimal seed language and is materialised after the verifier first
+refuses traces that omit Matador GPU training and Ollama localhost setup.
+
+We claim that this enumeration is the operational meaning of
+"Type-0 recursive enumeration" in the agentic setting.
+Turing's machines enumerate strings; Robinson's theorem connects
+the enumerated sets to Diophantine arithmetic; our agent
+enumerates tool-call strings, and the connection between the
+enumerated strings and the empirical Kaggle competition is
+mediated by the Aho-Corasick verifier.
+
+Idealisation and physical bounding
+
+It is worth being clear about the difference between the theory
+and the machine that actually ran the experiment.  The
+Goal-Driven agent's trace language is idealised Type-0.
+The actual execution was bounded by the finite tape and finite
+RAM of a single laptop and, for the heavier ablation runs, by
+the High Performance Computing Center at Texas Tech University.
+The realised machine is, formally, a (very large) linear-bounded
+automaton - Type-1.  The idealisation is sound for our
+purposes: every trace producible by the realised LBA is also
+producible by the idealised Turing machine, and the verified
+trace language is, by closure under intersection at the
+verifier's Chomsky level (Theorem thm:closure), bounded
+above by Type-3.  The physical computation is therefore
+far more restricted than the theoretical envelope, and any
+verification claim we discharge about the idealised system holds
+a fortiori on the bounded machine.  This is the standard
+idealisation of
+Hartmanis and Stearns hartmanis1965computational, and we
+adopt it on those terms.
+
+Contributions
+
+enumerate
+A formal definition of the trace language
+of an agent  as the language generated by an
+effectful controller over a finite operation alphabet, together
+with a proof that the resulting object satisfies the Chomsky
+hierarchy verbatim (Section sec:trace).
+A producer-consumer answer to the
+Koohestani-Li-Podkopaev-Izadi question:  a single Goal-Driven
+Type-0 producer, intersected with a single Data-Driven Type-3
+consumer realised as an Aho-Corasick DFA, suffices to produce a
+verified trace language whose Chomsky class is bounded above by
+the consumer's class (Section sec:chomsky,
+Theorem thm:closure).
+A demonstration that Type-2 and Type-1 sub-agents need not
+be designed but can be derived as projections of the
+recursively enumerated trace onto stack-discipline and
+bounded-workspace substrates respectively
+(Section sec:methodology).
+A discussion of how a Type-3 agent may itself act as a
+producer, backward-inferring constrained changes onto the tape,
+under the necessary condition that decidability be preserved
+(Section sec:discussion); failing this condition, the
+halting problem returns and the verification budget collapses.
+An empirical instantiation on the Rogii Wellbore Geology Prediction
+Kaggle task with six preprocessing-variant ablations.  The trace
+languages, experiment descriptors, base-paper PDFs, and Slurm consumer
+review scripts are released at
+
+https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction
+
+and in the agent-tracing repository (examples/rogii/, branch trace/base)
+(Sections sec:expsetup-sec:results).
+enumerate
+
+Roadmap
+
+Section sec:related surveys related work, opening with
+Koohestani et al. and the producer-consumer framing.
+Section sec:preliminaries fixes notation drawn from
+Turing's automata theory and Chomsky's hierarchy.
+Section sec:trace gives the rigorous definition of the
+trace language.  Section sec:chomsky classifies trace
+languages by Chomsky type and proves the closure theorem.
+Section sec:indexed situates Aho's indexed grammars and
+the Aho-Corasick verifier in the framework.
+Section sec:methodology describes the Goal-Driven/
+Data-Driven binding and the recursive enumeration of the start
+language.  Sections sec:expsetup-sec:results report
+the experimental study and result on Rogii Wellbore Geology Prediction.
+Section sec:discussion discusses idealisation, physical
+bounding, and the Type-3-as-producer subtlety.
+Section sec:conclusion concludes.
+

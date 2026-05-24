@@ -1,0 +1,44 @@
+=== trace phase job ===
+variant:      baseline_column_transformer
+trace_phase:  03_feature_engineering
+partition:    matador
+node:         gpu-20-8
+variant_dir:  /lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/baseline_column_transformer
+conda_prefix: /lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+=== module load (gcc / cuda / python) ===
+CONDA_PREFIX=/lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+Python 3.11.15
+trace env deps OK
+=== preboot: verify prior-phase handoff ===
+PREBOOT OK: baseline_column_transformer / 03_feature_engineering
+=== GPU check (matador) ===
+SLURM_JOB_PARTITION=matador
+SLURM_GPUS_ON_NODE=1
+GPU 0: Tesla V100-PCIE-32GB (UUID: GPU-d5bd732f-d8b2-389d-4d84-7cc36d8b5e85)
+torch 2.8.0+cu128 cuda True
+=== execute phase ===
+=== run_phase 03_feature_engineering variant=baseline_column_transformer ===
+{
+  "variant": "baseline_column_transformer",
+  "phase": "03_feature_engineering",
+  "completed_at": "2026-05-24T10:24:30Z",
+  "prior_phase": "02_statistical_framework",
+  "outputs": {
+    "feature_config": "artifacts/03_feature_engineering/feature_config.json",
+    "cv_config": "artifacts/03_feature_engineering/cv_config.json",
+    "fold_indices": "artifacts/03_feature_engineering/fold_indices.json"
+  },
+  "trace_steps_executed": 16
+}
+=== post-run: verify phase manifest outputs ===
+POST-RUN OK: 03_feature_engineering outputs: ['feature_config', 'cv_config', 'fold_indices']
+=== done 03_feature_engineering @ 2026-05-24T05:24:30-05:00 ===
+total 15
+drwxr-xr-x 2 sweeden users   4096 May 24 01:57 .
+drwxr-xr-x 8 sweeden users   4096 May 24 02:36 ..
+-rw-r--r-- 1 sweeden users    594 May 24 01:57 PHASE_CONTRACT.json
+-rw-r--r-- 1 sweeden users    109 May 24 05:24 cv_config.json
+-rw-r--r-- 1 sweeden users    375 May 24 05:24 feature_config.json
+-rw-r--r-- 1 sweeden users 364355 May 24 05:24 fold_indices.json
+-rw-r--r-- 1 sweeden users    440 May 24 05:24 phase_manifest.json
+-rw-r--r-- 1 sweeden users     39 May 24 05:24 subdivision_by_depth.json

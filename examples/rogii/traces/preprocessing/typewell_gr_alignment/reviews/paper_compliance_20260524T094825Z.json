@@ -1,0 +1,42 @@
+{
+  "timestamp": "20260524T094825Z",
+  "manifest": {
+    "title": "Dynamic Programming Algorithm Optimization for Spoken Word Recognition",
+    "authors": "Sakoe, Chiba",
+    "year": 1978,
+    "claims": [
+      "DTW aligns sequences with local warping\u2014applicable to depth-indexed GR/typewell curves.",
+      "Interpolation choice (linear vs PCHIP) changes tie-point smoothness and physics baseline RMSE.",
+      "Typewell alignment is an inductive bias ablation: off vs on tests geologic transfer value."
+    ],
+    "paper_path": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/typewell_gr_alignment/../../papers/typewell_gr_alignment/sakoe1978_dtw.pdf",
+    "paper_exists": false
+  },
+  "audit": {
+    "variant": "typewell_gr_alignment",
+    "trace_file": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/typewell_gr_alignment/trace_language.csv",
+    "gaps": [
+      {
+        "claim": "DTW / warping for depth-indexed GR alignment",
+        "required_tokens": [
+          "align_horizontal_to_typewell",
+          "build_typewell_gr_interpolator",
+          "gr_to_tvt_lookup",
+          "estimate_tvt_from_gr"
+        ],
+        "missing_tokens": [],
+        "satisfied": true
+      },
+      {
+        "claim": "Typewell GR physics baseline",
+        "required_tokens": [
+          "evaluate_gr_baseline_rmse_by_well",
+          "compute_gr_correlation_baseline"
+        ],
+        "missing_tokens": [],
+        "satisfied": true
+      }
+    ],
+    "all_satisfied": true
+  }
+}

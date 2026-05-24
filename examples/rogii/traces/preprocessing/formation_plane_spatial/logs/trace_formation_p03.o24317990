@@ -1,0 +1,20 @@
+=== trace phase job ===
+variant:      formation_plane_spatial
+trace_phase:  03_feature_engineering
+partition:    matador
+node:         gpu-21-10
+variant_dir:  /lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/formation_plane_spatial
+conda_prefix: /lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+=== module load (gcc / cuda / python) ===
+CONDA_PREFIX=/lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+Python 3.11.15
+trace env deps OK
+=== preboot: verify prior-phase handoff ===
+PREBOOT OK: formation_plane_spatial / 03_feature_engineering
+=== GPU check (matador) ===
+SLURM_JOB_PARTITION=matador
+SLURM_GPUS_ON_NODE=1
+GPU 0: Tesla V100-PCIE-32GB (UUID: GPU-5aebea88-c15e-949d-6138-fa45d9e64fd0)
+torch 2.8.0+cu128 cuda True
+=== execute phase ===
+=== run_phase 03_feature_engineering variant=formation_plane_spatial ===

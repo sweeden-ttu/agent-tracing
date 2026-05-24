@@ -1,0 +1,58 @@
+{
+  "train_rows": 5278,
+  "test_rows": 5278,
+  "train_columns": [
+    "id",
+    "MD",
+    "X",
+    "Y",
+    "Z",
+    "ANCC",
+    "ASTNU",
+    "ASTNL",
+    "EGFDU",
+    "EGFDL",
+    "BUDA",
+    "tvt",
+    "GR",
+    "TVT_input"
+  ],
+  "dtypes": {
+    "id": "object",
+    "MD": "float64",
+    "X": "float64",
+    "Y": "float64",
+    "Z": "float64",
+    "ANCC": "float64",
+    "ASTNU": "float64",
+    "ASTNL": "float64",
+    "EGFDU": "float64",
+    "EGFDL": "float64",
+    "BUDA": "float64",
+    "tvt": "float64",
+    "GR": "float64",
+    "TVT_input": "float64"
+  },
+  "missingness_rate": {
+    "id": 0.0,
+    "MD": 0.0,
+    "X": 0.0,
+    "Y": 0.0,
+    "Z": 0.0,
+    "ANCC": 0.0,
+    "ASTNU": 0.0,
+    "ASTNL": 0.0,
+    "EGFDU": 0.0,
+    "EGFDL": 0.0,
+    "BUDA": 0.0,
+    "tvt": 0.0,
+    "GR": 0.4278135657446002,
+    "TVT_input": 0.726790450928382
+  },
+  "target_summary": {
+    "min": 11236.02,
+    "max": 11756.12,
+    "mean": 11715.831127320955,
+    "std": 88.77368105239499
+  }
+}

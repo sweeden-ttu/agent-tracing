@@ -1,0 +1,12 @@
+{
+  "variant": "ps_point_leakage_aware",
+  "phase": "05_evaluation",
+  "completed_at": "2026-05-24T09:49:41Z",
+  "prior_phase": "04_model_training",
+  "outputs": {
+    "metrics": "artifacts/05_evaluation/metrics.json",
+    "residuals": "artifacts/05_evaluation/residuals.csv"
+  },
+  "trace_steps_executed": 12,
+  "oof_rmse": 0.0534188628793299
+}

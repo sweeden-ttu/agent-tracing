@@ -1,0 +1,49 @@
+=== trace phase job ===
+variant:      baseline_column_transformer
+trace_phase:  01_data_analysis
+partition:    matador
+node:         gpu-20-8
+variant_dir:  /lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/baseline_column_transformer
+conda_prefix: /lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+=== module load (gcc / cuda / python) ===
+CONDA_PREFIX=/lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+Python 3.11.15
+trace env deps OK
+=== preboot: verify prior-phase handoff ===
+PREBOOT OK: baseline_column_transformer / 01_data_analysis
+=== GPU check (matador) ===
+SLURM_JOB_PARTITION=matador
+SLURM_GPUS_ON_NODE=1
+GPU 0: Tesla V100-PCIE-32GB (UUID: GPU-d5bd732f-d8b2-389d-4d84-7cc36d8b5e85)
+torch 2.8.0+cu128 cuda True
+=== execute phase ===
+=== run_phase 01_data_analysis variant=baseline_column_transformer ===
+{
+  "variant": "baseline_column_transformer",
+  "phase": "01_data_analysis",
+  "completed_at": "2026-05-24T08:19:29Z",
+  "prior_phase": null,
+  "outputs": {
+    "schema": "artifacts/01_data_analysis/schema.json",
+    "data_paths": "artifacts/01_data_analysis/data_paths.json",
+    "well_groups": "artifacts/01_data_analysis/well_groups.json",
+    "target_diagnosis": "artifacts/01_data_analysis/target_diagnosis.json",
+    "eda_summary": "artifacts/01_data_analysis/eda_summary.json"
+  },
+  "trace_steps_executed": 25,
+  "id_column": "id",
+  "target_column": "tvt"
+}
+=== post-run: verify phase manifest outputs ===
+POST-RUN OK: 01_data_analysis outputs: ['schema', 'data_paths', 'well_groups', 'target_diagnosis', 'eda_summary']
+=== done 01_data_analysis @ 2026-05-24T03:19:29-05:00 ===
+total 15
+drwxr-xr-x 2 sweeden users 4096 May 24 02:36 .
+drwxr-xr-x 8 sweeden users 4096 May 24 02:36 ..
+-rw-r--r-- 1 sweeden users  472 May 24 01:57 PHASE_CONTRACT.json
+-rw-r--r-- 1 sweeden users  306 May 24 03:19 data_paths.json
+-rw-r--r-- 1 sweeden users  982 May 24 03:19 eda_summary.json
+-rw-r--r-- 1 sweeden users  567 May 24 03:19 phase_manifest.json
+-rw-r--r-- 1 sweeden users  164 May 24 03:19 schema.json
+-rw-r--r-- 1 sweeden users  143 May 24 03:19 target_diagnosis.json
+-rw-r--r-- 1 sweeden users   76 May 24 03:19 well_groups.json

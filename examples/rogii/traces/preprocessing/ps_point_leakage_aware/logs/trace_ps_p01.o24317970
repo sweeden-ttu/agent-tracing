@@ -1,0 +1,51 @@
+=== trace phase job ===
+variant:      ps_point_leakage_aware
+trace_phase:  01_data_analysis
+partition:    matador
+node:         gpu-20-8
+variant_dir:  /lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/ps_point_leakage_aware
+conda_prefix: /lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+=== module load (gcc / cuda / python) ===
+CONDA_PREFIX=/lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+Python 3.11.15
+trace env deps OK
+=== preboot: verify prior-phase handoff ===
+PREBOOT OK: ps_point_leakage_aware / 01_data_analysis
+=== GPU check (matador) ===
+SLURM_JOB_PARTITION=matador
+SLURM_GPUS_ON_NODE=1
+GPU 0: Tesla V100-PCIE-32GB (UUID: GPU-520611b9-0b0b-08cd-d551-f9454026960f)
+torch 2.8.0+cu128 cuda True
+=== execute phase ===
+=== run_phase 01_data_analysis variant=ps_point_leakage_aware ===
+{
+  "variant": "ps_point_leakage_aware",
+  "phase": "01_data_analysis",
+  "completed_at": "2026-05-24T09:48:51Z",
+  "prior_phase": null,
+  "outputs": {
+    "schema": "artifacts/01_data_analysis/schema.json",
+    "data_paths": "artifacts/01_data_analysis/data_paths.json",
+    "well_groups": "artifacts/01_data_analysis/well_groups.json",
+    "target_diagnosis": "artifacts/01_data_analysis/target_diagnosis.json",
+    "eda_summary": "artifacts/01_data_analysis/eda_summary.json",
+    "variant_scaffold": "artifacts/01_data_analysis/variant_scaffold.json"
+  },
+  "trace_steps_executed": 15,
+  "id_column": "id",
+  "target_column": "tvt"
+}
+=== post-run: verify phase manifest outputs ===
+POST-RUN OK: 01_data_analysis outputs: ['schema', 'data_paths', 'well_groups', 'target_diagnosis', 'eda_summary', 'variant_scaffold']
+=== done 01_data_analysis @ 2026-05-24T04:48:52-05:00 ===
+total 16
+drwxr-xr-x 2 sweeden users 4096 May 24 04:48 .
+drwxr-xr-x 8 sweeden users 4096 May 24 01:57 ..
+-rw-r--r-- 1 sweeden users  466 May 24 01:57 PHASE_CONTRACT.json
+-rw-r--r-- 1 sweeden users  306 May 24 04:48 data_paths.json
+-rw-r--r-- 1 sweeden users  982 May 24 04:48 eda_summary.json
+-rw-r--r-- 1 sweeden users  638 May 24 04:48 phase_manifest.json
+-rw-r--r-- 1 sweeden users  164 May 24 04:48 schema.json
+-rw-r--r-- 1 sweeden users  143 May 24 04:48 target_diagnosis.json
+-rw-r--r-- 1 sweeden users  172 May 24 04:48 variant_scaffold.json
+-rw-r--r-- 1 sweeden users   76 May 24 04:48 well_groups.json

@@ -1,0 +1,50 @@
+{
+  "factorial_runs": [
+    {
+      "log1p_target": "off",
+      "robust_features": "standard",
+      "inverse_at_predict": "off"
+    },
+    {
+      "log1p_target": "off",
+      "robust_features": "standard",
+      "inverse_at_predict": "on"
+    },
+    {
+      "log1p_target": "off",
+      "robust_features": "robust",
+      "inverse_at_predict": "off"
+    },
+    {
+      "log1p_target": "off",
+      "robust_features": "robust",
+      "inverse_at_predict": "on"
+    },
+    {
+      "log1p_target": "on",
+      "robust_features": "standard",
+      "inverse_at_predict": "off"
+    },
+    {
+      "log1p_target": "on",
+      "robust_features": "standard",
+      "inverse_at_predict": "on"
+    },
+    {
+      "log1p_target": "on",
+      "robust_features": "robust",
+      "inverse_at_predict": "off"
+    },
+    {
+      "log1p_target": "on",
+      "robust_features": "robust",
+      "inverse_at_predict": "on"
+    }
+  ],
+  "episodes_per_fold": 3,
+  "schedule": "well_or_fold_boundaries",
+  "recommended_baseline": {
+    "target_log1p": "none",
+    "cv_scheme": "kfold"
+  }
+}

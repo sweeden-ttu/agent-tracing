@@ -1,0 +1,6 @@
+{
+  "variant_slug": "typewell_gr_alignment",
+  "approach": "GR/typewell alignment features",
+  "typewell_align": "on",
+  "interpolator": "pchip"
+}

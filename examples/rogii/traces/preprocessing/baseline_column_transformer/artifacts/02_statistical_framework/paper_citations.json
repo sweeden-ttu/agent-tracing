@@ -1,0 +1,34 @@
+{
+  "base_papers": [
+    {
+      "title": "LightGBM: A Highly Efficient Gradient Boosting Decision Tree",
+      "claims": [
+        "Histogram-based GBDT improves tabular regression speed and accuracy vs level-wise boosting.",
+        "Leaf-wise growth with regularization supports strong baselines on heterogeneous numeric features.",
+        "Pairs with heterogeneous column preprocessing (ColumnTransformer) on tabular well-log features."
+      ],
+      "trace_tokens": [
+        "set_objective_regression",
+        "set_metric_rmse",
+        "log_best_iteration",
+        "train_with_seed_42"
+      ]
+    },
+    {
+      "title": "Scikit-learn: Machine Learning in Python",
+      "claims": [
+        "ColumnTransformer applies disjoint transformers to heterogeneous column blocks.",
+        "Pipeline compose chains preprocessing and estimator for leak-safe CV.",
+        "numeric_scaler ablation (standard vs robust) maps to sklearn preprocessor choice."
+      ],
+      "trace_tokens": [
+        "build_numeric_pipeline",
+        "build_lowcard_pipeline",
+        "build_highcard_pipeline",
+        "assemble_column_transformer"
+      ]
+    }
+  ],
+  "trace_csv": "traces/preprocessing/baseline_column_transformer/trace_language.csv",
+  "hypothesis": "ColumnTransformer + LightGBM baseline improves competition RMSE (post-PS) vs shared baseline under nested GroupKFold, as motivated by Ke et al. (2017), Pedregosa et al. (2011)."
+}

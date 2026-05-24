@@ -1,0 +1,11 @@
+=== trace phase job ===
+variant:      typewell_gr_alignment
+trace_phase:  01_data_analysis
+variant_dir:  /lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/typewell_gr_alignment
+artifacts:    /lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/typewell_gr_alignment/artifacts
+data_dir:     /lustre/work/sweeden/rogii/data
+=== module load (gcc / cuda / python) ===
+=== creating conda env typewell_gr_alignment from /lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/typewell_gr_alignment/environment.yml ===
+conda-forge/linux-64                                        Using cache
+conda-forge/noarch                                          Using cache
+

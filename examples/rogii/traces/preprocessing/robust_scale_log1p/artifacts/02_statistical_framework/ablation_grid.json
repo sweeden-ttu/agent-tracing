@@ -1,0 +1,45 @@
+{
+  "n_runs": 8,
+  "grid": [
+    {
+      "log1p_target": "off",
+      "robust_features": "standard",
+      "inverse_at_predict": "off"
+    },
+    {
+      "log1p_target": "off",
+      "robust_features": "standard",
+      "inverse_at_predict": "on"
+    },
+    {
+      "log1p_target": "off",
+      "robust_features": "robust",
+      "inverse_at_predict": "off"
+    },
+    {
+      "log1p_target": "off",
+      "robust_features": "robust",
+      "inverse_at_predict": "on"
+    },
+    {
+      "log1p_target": "on",
+      "robust_features": "standard",
+      "inverse_at_predict": "off"
+    },
+    {
+      "log1p_target": "on",
+      "robust_features": "standard",
+      "inverse_at_predict": "on"
+    },
+    {
+      "log1p_target": "on",
+      "robust_features": "robust",
+      "inverse_at_predict": "off"
+    },
+    {
+      "log1p_target": "on",
+      "robust_features": "robust",
+      "inverse_at_predict": "on"
+    }
+  ]
+}

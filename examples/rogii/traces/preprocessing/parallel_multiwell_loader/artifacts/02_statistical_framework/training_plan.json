@@ -1,0 +1,70 @@
+{
+  "factorial_runs": [
+    {
+      "io_workers": "4",
+      "surface_cols": "off",
+      "loader_cache": "off"
+    },
+    {
+      "io_workers": "4",
+      "surface_cols": "off",
+      "loader_cache": "on"
+    },
+    {
+      "io_workers": "4",
+      "surface_cols": "on",
+      "loader_cache": "off"
+    },
+    {
+      "io_workers": "4",
+      "surface_cols": "on",
+      "loader_cache": "on"
+    },
+    {
+      "io_workers": "8",
+      "surface_cols": "off",
+      "loader_cache": "off"
+    },
+    {
+      "io_workers": "8",
+      "surface_cols": "off",
+      "loader_cache": "on"
+    },
+    {
+      "io_workers": "8",
+      "surface_cols": "on",
+      "loader_cache": "off"
+    },
+    {
+      "io_workers": "8",
+      "surface_cols": "on",
+      "loader_cache": "on"
+    },
+    {
+      "io_workers": "16",
+      "surface_cols": "off",
+      "loader_cache": "off"
+    },
+    {
+      "io_workers": "16",
+      "surface_cols": "off",
+      "loader_cache": "on"
+    },
+    {
+      "io_workers": "16",
+      "surface_cols": "on",
+      "loader_cache": "off"
+    },
+    {
+      "io_workers": "16",
+      "surface_cols": "on",
+      "loader_cache": "on"
+    }
+  ],
+  "episodes_per_fold": 3,
+  "schedule": "well_or_fold_boundaries",
+  "recommended_baseline": {
+    "target_log1p": "none",
+    "cv_scheme": "kfold"
+  }
+}

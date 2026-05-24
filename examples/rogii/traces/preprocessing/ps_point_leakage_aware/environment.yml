@@ -1,0 +1,30 @@
+name: ps_point_leakage_aware
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.11
+  - pip
+  - kaggle
+  - pandas
+  - numpy
+  - scikit-learn
+  - lightgbm
+  - pyarrow
+  - pyyaml
+  - requests
+  - pytest
+  - tqdm
+  - rich
+  - matplotlib
+  - seaborn
+  - ipykernel
+  - xgboost
+  - scipy
+  - pytorch
+  - pytorch-cuda=12.1
+  - statsmodels
+  - pip:
+      - openai>=1.40
+      - lancedb
+      - kagglehub>=0.3

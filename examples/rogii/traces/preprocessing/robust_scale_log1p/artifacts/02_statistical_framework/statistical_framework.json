@@ -1,0 +1,15 @@
+{
+  "hypothesis": "RobustScaler + log1p target improves competition RMSE (post-PS) vs shared baseline under KFold, as motivated by Hampel, Ronchetti, Rousseuw, Stahel (1986).",
+  "cv": "kfold",
+  "metric": "rmse_post_ps",
+  "smre": "mean_rmse_plus_std_across_folds",
+  "phase01_recommendations": {
+    "target_log1p": "none",
+    "group_key": null,
+    "high_missing_features": [
+      "GR",
+      "TVT_input"
+    ],
+    "strict_positive_target": true
+  }
+}

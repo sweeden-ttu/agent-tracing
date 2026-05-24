@@ -1,0 +1,12 @@
+{
+  "variant": "robust_scale_log1p",
+  "phase": "04_model_training",
+  "status": "pending",
+  "prior_phase": "03_feature_engineering",
+  "outputs": {
+    "transform": "artifacts/04_model_training/transform.json",
+    "test_preds_per_fold": "artifacts/04_model_training/test_preds_per_fold.npy",
+    "oof_predictions": "artifacts/04_model_training/oof_predictions.npy",
+    "training_metrics": "artifacts/04_model_training/training_metrics.json"
+  }
+}

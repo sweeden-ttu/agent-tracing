@@ -1,0 +1,32 @@
+{
+  "timestamp": "20260524T094825Z",
+  "manifest": {
+    "title": "Nearest Neighbor Pattern Classification",
+    "authors": "Cover, Hart",
+    "year": 1967,
+    "claims": [
+      "k-NN risk bounds motivate formation-label propagation from spatial neighbors in TVD/MD space.",
+      "Drilling geometry features encode directional survey context for plane-aware lithology.",
+      "Formation plane fit (off/on) ablates explicit structural surface vs pure neighbor voting."
+    ],
+    "paper_path": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/formation_plane_spatial/../../papers/formation_plane_spatial/cover1967_knn.pdf",
+    "paper_exists": false
+  },
+  "audit": {
+    "variant": "formation_plane_spatial",
+    "trace_file": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/formation_plane_spatial/trace_language.csv",
+    "gaps": [
+      {
+        "claim": "k-NN spatial formation propagation (Cover & Hart)",
+        "required_tokens": [
+          "fit_formation_plane_knn",
+          "encode_formation_codes",
+          "compute_drilling_geometry_features"
+        ],
+        "missing_tokens": [],
+        "satisfied": true
+      }
+    ],
+    "all_satisfied": true
+  }
+}

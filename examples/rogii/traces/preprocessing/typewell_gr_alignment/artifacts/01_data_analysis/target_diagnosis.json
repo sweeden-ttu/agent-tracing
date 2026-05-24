@@ -1,0 +1,8 @@
+{
+  "use_log1p": false,
+  "skewness": -3.5664433238825155,
+  "skew_threshold": 1.5,
+  "strict_positivity": {
+    "strict_positive": true
+  }
+}

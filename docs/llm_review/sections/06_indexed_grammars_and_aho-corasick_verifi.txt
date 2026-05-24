@@ -1,0 +1,213 @@
+# Indexed Grammars and Aho-Corasick Verifier
+
+Source: llm.txt lines 1365–1573
+
+Indexed Grammars and the Aho-Corasick Verifier
+
+This section deepens the role played by Aho's two great
+contributions to the theory of formal languages:
+indexed grammars aho1968indexed, which fix the language
+class strictly between context-free and context-sensitive, and
+the Aho-Corasick aho1975corasick multi-pattern matcher,
+which compiles a finite keyword set into a deterministic
+linear-time recogniser.  The two papers were written eight years
+apart, but in our framework they play complementary roles: the
+indexed grammar is the natural home of the iterative repair loop
+inside the Goal-Driven generator; the Aho-Corasick DFA is the
+realisation of the Data-Driven verifier.
+
+Indexed grammars
+
+An indexed grammar aho1968indexed is a 5-tuple
+
+G = (V,,F,P,S)
+
+where  is the set of nonterminals,  is the alphabet
+of terminals,  is a finite set of index symbols,  is the start symbol, and  is a finite set of productions
+each of one of three forms:
+align*
+(a)& A[]  []
+
+(b)& A[]  [f]
+                    (push  fF )
+
+(c)& A[f]  []
+                    (pop  fF )
+align*
+where  and  is a string of
+indices attached to each nonterminal in.  The string
+attached to a nonterminal acts as a stack of indices that may be
+pushed at derivation steps of form (b), popped at form (c), and
+inherited unchanged at form (a).
+
+lemma[Aho 1968].
+lemma
+
+The strict inclusion is witnessed by the language, which is in  but not in.  Its mirror image in our framework is the
+paired iteration counter pattern in
+soporchestrator's trace, where the
+capiterationsatmax(=3) bound is enforced
+synchronously across the planner, developer, and reviewer
+sub-traces.
+
+Why the iterative repair loop is indexed, not
+context-free
+
+In soporchestrator's trace we observe the cycle
+verbatim
+   invoke_planner
+-> invoke_developer
+-> invoke_reviewer
+-> compare_score_to_advance_threshold(>=3)
+-> [ if score < 3:
+        retry_phase_on_low_score (loop)
+        cap_iterations_at_max(=3) ]
+-> invoke_summarizer_on_advance
+-> emit_outcome(completefail).
+verbatim
+Three observations make this trace indexed rather than
+context-free:
+enumerate
+The iteration counter is shared across three nested
+sub-traces (planner / developer / reviewer); the same counter
+appears synchronously in each.  This is a cross-serial
+dependency, which a PDA cannot recognise.
+The counter is bounded by a constant (3); this rules out
+arbitrary linear-bounded behaviour.  The counter is not a tape, it
+is an index.
+Each invocation of the loop pushes a fresh index
+configuration (the EDA bundle, the failed-test list, the
+clamped score) that is consumed in inverse order during the
+forwardartifacttonextphase step.
+enumerate
+
+These three properties are exactly the ones Aho identified in
+1968 as motivating the indexed-grammar
+extension aho1968indexed.  We therefore place
+soporchestrator in the indexed zone.  The placement
+sharpens, but does not contradict, the Type-1 placement of
+taskorchestrator and kernelpipeline, whose
+workspace genuinely grows with input size.
+
+Aho-Corasick as the Data-Driven verifier
+
+The Aho-Corasick algorithm aho1975corasick takes a
+finite keyword set  of total size  and produces a deterministic finite automaton
+ such that, for any input string,
+identifies all occurrences of all  in  time, where  is the number of matches.  The construction
+has three steps:
+enumerate
+Build a trie of  (the goto function).
+Compute, for each trie node, a failure link to the
+longest proper suffix that is also a prefix of some keyword.
+Compose the goto and failure into a single deterministic
+transition function.
+enumerate
+
+In our setting  is the operation alphabet of
+Section sec:trace,  is the set of operation symbols
+that appear in the unit-test catalogue and tools-index manifest,
+and the verifier  is the agent whose configuration
+space is the state set of.  Concretely  is read off
+the columns toolsindex and unittestrunner
+of examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K); the full keyword catalogue and DFA
+statistics are listed in Appendix A (below).
+
+Worked Type-3 micro-automaton (submission_validator lane).
+The submission_validator swim lane is our smallest exhibited DFA.
+Alphabet Sigma_V = {check_submission_schema, validate_id_column,
+validate_tvt_column, validate_row_count, validate_no_nans,
+emit_submission_ready}.  States Q = {q0, q_schema, q_cols, q_rows,
+q_accept, q_reject}.  Start q0; accept q_accept.  Transitions:
+q0 --check_submission_schema--> q_schema;
+q_schema --validate_id_column--> q_cols;
+q_cols --validate_tvt_column--> q_rows;
+q_rows --validate_row_count--> q_rows;
+q_rows --validate_no_nans--> q_accept;
+q_rows --emit_submission_ready--> q_accept;
+any mismatch --> q_reject (sink).  This six-state machine accepts
+exactly the regular language of submission-format checks enforced
+before Kaggle upload; it is a concrete Type-3 recogniser, not a
+post-hoc narrative label.
+
+proposition[Verifier as DFA]
+The Data-Driven verifier  is realisable as a
+deterministic finite automaton over  with state set
+ of size.  For any candidate trace, the verdict  is computed in
+time.
+proposition
+
+proof
+Construct the Aho-Corasick DFA  over the keyword set
+extracted from the two columns above; declare its accepting
+states to be those visited iff at least one keyword from each
+required category (e.g., testsubmissionvalidity,
+testcolumnnamessubmission) is matched.  Categories are disjoint by
+construction (schema vs submission vs dtype); overlap would be a
+specification bug caught by the tools-index manifest.  The size
+bound  is the standard size of an Aho-Corasick DFA,
+and the linear-time membership decision is the standard property
+of a DFA aho1975corasick,rabin1959finite.proof
+
+Why Aho-Corasick rather than a generic LLM judge
+
+A generic LLM-as-judge could, in principle, also play the role of.  We deliberately chose Aho-Corasick for three
+reasons:
+enumerate
+Class containment.  An LLM-as-judge is itself a
+Type-0 agent.  Composing two Type-0 agents does not lower the
+class.  An Aho-Corasick DFA is Type-3 and lowers the
+verification budget to  by Theorem thm:closure.
+Auditability.  The keyword set  is finite, human
+readable, and version-controlled; the failure links and goto
+table are derivable mechanically.  An LLM-as-judge offers no
+such audit surface.
+Soundness against the Type-0 generator.  If the
+generator is permitted to enumerate arbitrary strings, the
+verifier must be unable to be "talked into" accepting a
+malformed trace.  A DFA cannot be talked into anything; it
+either matches or it does not.  This is the precise sense in
+which the Goal-Driven Type-0 agent is tamed by the
+Type-3 verifier.
+enumerate
+
+The recursive enumeration step, decoded
+
+We can now describe the recursive enumeration step that takes
+the start language  to the enumerated
+language  in
+explicit terms.
+
+enumerate
+Let  be the operation alphabet of  and
+ be the corresponding keyword set extracted from its
+toolsindex and unittestrunner columns.
+ is the corresponding
+Aho-Corasick DFA.
+Run the Goal-Driven generator over the Rogii Wellbore Geology
+Prediction train wells, intersecting every emitted prefix with
+K_V and rejecting prefixes that exit the language of V.
+During execution, G proposes new operation symbols not in Sigma_0
+(e.g., the build_column_transformer_pipeline() symbol).  Each new
+symbol is admitted to Sigma_G iff its emission satisfies V when
+treated as a keyword extension; the verifier's keyword set is
+correspondingly extended to K_V' only for the duration of this
+enumeration.
+The accumulated trace is written to disk under
+examples/rogii/traces/preprocessing/{variant}/trace_language.csv.
+Its alphabet properly extends Sigma_0; Slurm and Ollama localhost
+tokens cluster in the emergent slurm_episodic_trainer swim lane---
+operations that were never in the minimal seed language but became
+necessary under the Type-3 consumer's Matador resource envelope.
+enumerate
+
+The procedure is, in the operational sense, a Type-0 recursive
+enumeration: the agent enumerates strings, the verifier filters
+them, and the recursion terminates when the enumerated language
+satisfies all properties of the data-driven specification.  In
+the literal sense of
+Robinson robinson1949definability,davis1961decision the
+recursion has no general termination guarantee; in our bounded
+laptop the recursion is forced to halt by the LBA bound described
+in the next section.
+

@@ -1,0 +1,46 @@
+=== trace phase job ===
+variant:      ps_point_leakage_aware
+trace_phase:  04_model_training
+partition:    matador
+node:         gpu-20-8
+variant_dir:  /lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/ps_point_leakage_aware
+conda_prefix: /lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+=== module load (gcc / cuda / python) ===
+CONDA_PREFIX=/lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+Python 3.11.15
+trace env deps OK
+=== preboot: verify prior-phase handoff ===
+PREBOOT OK: ps_point_leakage_aware / 04_model_training
+=== GPU check (matador) ===
+SLURM_JOB_PARTITION=matador
+SLURM_GPUS_ON_NODE=1
+GPU 0: Tesla V100-PCIE-32GB (UUID: GPU-520611b9-0b0b-08cd-d551-f9454026960f)
+torch 2.8.0+cu128 cuda True
+=== execute phase ===
+=== run_phase 04_model_training variant=ps_point_leakage_aware ===
+{
+  "variant": "ps_point_leakage_aware",
+  "phase": "04_model_training",
+  "completed_at": "2026-05-24T09:49:29Z",
+  "prior_phase": "03_feature_engineering",
+  "outputs": {
+    "transform": "artifacts/04_model_training/transform.json",
+    "test_preds_per_fold": "artifacts/04_model_training/test_preds_per_fold.npy",
+    "oof_predictions": "artifacts/04_model_training/oof_predictions.npy",
+    "training_metrics": "artifacts/04_model_training/training_metrics.json"
+  },
+  "trace_steps_executed": 18,
+  "cv_rmse": 0.05313124288719366
+}
+=== post-run: verify phase manifest outputs ===
+POST-RUN OK: 04_model_training outputs: ['transform', 'test_preds_per_fold', 'oof_predictions', 'training_metrics']
+=== done 04_model_training @ 2026-05-24T04:49:29-05:00 ===
+total 15
+drwxr-xr-x 2 sweeden users   4096 May 24 04:49 .
+drwxr-xr-x 8 sweeden users   4096 May 24 01:57 ..
+-rw-r--r-- 1 sweeden users    455 May 24 01:57 PHASE_CONTRACT.json
+-rw-r--r-- 1 sweeden users  42352 May 24 04:49 oof_predictions.npy
+-rw-r--r-- 1 sweeden users    538 May 24 04:49 phase_manifest.json
+-rw-r--r-- 1 sweeden users 211248 May 24 04:49 test_preds_per_fold.npy
+-rw-r--r-- 1 sweeden users    261 May 24 04:49 training_metrics.json
+-rw-r--r-- 1 sweeden users    941 May 24 04:49 transform.json
