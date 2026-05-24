@@ -1,0 +1,20 @@
+\section{Evaluation and Pre-Registration}
+\label{sec:eval}
+
+Following multi-model evaluation practice, we separate \emph{claims} about an agent's computational class from \emph{evidence} \citep{russell2020aima}.
+
+\subsection{Mapping implementations to schemata}
+
+\begin{itemize}
+  \item \textbf{Control-state audit:} bound $|S|$ (explicit modes in code: planner states, finite state machine nodes).
+  \item \textbf{Memory audit:} classify $\mathcal{W}$ as finite, stack-structured, linear in transcript length, or unbounded external store.
+  \item \textbf{Trace logging:} record $(o_i,a_i)$ sequences under a fixed discretization of observations and actions; hash secrets for privacy.
+\end{itemize}
+
+\subsection{Pre-registered hypotheses}
+
+Before comparing models, specify: (i) the trace encoding; (ii) which class $\mathcal{A}$ is claimed to inhabit; (iii) stopping rules and primary metrics (e.g., success rate within $n$ steps for tasks known to separate classes). Changes to the audit protocol should be versioned in experiment notes, as with rubric versioning in structured evaluations.
+
+\subsection{Cost and latency}
+
+Report wall time and token usage per condition when comparing ``regular'' versus ``pushdown-style'' agent wrappers around the same backbone LLM, holding prompts and tool APIs fixed.
