@@ -1,0 +1,11 @@
+\section{Introduction}
+
+Software systems that combine large language models (LLMs) with tools, retrieval, and multi-step control flow are often described as \emph{agentic}: they repeatedly observe an environment, update internal state, and emit actions until a termination condition holds \citep{russell2020aima}. Surveys of ``agentic AI'' emphasize planning depth, tool diversity, and memory mechanisms, but rarely tie these informal axes to the classical theory of computation.
+
+The Chomsky hierarchy partitions formal languages by generative power and, equivalently, by the automaton class needed to recognize them \citep{hopcroft2006automata}. Type~3 (regular) languages correspond to finite-state control; Type~2 (context-free) to a single stack; Type~1 (context-sensitive) to linear-bounded workspace; Type~0 to unrestricted Turing machines.
+
+This paper does \emph{not} assert that a deployed LLM instantiates a particular grammar on natural language. Instead, we treat an \emph{agentic program} as a specified controller---often a finite template of prompts, parsers, and API calls---whose \emph{interaction traces} form a formal language over finite grammars of observable events (finite sets of observation and action terminals after discretization). Restrictions on that controller's state space and memory discipline yield a hierarchy of trace languages that parallels Types~3--0. The contribution is definitional: we supply a common formal basis for comparing agent designs, benchmarking, and peer review, in line with separating claims from evidence in multi-model evaluation \citep{react2023}.
+
+\section*{Claims and scope}
+
+We state comparative claims only at the level of \emph{agent schemata} (Section~\ref{sec:schemata}) and their idealized trace languages. Empirical measurements of real LLM agents must map implementations to these schemata; Section~\ref{sec:eval} outlines how to pre-register such mappings.
