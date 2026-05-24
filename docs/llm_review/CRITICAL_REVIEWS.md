@@ -362,10 +362,10 @@ The following P0–P2 items from the checklist below were addressed in `llm.txt`
 
 ## Overall assessment
 
-The manuscript has a **coherent thesis**: treat agents as trace languages, bind a powerful producer with a regular verifier, and let sub-roles emerge. The **formal preliminaries and closure argument** are standard; the **novelty** is architectural and empirical. In `llm.txt` form the document is **not review-ready**: missing math, missing results, and appendix references break verification.
+The manuscript has a **coherent thesis**: treat agents as trace languages, bind a powerful producer with a regular verifier, and let sub-roles emerge. The **formal preliminaries and closure argument** are standard; the **novelty** is architectural and empirical. After the May 2026 remediation pass, `llm.txt` is **internally consistent** for scaffold review: P0 placeholders, Appendix A, DFA exhibit, ablation table, and composite-consumer wording are in place; full math and verified P4 numerics still require PDF/LaTeX and `slurm_full_pipeline`.
 
 **Strongest contribution:** Typed producer–consumer methodology tied to concrete CSV traces and Aho–Corasick auditability.
 
-**Weakest link:** Equating empirical trace length / author-assigned labels with Chomsky class, plus single-competition evidence with withheld submission and human final gate.
+**Weakest link (mitigated in text, not eliminated empirically):** Equating trace length or author-assigned column labels with Chomsky class, plus single-competition evidence with withheld submission and a human final gate. The manuscript now states these limits explicitly (Classification caveats, Section 05; P2 qualification, Section 09; composite consumer and withheld CSV, Sections 00/08/10) and exhibits one Type-3 DFA rather than relying on narrative alone.
 
-**Recommendation before external review:** P4 numerics and ablation Slurm runs remain; manuscript is internally consistent with May 2026 scaffold status. Next gate: complete `slurm_full_pipeline`, insert verified rank/RMSE, run verifier on/off ablation.
+**Recommendation before external review:** Complete `slurm_full_pipeline`, insert verified rank/RMSE for P4, execute the pre-registered verifier on/off ablation, and ship PDF/LaTeX alongside `llm.txt`. Ontological identity claims are already softened to a methodological evaluation interface; P0 text fixes and the minimal formal artefact + ablation table are done in the canonical `llm.txt`.

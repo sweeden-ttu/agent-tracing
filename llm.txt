@@ -1126,6 +1126,24 @@ new mathematics here, only the application of an old hierarchy to
 a new object.  The novelty, if any, is the identification of
 which sub-agents in the empirical CSVs inhabit which class.
 
+Classification caveats (scope limits).
+Three limits apply throughout this section and are not softened away.
+First, Type-3 assignments for toolsindex and unittestrunner
+are backed by exhibited recognisers (regular expression and DFA in
+Section sec:indexed; submission_validator micro-automaton); Type-2
+and Type-1 assignments for planneragent, revieweragent,
+taskorchestrator, and kernelpipeline rest on structural inspection
+of nested or linear-bounded trace shape---interpretive labels, not
+exhibited grammars or PDAs.  Second, trace column length is not a
+Chomsky-class decision procedure: probe P2 (Section sec:results) uses
+length growth only as a necessary scaffold observation, not as proof
+of Type-0.  Third, the empirical evidence is a single Kaggle
+competition (Rogii Wellbore Geology Prediction); the submission CSV
+is withheld to avoid benchmark contamination; and the outer consumer
+loop includes human upload review (Section sec:discussion).  Claims
+here are architectural and single-task unless explicitly marked as
+conjecture.
+
 Type-3: regular trace languages
 
 definition[Type-3 agent]
