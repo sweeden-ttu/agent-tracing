@@ -1,6 +1,11 @@
 {
+<<<<<<<< HEAD:examples/rogii/traces/preprocessing/robust_scale_log1p/artifacts/02_statistical_framework/mle_plan_snapshot.json
+  "variant": "robust_scale_log1p",
+  "approach": "RobustScaler + log1p target transform",
+========
   "variant": "parallel_multiwell_loader",
   "approach": "Parallel IO + geology surface columns",
+>>>>>>>> trace/parallel-multiwell-loader:examples/rogii/traces/preprocessing/parallel_multiwell_loader/artifacts/02_statistical_framework/mle_plan_snapshot.json
   "phases": [
     "01_data_analysis",
     "02_statistical_framework",
