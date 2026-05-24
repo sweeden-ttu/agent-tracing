@@ -1,7 +1,7 @@
 {
-  "scheme": "kfold",
+  "scheme": "groupkfold",
   "n_splits": 5,
-  "group_key": null,
+  "group_key": "gr_typewell_diff",
   "id_column": "id",
   "target_column": "tvt"
 }

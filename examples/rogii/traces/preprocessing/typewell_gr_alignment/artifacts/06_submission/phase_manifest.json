@@ -1,7 +1,7 @@
 {
-  "variant": "baseline_column_transformer",
+  "variant": "typewell_gr_alignment",
   "phase": "06_submission",
-  "completed_at": "2026-05-24T08:25:40Z",
+  "completed_at": "2026-05-24T09:49:59Z",
   "prior_phase": "05_evaluation",
   "outputs": {
     "submission_csv": "artifacts/06_submission/submission.csv",

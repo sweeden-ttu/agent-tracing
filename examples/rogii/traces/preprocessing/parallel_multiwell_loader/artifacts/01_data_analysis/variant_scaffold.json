@@ -1,0 +1,11 @@
+{
+  "variant_slug": "parallel_multiwell_loader",
+  "approach": "Parallel IO + geology surfaces",
+  "parallel_loader": {
+    "n_workers": 8,
+    "n_files": 0,
+    "paths": [],
+    "elapsed_sec": 0.0,
+    "backend": "sequential"
+  }
+}

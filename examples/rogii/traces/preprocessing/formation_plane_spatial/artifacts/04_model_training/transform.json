@@ -1,0 +1,40 @@
+{
+  "variant": "formation_plane_spatial",
+  "use_log1p": false,
+  "is_positive": true,
+  "target_column": "tvt",
+  "id_column": "id",
+  "numeric_scaler": "median",
+  "eval_mask": "full_well",
+  "variant_extra_cols": [
+    "md_delta",
+    "md_pct_rank",
+    "z_delta",
+    "formation_code",
+    "formation_thickness_sum",
+    "formation_over_tvt",
+    "formation_knn_propagated",
+    "formation_knn_self"
+  ],
+  "cv_rmse": 0.6312817901873846,
+  "fold_rmses": [
+    0.5368630255260912,
+    0.5935303430496408,
+    0.5793187863847507,
+    0.99962673666613,
+    0.4470700593103111
+  ],
+  "cv_scheme": "kfold",
+  "n_folds": 5,
+  "group_key": null,
+  "n_train_rows": 5278,
+  "max_rows_applied": null,
+  "backend": "lightgbm",
+  "feature_config": "artifacts/03_feature_engineering/feature_config.json",
+  "paths": {
+    "data_dir": "/lustre/work/sweeden/rogii/data",
+    "train_csv": "/lustre/work/sweeden/rogii/data/_train_000d7d20_horizontal_well.csv",
+    "test_csv": "/lustre/work/sweeden/rogii/data/_test_000d7d20_horizontal_well.csv",
+    "sample_submission_csv": "/lustre/work/sweeden/rogii/data/sample_submission.csv"
+  }
+}

@@ -2,9 +2,11 @@
 
 **Approach:** RobustScaler + log1p target
 
-## Base paper (ablation / experiment design)
+## Base papers (ablation / experiment design)
 
-- **Title:** Robust Statistics: The Approach Based on Influence Functions
+### 1. Robust Statistics: The Approach Based on Influence Functions
+
+- **Role:** primary_experiment_descriptor
 - **Authors:** Hampel, Ronchetti, Rousseuw, Stahel
 - **Year / venue:** 1986 / Wiley
 - **DOI:** 10.1002/9781118186435

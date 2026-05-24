@@ -1,0 +1,14 @@
+{
+  "variant": "parallel_multiwell_loader",
+  "phase": "04_model_training",
+  "completed_at": "2026-05-24T09:49:37Z",
+  "prior_phase": "03_feature_engineering",
+  "outputs": {
+    "transform": "artifacts/04_model_training/transform.json",
+    "test_preds_per_fold": "artifacts/04_model_training/test_preds_per_fold.npy",
+    "oof_predictions": "artifacts/04_model_training/oof_predictions.npy",
+    "training_metrics": "artifacts/04_model_training/training_metrics.json"
+  },
+  "trace_steps_executed": 18,
+  "cv_rmse": 0.6129358585687535
+}

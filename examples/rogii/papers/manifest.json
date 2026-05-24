@@ -5,11 +5,15 @@
       "variant": "baseline_column_transformer",
       "paper_id": "ke2017_lightgbm",
       "title": "LightGBM: A Highly Efficient Gradient Boosting Decision Tree",
-      "authors": "Ke, Meng, Finley, Wang, Chen, Ma, Ye, Liu",
+      "authors": "Ke et al.",
       "year": 2017,
       "doi": "10.5555/3294996.3295074",
-      "url": "https://papers.nips.cc/paper/6907-lightgbm-a-highly-efficient-gradient-boosting-decision-tree",
-      "repo_pdf": "papers/baseline_column_transformer/ke2017_lightgbm.pdf"
+      "note": null,
+      "supporting": false,
+      "downloaded": true,
+      "repo_pdf": "papers/baseline_column_transformer/ke2017_lightgbm.pdf",
+      "source_url": "(existing)",
+      "is_substitute": false
     },
     {
       "variant": "baseline_column_transformer",
@@ -18,8 +22,12 @@
       "authors": "Pedregosa et al.",
       "year": 2011,
       "doi": "10.5555/1953048.2029494",
-      "url": "https://jmlr.org/papers/v12/pedregosa11a.html",
-      "repo_pdf": "papers/baseline_column_transformer/pedregosa2011_sklearn.pdf"
+      "note": null,
+      "supporting": false,
+      "downloaded": true,
+      "repo_pdf": "papers/baseline_column_transformer/pedregosa2011_sklearn.pdf",
+      "source_url": "(existing)",
+      "is_substitute": false
     },
     {
       "variant": "typewell_gr_alignment",
@@ -28,29 +36,42 @@
       "authors": "Sakoe, Chiba",
       "year": 1978,
       "doi": "10.1109/TASSP.1978.1163055",
-      "url": "https://ieeexplore.ieee.org/document/1163055",
-      "repo_pdf": "papers/typewell_gr_alignment/sakoe1978_dtw.pdf"
+      "note": null,
+      "supporting": false,
+      "downloaded": true,
+      "repo_pdf": "papers/typewell_gr_alignment/sakoe1978_dtw.pdf",
+      "source_url": "(existing)",
+      "is_substitute": false
     },
     {
       "variant": "ps_point_leakage_aware",
       "paper_id": "kaufman2012_leakage",
       "title": "Leakage in Data Mining: Formulation, Detection, and Avoidance",
-      "authors": "Kaufman, Rosset, Perlich, Stitelman",
+      "authors": "Kaufman et al.",
       "year": 2012,
       "doi": "10.1145/2382575.2382577",
-      "url": "https://doi.org/10.1145/2382575.2382577",
-      "repo_pdf": "papers/ps_point_leakage_aware/kaufman2012_leakage.pdf"
+      "note": null,
+      "supporting": false,
+      "downloaded": true,
+      "repo_pdf": "papers/ps_point_leakage_aware/kaufman2012_leakage.pdf",
+      "source_url": "(layer copy)",
+      "is_substitute": false
     },
     {
       "variant": "robust_scale_log1p",
       "paper_id": "hampel1986_robust",
       "title": "Robust Statistics: The Approach Based on Influence Functions",
-      "authors": "Hampel, Ronchetti, Rousseuw, Stahel",
+      "authors": "Hampel et al.",
       "year": 1986,
       "doi": "10.1002/9781118186435",
-      "url": "https://onlinelibrary.wiley.com/doi/book/10.1002/9781118186435",
-      "repo_pdf": null,
-      "note": "Wiley book — canonical DOI link only; no open PDF in repo"
+      "note": "Hampel (1986) Wiley book is paywalled; Pedregosa JMLR covers RobustScaler.",
+      "supporting": false,
+      "downloaded": true,
+      "repo_pdf": "papers/robust_scale_log1p/pedregosa2011_sklearn_robust_substitute.pdf",
+      "source_url": "https://jmlr.org/papers/volume12/pedregosa11a/pedregosa11a.pdf",
+      "is_substitute": true,
+      "substitute_for": "hampel1986_robust",
+      "substitute_title": "Scikit-learn: Machine Learning in Python (RobustScaler)"
     },
     {
       "variant": "parallel_multiwell_loader",
@@ -59,8 +80,12 @@
       "authors": "Rocklin",
       "year": 2015,
       "doi": "10.25080/Majora-7b98e3ed-013",
-      "url": "https://proceedings.scipy.org/articles/Majora-7b98e3ed-013",
-      "repo_pdf": "papers/parallel_multiwell_loader/rocklin2015_dask.pdf"
+      "note": null,
+      "supporting": false,
+      "downloaded": true,
+      "repo_pdf": "papers/parallel_multiwell_loader/rocklin2015_dask.pdf",
+      "source_url": "(existing)",
+      "is_substitute": false
     },
     {
       "variant": "formation_plane_spatial",
@@ -69,8 +94,26 @@
       "authors": "Cover, Hart",
       "year": 1967,
       "doi": "10.1109/TIT.1967.1053964",
-      "url": "https://ieeexplore.ieee.org/document/1053964",
-      "repo_pdf": "papers/formation_plane_spatial/cover1967_knn.pdf"
+      "note": null,
+      "supporting": false,
+      "downloaded": true,
+      "repo_pdf": "papers/formation_plane_spatial/cover1967_knn.pdf",
+      "source_url": "(layer copy)",
+      "is_substitute": false
+    },
+    {
+      "variant": "formation_plane_spatial",
+      "paper_id": "shepard1968_interpolation",
+      "title": "A Two-dimensional Interpolation Function for Irregularly-spaced Data",
+      "authors": "Shepard",
+      "year": 1968,
+      "doi": "10.1145/321267.321298",
+      "note": "Supporting reference for formation-plane interpolation.",
+      "supporting": true,
+      "downloaded": true,
+      "repo_pdf": "papers/formation_plane_spatial/shepard1968_interpolation.pdf",
+      "source_url": "(layer copy)",
+      "is_substitute": false
     }
   ]
 }

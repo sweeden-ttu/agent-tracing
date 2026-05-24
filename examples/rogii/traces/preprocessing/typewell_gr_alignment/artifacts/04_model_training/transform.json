@@ -1,19 +1,32 @@
 {
+  "variant": "typewell_gr_alignment",
   "use_log1p": false,
   "is_positive": true,
   "target_column": "tvt",
   "id_column": "id",
-  "cv_rmse": 0.6129358585687535,
-  "fold_rmses": [
-    0.5691583081659909,
-    0.5934484920167644,
-    0.45921284791444356,
-    1.005549225730749,
-    0.43731041901581985
+  "numeric_scaler": "median",
+  "eval_mask": "full_well",
+  "variant_extra_cols": [
+    "gr_typewell_diff",
+    "gr_typewell_absdiff",
+    "gr_typewell_zscore",
+    "typewell_gr_at_path",
+    "estimated_tvt",
+    "typewell_gr_at_tvt",
+    "gr_tvt_residual",
+    "dtw_path_cost"
   ],
-  "cv_scheme": "kfold",
+  "cv_rmse": 0.6707725245919105,
+  "fold_rmses": [
+    0.23830306647444968,
+    0.7851730846806099,
+    0.8100153908939586,
+    0.7989190216027813,
+    0.721452059307753
+  ],
+  "cv_scheme": "groupkfold",
   "n_folds": 5,
-  "group_key": null,
+  "group_key": "gr_typewell_diff",
   "n_train_rows": 5278,
   "max_rows_applied": null,
   "backend": "lightgbm",

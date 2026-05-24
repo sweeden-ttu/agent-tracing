@@ -1,0 +1,6 @@
+{
+  "variant_slug": "formation_plane_spatial",
+  "approach": "Drilling geometry + formation KNN",
+  "formation_knn": "on",
+  "formation_knn_k": 5
+}

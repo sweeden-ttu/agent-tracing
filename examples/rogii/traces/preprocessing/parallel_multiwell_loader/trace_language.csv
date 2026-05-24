@@ -211,3 +211,8 @@ cd /lustre/work/sweeden/rogii && head -5 data/train/*__horizontal_well.csv data/
 ,,,,,,,,,,,,,,,,,,record,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,serialize_markdown,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,topological_order,,,,,,,,,
+parallel_read_multiwell_csvs,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+init_dask_client,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+configure_loader_cache,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+set_parallel_workers,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,,,,,,

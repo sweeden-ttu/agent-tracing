@@ -1,11 +1,20 @@
 {
+  "variant": "typewell_gr_alignment",
   "feature_cols": [
     "MD",
     "X",
     "Y",
     "Z",
     "GR",
-    "TVT_input"
+    "TVT_input",
+    "gr_typewell_diff",
+    "gr_typewell_absdiff",
+    "typewell_gr_at_path",
+    "estimated_tvt",
+    "typewell_gr_at_tvt",
+    "gr_tvt_residual",
+    "gr_typewell_zscore",
+    "dtw_path_cost"
   ],
   "numeric_cols": [
     "MD",
@@ -13,10 +22,29 @@
     "Y",
     "Z",
     "GR",
-    "TVT_input"
+    "TVT_input",
+    "gr_typewell_diff",
+    "gr_typewell_absdiff",
+    "typewell_gr_at_path",
+    "estimated_tvt",
+    "typewell_gr_at_tvt",
+    "gr_tvt_residual",
+    "gr_typewell_zscore",
+    "dtw_path_cost"
   ],
   "low_card_cols": [],
   "high_card_cols": [],
+  "variant_extra_cols": [
+    "gr_typewell_diff",
+    "gr_typewell_absdiff",
+    "gr_typewell_zscore",
+    "typewell_gr_at_path",
+    "estimated_tvt",
+    "typewell_gr_at_tvt",
+    "gr_tvt_residual",
+    "dtw_path_cost"
+  ],
+  "numeric_scaler": "median",
   "n_train_rows": 5278,
   "n_test_rows": 5278
 }

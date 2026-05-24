@@ -1,0 +1,39 @@
+{
+  "timestamp": "20260524T094825Z",
+  "manifest": {
+    "title": "Dask: Parallel Computation with Blocked algorithms and Task Scheduling",
+    "authors": "Rocklin",
+    "year": 2015,
+    "claims": [
+      "Parallel blocked IO scales multi-well CSV ingestion beyond single-threaded loaders.",
+      "Worker count and on-disk cache are ablatable throughput\u2013memory tradeoffs.",
+      "Geology surface columns add Type-1 feature materialization cost testable via on/off ablation."
+    ],
+    "paper_path": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/parallel_multiwell_loader/../../papers/parallel_multiwell_loader/rocklin2015_dask.pdf",
+    "paper_exists": false
+  },
+  "audit": {
+    "variant": "parallel_multiwell_loader",
+    "trace_file": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/parallel_multiwell_loader/trace_language.csv",
+    "gaps": [
+      {
+        "claim": "Parallel blocked multi-well IO (Rocklin / Dask)",
+        "required_tokens": [
+          "parallel_read_multiwell_csvs",
+          "init_dask_client",
+          "configure_loader_cache",
+          "set_parallel_workers",
+          "attach_geology_surface_features"
+        ],
+        "missing_tokens": [
+          "parallel_read_multiwell_csvs",
+          "init_dask_client",
+          "configure_loader_cache",
+          "set_parallel_workers"
+        ],
+        "satisfied": false
+      }
+    ],
+    "all_satisfied": false
+  }
+}

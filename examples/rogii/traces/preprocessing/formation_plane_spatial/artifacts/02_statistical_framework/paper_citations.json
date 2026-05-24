@@ -1,0 +1,14 @@
+{
+  "base_paper_title": "Nearest Neighbor Pattern Classification",
+  "claims": [
+    "k-NN risk bounds motivate formation-label propagation from spatial neighbors in TVD/MD space.",
+    "Drilling geometry features encode directional survey context for plane-aware lithology.",
+    "Formation plane fit (off/on) ablates explicit structural surface vs pure neighbor voting."
+  ],
+  "ablation_sections": [
+    "\u00a71 k-NN error bounds",
+    "\u00a72 finite-sample behavior"
+  ],
+  "trace_csv": "traces/preprocessing/formation_plane_spatial/trace_language.csv",
+  "hypothesis": "Drilling geometry + formation KNN improves competition RMSE (post-PS) vs shared baseline under nested GroupKFold, as motivated by Cover, Hart (1967)."
+}

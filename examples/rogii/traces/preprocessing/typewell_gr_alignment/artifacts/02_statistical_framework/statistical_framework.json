@@ -11,5 +11,8 @@
       "TVT_input"
     ],
     "strict_positive_target": true
+  },
+  "gr_baseline_rmse_by_well": {
+    "all": 11529.934481864993
   }
 }

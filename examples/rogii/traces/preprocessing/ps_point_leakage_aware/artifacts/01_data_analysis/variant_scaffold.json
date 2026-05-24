@@ -1,0 +1,8 @@
+{
+  "variant_slug": "ps_point_leakage_aware",
+  "approach": "PS-point detection + post-PS RMSE mask",
+  "ps_per_well": {
+    "all": 1442
+  },
+  "leakage_audit": "strict"
+}

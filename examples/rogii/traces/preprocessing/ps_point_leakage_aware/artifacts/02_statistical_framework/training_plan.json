@@ -1,0 +1,50 @@
+{
+  "factorial_runs": [
+    {
+      "ps_mask": "full_well",
+      "ps_detector": "auto",
+      "leakage_audit": "strict"
+    },
+    {
+      "ps_mask": "full_well",
+      "ps_detector": "auto",
+      "leakage_audit": "lenient"
+    },
+    {
+      "ps_mask": "full_well",
+      "ps_detector": "manual_offset",
+      "leakage_audit": "strict"
+    },
+    {
+      "ps_mask": "full_well",
+      "ps_detector": "manual_offset",
+      "leakage_audit": "lenient"
+    },
+    {
+      "ps_mask": "post_ps_only",
+      "ps_detector": "auto",
+      "leakage_audit": "strict"
+    },
+    {
+      "ps_mask": "post_ps_only",
+      "ps_detector": "auto",
+      "leakage_audit": "lenient"
+    },
+    {
+      "ps_mask": "post_ps_only",
+      "ps_detector": "manual_offset",
+      "leakage_audit": "strict"
+    },
+    {
+      "ps_mask": "post_ps_only",
+      "ps_detector": "manual_offset",
+      "leakage_audit": "lenient"
+    }
+  ],
+  "episodes_per_fold": 3,
+  "schedule": "well_or_fold_boundaries",
+  "recommended_baseline": {
+    "target_log1p": "none",
+    "cv_scheme": "kfold"
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "n_runs": 12,
+  "grid": [
+    {
+      "knn_k": "3",
+      "geometry_feats": "off",
+      "plane_fit": "off"
+    },
+    {
+      "knn_k": "3",
+      "geometry_feats": "off",
+      "plane_fit": "on"
+    },
+    {
+      "knn_k": "3",
+      "geometry_feats": "on",
+      "plane_fit": "off"
+    },
+    {
+      "knn_k": "3",
+      "geometry_feats": "on",
+      "plane_fit": "on"
+    },
+    {
+      "knn_k": "5",
+      "geometry_feats": "off",
+      "plane_fit": "off"
+    },
+    {
+      "knn_k": "5",
+      "geometry_feats": "off",
+      "plane_fit": "on"
+    },
+    {
+      "knn_k": "5",
+      "geometry_feats": "on",
+      "plane_fit": "off"
+    },
+    {
+      "knn_k": "5",
+      "geometry_feats": "on",
+      "plane_fit": "on"
+    },
+    {
+      "knn_k": "11",
+      "geometry_feats": "off",
+      "plane_fit": "off"
+    },
+    {
+      "knn_k": "11",
+      "geometry_feats": "off",
+      "plane_fit": "on"
+    },
+    {
+      "knn_k": "11",
+      "geometry_feats": "on",
+      "plane_fit": "off"
+    },
+    {
+      "knn_k": "11",
+      "geometry_feats": "on",
+      "plane_fit": "on"
+    }
+  ]
+}

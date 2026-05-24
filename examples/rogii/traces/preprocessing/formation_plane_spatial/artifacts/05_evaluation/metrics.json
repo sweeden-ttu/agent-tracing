@@ -1,0 +1,18 @@
+{
+  "cv_rmse": 0.6312817901873846,
+  "fold_rmses": [
+    0.5368630255260912,
+    0.5935303430496408,
+    0.5793187863847507,
+    0.99962673666613,
+    0.4470700593103111
+  ],
+  "mean_fold_rmse": 0.6312817901873846,
+  "std_fold_rmse": 0.1911293750497334,
+  "variant": "formation_plane_spatial",
+  "eval_mask": "full_well",
+  "oof_rmse_recomputed": 0.6595337721015068,
+  "residual_mean": -0.0032666055907537295,
+  "residual_std": 0.6595256824645699,
+  "n_oof_points": 5278
+}

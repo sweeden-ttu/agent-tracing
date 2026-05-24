@@ -4,5 +4,5 @@
 
 - **Options considered:** proceed, defer
 - **Chosen:** proceed
-- **Rationale:** baseline_column_transformer phase 02 bootstrap; cv=kfold; target_log1p=none; high_missing=GR,TVT_input
+- **Rationale:** typewell_gr_alignment phase 02 bootstrap (typewell GR alignment (Sakoe–Chiba DTW proxy features)); cv=kfold; target_log1p=none; high_missing=GR,TVT_input
 - **Consequences:** Revise after first CV

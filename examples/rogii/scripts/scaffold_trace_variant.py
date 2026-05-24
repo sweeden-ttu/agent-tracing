@@ -42,6 +42,7 @@ PHASE_CONTRACTS: dict[str, dict] = {
             "well_groups": "artifacts/01_data_analysis/well_groups.json",
             "target_diagnosis": "artifacts/01_data_analysis/target_diagnosis.json",
             "eda_summary": "artifacts/01_data_analysis/eda_summary.json",
+            "variant_scaffold": "artifacts/01_data_analysis/variant_scaffold.json",
         },
     },
     "02_statistical_framework": {
@@ -107,6 +108,16 @@ SPEC_FILES = (
 )
 
 NOTEBOOKS = tuple(f"{p}.ipynb" for p in PHASE_ORDER)
+
+WORKTREE_ROOT = Path("/lustre/work/sweeden")
+WORKTREE_BY_VARIANT: dict[str, str] = {
+    "baseline_column_transformer": "agent-tracing-trace-baseline",
+    "typewell_gr_alignment": "agent-tracing-trace-typewell",
+    "ps_point_leakage_aware": "agent-tracing-trace-ps",
+    "robust_scale_log1p": "agent-tracing-trace-robust",
+    "parallel_multiwell_loader": "agent-tracing-trace-parallel",
+    "formation_plane_spatial": "agent-tracing-trace-formation",
+}
 
 VARIANT_META: dict[str, dict[str, str]] = {
     "baseline_column_transformer": {
@@ -211,14 +222,34 @@ def _copy_specs(variant_dir: Path, variant: str) -> list[str]:
     return copied
 
 
-def _copy_phase_runner(variant_dir: Path, baseline_dir: Path) -> None:
-    src = baseline_dir / "notebooks" / "phase_runner.py"
+def _write_phase_runner(variant_dir: Path) -> None:
+    """Install thin wrapper that delegates to ``_shared/phase_runner_core``."""
+    template_path = TRACES_ROOT / "_shared" / "phase_runner_entry.py.txt"
     dst = variant_dir / "notebooks" / "phase_runner.py"
+    variant_dir.joinpath("notebooks").mkdir(parents=True, exist_ok=True)
+    text = template_path.read_text(encoding="utf-8").replace("{variant}", variant_dir.name)
+    if not dst.is_file() or dst.read_text(encoding="utf-8") != text:
+        dst.write_text(text, encoding="utf-8")
+
+
+def _write_phase_notebook_cells(variant_dir: Path, variant: str, baseline_dir: Path) -> None:
+    """Copy baseline cell definitions and set VARIANT slug."""
+    src = baseline_dir / "notebooks" / "phase_notebook_cells.py"
+    dst = variant_dir / "notebooks" / "phase_notebook_cells.py"
     if not src.is_file():
         return
     variant_dir.joinpath("notebooks").mkdir(parents=True, exist_ok=True)
-    if not dst.exists() or dst.read_text(encoding="utf-8") != src.read_text(encoding="utf-8"):
-        shutil.copy2(src, dst)
+    text = src.read_text(encoding="utf-8")
+    text = text.replace('VARIANT = "baseline_column_transformer"', f'VARIANT = "{variant}"')
+    meta = VARIANT_META.get(variant, {})
+    if meta and "approach" in meta:
+        text = text.replace(
+            "ColumnTransformer + LightGBM baseline",
+            meta["approach"],
+            1,
+        )
+    if not dst.is_file() or dst.read_text(encoding="utf-8") != text:
+        dst.write_text(text, encoding="utf-8")
 
 
 def _write_write_phase_notebooks(variant_dir: Path, variant: str) -> None:
@@ -288,9 +319,12 @@ def scaffold_variant(
     copied = _copy_specs(variant_dir, variant)
     actions.extend(f"copied {c}" for c in copied)
 
-    _copy_phase_runner(variant_dir, baseline_dir)
-    if (variant_dir / "notebooks" / "phase_runner.py").is_file():
-        actions.append(f"phase_runner.py -> {variant}/notebooks/")
+    _write_phase_runner(variant_dir)
+    actions.append(f"phase_runner.py (shared core) -> {variant}/notebooks/")
+
+    _write_phase_notebook_cells(variant_dir, variant, baseline_dir)
+    if (variant_dir / "notebooks" / "phase_notebook_cells.py").is_file():
+        actions.append(f"phase_notebook_cells.py -> {variant}/notebooks/")
 
     _write_write_phase_notebooks(variant_dir, variant)
     _write_notebooks_readme(variant_dir)
@@ -319,6 +353,33 @@ def scaffold_variant(
     return actions
 
 
+def sync_dedicated_worktree(variant: str) -> list[str]:
+    """Copy variant scaffolding into its dedicated git worktree checkout."""
+    actions: list[str] = []
+    repo_name = WORKTREE_BY_VARIANT.get(variant)
+    if not repo_name or repo_name == "agent-tracing-trace-baseline":
+        return actions
+    wt_pre = WORKTREE_ROOT / repo_name / "examples" / "rogii" / "traces" / "preprocessing"
+    src = TRACES_ROOT / variant
+    dst = wt_pre / variant
+    shared_src = TRACES_ROOT / "_shared"
+    shared_dst = wt_pre / "_shared"
+    if not src.is_dir():
+        return actions
+    wt_pre.mkdir(parents=True, exist_ok=True)
+    if shared_src.is_dir():
+        if shared_dst.is_dir():
+            shutil.rmtree(shared_dst)
+        shutil.copytree(shared_src, shared_dst, ignore=shutil.ignore_patterns("__pycache__"))
+        actions.append(f"synced _shared/ -> {repo_name}")
+    if dst.is_dir() and dst.resolve() != src.resolve():
+        shutil.rmtree(dst)
+    if not dst.exists():
+        shutil.copytree(src, dst, ignore=shutil.ignore_patterns("__pycache__", "logs", "*.o*", "*.e*"))
+        actions.append(f"synced worktree {repo_name} <- {variant}")
+    return actions
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Scaffold Rogii trace variant directories.")
     parser.add_argument("--variant", action="append", help="Variant slug (repeatable).")
@@ -332,10 +393,27 @@ def main() -> None:
         action="store_true",
         help="Only write artifact phase dirs + PHASE_CONTRACT.json.",
     )
+    parser.add_argument(
+        "--all-variants",
+        action="store_true",
+        help="Scaffold all six trace variants (including baseline).",
+    )
+    parser.add_argument(
+        "--sync-worktrees",
+        action="store_true",
+        help="After scaffolding, sync dedicated agent-tracing-trace-* worktrees.",
+    )
+    parser.add_argument(
+        "--regenerate-notebooks",
+        action="store_true",
+        help="Run write_phase_notebooks.py --all-variants after scaffolding.",
+    )
     args = parser.parse_args()
 
     variants: list[str] = []
-    if args.all_pending:
+    if args.all_variants:
+        variants = list(VARIANT_META.keys())
+    elif args.all_pending:
         variants = [v for v in VARIANT_META if v != "baseline_column_transformer"]
     if args.variant:
         variants.extend(args.variant)
@@ -349,6 +427,18 @@ def main() -> None:
         print(f"\n=== {variant} ===")
         for line in actions or ["(nothing new — already scaffolded)"]:
             print(f"  {line}")
+        if args.sync_worktrees:
+            for line in sync_dedicated_worktree(variant):
+                print(f"  {line}")
+
+    if args.regenerate_notebooks and not args.phases_only:
+        wp = TRACES_ROOT / "baseline_column_transformer" / "notebooks" / "write_phase_notebooks.py"
+        if wp.is_file():
+            subprocess.run(
+                [sys.executable, str(wp), "--all-variants"],
+                check=False,
+                cwd=str(REPO_ROOT),
+            )
 
 
 if __name__ == "__main__":
