@@ -1,0 +1,9 @@
+=== trace phase job ===
+variant:      baseline_column_transformer
+trace_phase:  01_data_analysis
+variant_dir:  /lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/baseline_column_transformer
+artifacts:    /lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/baseline_column_transformer/artifacts
+data_dir:     /lustre/work/sweeden/rogii/data
+=== module load (gcc / cuda / python) ===
+=== creating conda env baseline_column_transformer from /lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/baseline_column_transformer/environment.yml ===
+
