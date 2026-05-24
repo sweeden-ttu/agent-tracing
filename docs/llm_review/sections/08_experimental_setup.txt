@@ -1,0 +1,160 @@
+# Experimental Setup
+
+Source: llm.txt lines 1814–1969
+
+Experimental Setup
+
+Benchmark
+
+We instantiate the architecture on the Rogii Wellbore Geology
+Prediction task hosted on Kaggle
+(rogii-wellbore-geology-prediction).  The competition is a
+multi-well regression benchmark: agents predict True Vertical
+Thickness (TVT) lithology labels at each test depth index from
+horizontal-well log features, typewell GR curves, and optional
+geology-surface columns.  The public leaderboard ranks teams by
+RMSE on the post-perforation-start (post-PS) subset; submission
+validity requires an id column plus a tvt prediction column
+matching sample_submission.csv exactly.
+
+The task is selected for three reasons: it requires non-trivial
+feature engineering (well-log normalization, typewell GR alignment,
+GroupKFold by well, PS-point leakage masks, formation/spatial
+features); it has a clearly defined submission envelope (id, tvt,
+row count, no NaNs); and its leaderboard is active enough that a
+verified trace-language pipeline constitutes a reproducible signal.
+Six preprocessing-variant trace languages under
+examples/rogii/traces/preprocessing/{variant}/trace_language.csv
+instantiate distinct scientific concepts on this benchmark; see
+Section sec:trace-csv for the directory audit and per-variant
+critical review against BASE_PAPERS.md.
+
+Hardware and software environment
+
+itemize
+Hardware: a single laptop (the author's macOS development
+machine).  CPU and RAM bounds are recorded in the run log; both
+are finite and the realised computation is therefore an LBA in
+the formal sense of Section sec:preliminaries.
+Operating system: macOS, with the Kaggle CLI version locked
+in the run-time configuration.
+LLM backbone: Google Gemini, accessed through the
+google-genai client.  Two model strings appear in the
+realised trace: gemini-2.5-pro for Type-0 deliberation
+steps; gemini-2.5-flash and
+gemini-2.5-flash-lite for finite-state housekeeping and
+verification-adjacent steps.
+Embedding backbone: text-embedding-004 for the
+research-agent vector store and the tools-index keyword
+embedding.
+itemize
+
+The deliberate restriction of the backbone to a single hosted LLM
+family is methodological: the goal is to minimise the
+architectural surface area while exhibiting the trace-language
+phenomenon.  We report no comparison across backbone families.
+
+Start language
+
+The start language
+is the publicly attached artefact in
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv.  Its alphabet
+ is the set of operation symbols read off the file's
+twenty swim-lane columns (plus nine resource-envelope columns).   is approximately 120, after
+deduplication of recurring symbols across columns.
+
+The start language was constructed from the Rogii trace experiment
+orchestrator under examples/rogii/, the Kaggle CLI workflow, and
+PaperBench agent-tracing audit tokens.  No held-out test-well labels
+enter at design time.  In particular,  contains no symbol
+pertaining to the Rogii feature space (no MD, GR, TVT_input,
+ANCC, typewell curves, or PS masks); these symbols enter only after
+the recursive enumeration of Algorithm alg:enum has materialised
+them under the verifier's pressure.
+
+Verifier keyword set
+
+The verifier  is the Aho-Corasick DFA
+constructed from the keyword set  obtained by:
+enumerate
+Reading the toolsindex column of  and
+including each operation symbol (e.g.,
+scoreagainstindex(cosine)).
+Reading the unittestrunner column of
+and including each test* symbol (e.g.,
+testsubmissionvalidity,
+testcolumnnamessubmission).
+Adjoining the column-name and dtype keywords mechanically
+extracted from the Rogii Wellbore Geology Prediction data schema:
+submission columns id, tvt (from sample_submission.csv);
+horizontal-well train columns MD, X, Y, Z, ANCC, ASTNU, ASTNL,
+EGFDU, EGFDL, BUDA, TVT, GR, TVT_input;
+typewell columns TVT, GR; horizontal-well test columns MD, X, Y,
+Z, GR, TVT_input.
+enumerate
+The full keyword set K is enumerated in Appendix A.  |K| is approximately
+80 keywords; |Sigma| is approximately 2,400 characters.  The
+Aho-Corasick DFA has on the order of 400 states (standard trie plus
+failure-link construction; exact count in Appendix A).
+
+Probes and predictions
+
+To preserve falsifiability, we pre-register four probes against
+the architecture before running the binding.
+
+P1 (Type-3 envelope of ).
+The verifier's trace language is regular.  The empirical
+prediction is that the membership decision per candidate prefix
+runs in time linear in prefix length, with a flat constant in
+prefix length.  Refutation: any super-linear timing on
+'s side.
+
+P2 (Type-0 envelope of ).
+The Goal-Driven agent emits at least one trace whose length
+strictly exceeds the LBA bound that any of the start-language
+columns would predict.  Refutation: the realised trace is no
+longer than the start-language columns.
+
+P3 (Emergent thirteenth agent).
+The realised trace contains operation symbols that are not in, and these symbols cluster into a thirteenth column
+(slurm_episodic_trainer) absent from
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0).  Refutation: no new
+column appears, or the new symbols do not cluster into a coherent
+sub-agent.
+
+P4 (Leaderboard placement).
+The verified trace, executed end-to-end via slurm_full_pipeline, is
+predicted to yield a public leaderboard placement at or above the top
+tertile of submissions (rank <= ceil(N/3) for N teams on the public
+leaderboard snapshot).  Refutation: placement strictly worse than the
+tertile threshold.  As of May 2026 this probe is pre-registered but
+not yet verified; numerics are reported in Section sec:results as
+TBD until the Slurm gate completes.
+
+These four probes are pre-registered in the sense that their
+predictions are stated before the binding is run.  We report
+their outcomes in Section sec:results.
+
+Reproducibility artefacts
+
+Canonical paths (unified manifest).
+All artefacts use the repository paths below; SHA256 hashes are recorded
+in examples/rogii/papers/manifest.json and updated when slurm_full_pipeline
+completes.
+itemize
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv
+--- the start language L_0 (twenty sub-agent swim lanes plus nine
+resource-envelope columns).
+The same path after recursive enumeration --- the realised trace L_K
+(thirteen operational swim lanes in the baseline binding; slurm_episodic_trainer
+emergent).
+This paper's LaTeX/PDF source and refs.bib bibliography in the
+agent-tracing repository (branch trace/base).
+itemize
+
+The Kaggle submission CSV itself is not released, on the
+deliberate principle that its release would contaminate the
+benchmark for future researchers; when verified, we report public
+leaderboard rank, team count N, and RMSE as a single snapshot, or
+mark them TBD pending slurm_full_pipeline (Section sec:results).
+

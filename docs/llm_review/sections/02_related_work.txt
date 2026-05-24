@@ -1,0 +1,212 @@
+# Related Work
+
+Source: llm.txt lines 354–561
+
+Related Work
+
+The literature relevant to this paper falls into five strands.
+The first asks whether agents are automata, and answers
+affirmatively in a memory-architecture sense
+(Koohestani et al. koohestani2025automata).  The second is
+the producer-consumer framing of cooperating sequential
+processes (Dijkstra dijkstra1968cooperating), which is
+the operational form of the question we actually wish to answer:
+how can the type of one agent bound another?  The third is the
+classical theory of automata and the Chomsky hierarchy (Turing,
+Chomsky, Rabin and Scott, Hopcroft and Ullman, Aho).  The fourth
+is software verification and validation (Hoare, Dijkstra, Pnueli,
+Clarke and Emerson, Lamport).  The fifth is the boundary
+between decidable and undecidable verification fixed by Robinson
+and the MRDP theorem.  We address each in turn.
+
+Are agents just automata?
+
+Koohestani, Li, Podkopaev, and Izadi koohestani2025automata
+recently posed and answered the title question, establishing a
+memory-architecture equivalence: simple-reflex agents are finite
+automata; hierarchical task-decomposition agents are pushdown
+automata; agents employing read/write memory for reflection are
+Turing machines.  Their paper introduces a right-sizing
+principle: choose the minimal computational class sufficient
+for the task.
+
+Two observations are owed to that paper.  First, the equivalence
+they establish is the architectural premise of the present work;
+without it, the question of how Chomsky classes interact across
+agents would have no canonical formulation.  Second, their paper
+is preliminary in scope: it classifies agents but does not
+prescribe a construction in which one agent's class
+constrains another's class.  We supply that construction
+here.  Where they ask Are agents just automata? and
+answer yes, we ask can the type of one agent bound
+another? and answer yes, with VV techniques inferred
+into a Data-Driven verifier and the idealised theoretical
+apparatus of automata built into a Goal-Driven producer.
+
+A related strand, Formal-LLM li2024formalllm, encodes
+plan-construction constraints as a context-free grammar and
+guides an LLM-based planner with a pushdown automaton.  Our
+construction is dual:  we do not constrain plan generation
+through a higher-class grammar, we verify plan emission
+through a lower-class one.  Aho-Corasick is the
+"less-Turing-complete-than-the-LLM" device that earns us the
+verification budget of Theorem thm:closure.
+
+The producer-consumer framing
+
+Dijkstra's cooperating sequential
+processes dijkstra1968cooperating fix the producer-
+consumer formulation:  one process produces a sequence of
+artefacts; another consumes them; correct cooperation requires
+that the consumer never reads an artefact the producer has not
+yet produced, and the producer never overwrites an artefact the
+consumer has not yet consumed.  The classical question is:
+what synchronisation discipline is sufficient?  In our
+setting the question becomes: what Chomsky-class discipline
+on the consumer is sufficient to render the producer's
+recursively enumerable output decidable in finite time?  The
+answer, by Theorem thm:closure, is Type-3.  Lower would not
+work (Type-3 is the minimal class that contains the keyword
+matchers Aho-Corasick implements); higher would work but raise
+the verification budget unnecessarily and risk the halting
+problem returning through the consumer's loop.
+
+Automata theory and the Chomsky hierarchy
+
+Turing's 1936 paper turing1936computable introduces the
+abstract machine that bears his name and proves the existence of
+a universal one.  Every formal claim in this paper inherits, at
+some depth, from that construction.  Chomsky's 1956 and 1959
+papers chomsky1956three,chomsky1959certain fix the
+hierarchy itself: regular, context-free, context-sensitive, and
+unrestricted (Type-3 through Type-0).  Rabin and
+Scott rabin1959finite fix the formal correspondence
+between regular languages and finite automata, with the
+nondeterminism that makes the proofs tractable.  Hopcroft,
+Motwani, and Ullman hopcroft2006automata consolidate the
+modern treatment with strict inclusions and standard parsing
+complexities.  Hartmanis and
+Stearns hartmanis1965computational introduce the time and
+space complexity classes in which our Type-1/Type-0 distinction
+ultimately lives, and supply the formal vocabulary for our
+"idealised Type-0 versus realised LBA" discussion in
+Section sec:discussion.
+
+Aho's 1968 paper aho1968indexed introduces indexed
+grammars as a strict extension of context-free grammars,
+positioned strictly between Type-2 and Type-1.  In our framework
+the back-edge structure of an iterative repair loop - e.g.,
+the retryphaseonlowscore cycle in
+Section sec:methodology - inhabits exactly that zone.  We
+use Aho's indexed grammars as the bridge between the pushdown
+sub-agent (Type-2) and the linear-bounded sub-agent (Type-1).
+
+The Aho-Corasick paper aho1975corasick compiles a finite
+keyword set into a deterministic finite automaton that recognises
+the union of the keywords in linear time and constant space.  In
+our framework Aho-Corasick is the canonical realisation
+of the Data-Driven Type-3 consumer.
+
+Software verification and validation
+
+Hoare's axiomatic basis hoare1969axiomatic and Dijkstra's
+guarded-command calculus dijkstra1975guarded supply the
+machinery of Hoare triples  that we apply to
+each unit-test step in the Aho-Corasick keyword set.  The
+predicates  and  are the "before" and "after" states
+of a single tool invocation in the trace.
+
+Pnueli's 1977 paper pnueli1977temporal introduces the
+linear temporal logic in which we phrase the safety and
+liveness properties of the Goal-Driven loop:
+
+G(plan Fverified)
+
+expresses that every plan emitted by the producer is eventually
+verified or refuted by the consumer.  Clarke and
+Emerson clarke1981ctl introduce the branching variant we
+use to reason about the back-edges of the iterative repair loop,
+and Clarke, Grumberg, and Peled clarke1999modelchecking
+consolidate the model-checking framework that, in principle,
+decides the Type-3 component of our verifier.
+
+Lamport lamport1978clocks,lamport1994tla supplies the
+ordering on events in the multi-agent execution and the temporal
+logic of actions; the typesetting of this paper itself uses his
+ system lamport1986latex.  Liskov's abstract data
+types liskov1974abstraction are the type discipline
+underlying the TypedDict state objects that flow between
+sub-agents.
+
+The undecidability boundary: Robinson and MRDP
+
+The boundary between decidable and undecidable verification -
+which, in our framework, is the boundary between Type-1 and
+Type-0 agents - is fixed by Hilbert's tenth problem and its
+resolution.  Robinson's 1949 paper robinson1949definability
+and the Davis-Putnam-Robinson follow-up davis1961decision
+established that the recursively enumerable subsets of
+ are exactly the Diophantine subsets, and that
+the membership problem for an arbitrary recursively enumerable
+set admits no general algorithm.  The Goal-Driven Type-0 producer
+in our architecture inherits this undecidability directly: in the
+absence of the Type-3 verifier, no algorithm decides whether a
+candidate trace lies in the producer's trace language.  The
+verifier is the entire reason the system is decidable in
+practice.
+
+Complexity, learning, and symbolic AI
+
+Cook cook1971complexity and Karp karp1972reducibility
+fix the NP-completeness frame within which the model-search step
+of the Goal-Driven producer (the Optuna tuning of LightGBM, the
+cross-validated stacking ensemble) is, formally, an instance of
+constrained combinatorial optimisation.
+Yao yao1977probabilistic supplies the notion of expected
+complexity used when reporting average trace lengths over the
+input distribution.  Blum blum1967machine fixes the
+machine-independent measure in which we report the verified
+trace language's complexity.
+
+The supervised-learning component of the Rogii Wellbore Geology
+Prediction pipeline is justified by the deep-learning manifesto of LeCun,
+Bengio, and Hinton hinton2015deep; the causal discipline
+that prevents the verifier from being fooled by spurious
+correlations is justified by Pearl pearl2009causality.
+McCarthy mccarthy1960lisp is the symbolic representation
+of programs as data - the property that lets a Goal-Driven
+agent emit a program (a Kaggle notebook) as the terminal
+element of its trace.  Newell and Simon newell1976physical
+state the physical-symbol-system hypothesis under which the
+agent's tool calls are the elementary symbols.  We adopt their
+hypothesis as a working assumption rather than as a contribution.
+
+Agent evaluation and process-supervision benchmarks.
+Contemporary agent evaluation spans tool-use and coding benchmarks
+(SWE-bench, AgentBench, Inspect AI, MLAgentBench) and competition-style
+MLE pipelines (Rogii Wellbore Geology Prediction, MLE-bench).  These
+systems measure task success, pass@k, and leaderboard placement rather
+than trace-language class.  Our contribution is orthogonal: we specify
+*how* to bind a Type-0 producer with a Type-3 consumer so that emitted
+traces are auditable, not which backbone wins a single leaderboard.
+Where Koohestani et al. classify memory architecture, we prescribe a
+producer-consumer construction; where agent benchmarks report scores,
+we report whether the realised trace language matches the predicted
+Chomsky signature under pre-registered probes P1--P4.
+
+Synthesis
+
+The strands above suffice to support every formal claim in the
+sequel.  In particular, our novelty relative to
+Koohestani et al. koohestani2025automata is the
+producer-consumer construction: where they classify, we bound;
+where they say which class an agent inhabits, we say which class
+must consume an agent of class  in order for the system
+as a whole to remain decidable.  The empirical instantiation in
+Sections sec:expsetup-sec:results is reported as
+data, not as theory, and stands or falls on its own
+reproducibility artefacts.  The final Kaggle submission CSV is
+withheld to avoid benchmark contamination; we report leaderboard rank
+and RMSE when verified, or mark them TBD until slurm_full_pipeline
+completes (Section sec:expsetup).
+
