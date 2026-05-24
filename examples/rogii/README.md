@@ -16,8 +16,6 @@ Six preprocessing/modeling approaches for [rogii-wellbore-geology-prediction](ht
 
 **Base papers (PDFs + links):** [`BASE_PAPERS.md`](BASE_PAPERS.md) — six variant primaries (+ Pedregosa co-primary for baseline); open-access PDFs in [`papers/`](papers/).
 
-**Full documentation:** [`docs/README.md`](docs/README.md) — table of contents, [glossary](docs/GLOSSARY.md), architecture, variants, phases, ML modules, Slurm, PaperBench.
-
 Per-variant artifacts under `traces/preprocessing/{variant}/`:
 
 | File | Role |

@@ -2,11 +2,9 @@
 
 **Approach:** GR/typewell alignment features
 
-## Base papers (ablation / experiment design)
+## Base paper (ablation / experiment design)
 
-### 1. Dynamic Programming Algorithm Optimization for Spoken Word Recognition
-
-- **Role:** primary_experiment_descriptor
+- **Title:** Dynamic Programming Algorithm Optimization for Spoken Word Recognition
 - **Authors:** Sakoe, Chiba
 - **Year / venue:** 1978 / IEEE Trans. Acoustics, Speech, and Signal Processing
 - **DOI:** 10.1109/TASSP.1978.1163055
