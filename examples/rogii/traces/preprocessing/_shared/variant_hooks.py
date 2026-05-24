@@ -94,11 +94,24 @@ class VariantHooks:
             extra_cols.extend(form_extra)
 
         if self.slug == "parallel_multiwell_loader":
-            from pipeline.parallel_loader import attach_geology_surface_features
+            from pipeline.parallel_loader import (
+                add_formation_thickness_features,
+                add_parallel_loader_features,
+                attach_geology_surface_features,
+                parallel_read_multiwell_csvs,
+            )
 
+            if not self.loader_meta:
+                _frames, self.loader_meta = parallel_read_multiwell_csvs(
+                    data_dir, n_workers=self.parallel_workers
+                )
             tr, surf_extra = attach_geology_surface_features(tr, data_dir)
             te, surf_extra_te = attach_geology_surface_features(te, data_dir)
-            extra_cols.extend(list(dict.fromkeys(surf_extra + surf_extra_te)))
+            tr, te, form_extra = add_formation_thickness_features(tr, te)
+            tr, te, par_extra = add_parallel_loader_features(tr, te, self.loader_meta)
+            extra_cols.extend(
+                list(dict.fromkeys(surf_extra + surf_extra_te + form_extra + par_extra))
+            )
 
         return tr, te, list(dict.fromkeys(extra_cols))
 
