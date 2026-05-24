@@ -5,6 +5,7 @@
 | Script | Purpose |
 |--------|---------|
 | `scaffold_trace_variant.py` | Create phase dirs, contracts, notebooks; `--sync-worktrees` |
+| `expander_agent.py` | Audit gaps, expand all scaffolding, sync tracking, optional Chomsky gate |
 | `download_variant_papers.py` | Fetch variant base PDFs; `--verify-only` |
 | `download_layer_papers.py` | Fetch leaderboard ensemble layer PDFs |
 | `write_trace_row_index.py` | Generate `trace_row_index.csv` from trace CSV |
@@ -17,7 +18,18 @@ python examples/rogii/scripts/scaffold_trace_variant.py --all-variants --sync-wo
 python examples/rogii/scripts/scaffold_trace_variant.py --variant formation_plane_spatial --phases-only
 ```
 
-Worktree mapping (internal `WORKTREE_BY_VARIANT`):
+### expander_agent.py
+
+```bash
+python examples/rogii/scripts/expander_agent.py --audit
+python examples/rogii/scripts/expander_agent.py --expand-all
+python examples/rogii/scripts/expander_agent.py --expand-all --validate-traces
+```
+
+Runs scaffold batch, experiment-design artifacts, variant-hook pytest, and refreshes
+`ablation_tracking_status.csv` with `slurm_full_pipeline` from phase manifests.
+
+### scaffold_trace_variant.py (internal `WORKTREE_BY_VARIANT`):
 
 | Variant | Worktree repo folder |
 |---------|---------------------|
