@@ -1,0 +1,13 @@
+{
+  "id": "scottweeden/rogii-trace-baseline-smoke",
+  "title": "rogii-trace-baseline-smoke",
+  "code_file": "rogii_trace_baseline_smoke.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "true",
+  "enable_gpu": "true",
+  "enable_internet": "true",
+  "dataset_sources": ["scottweeden/rogii-synthetic-trace-smoke-data"],
+  "competition_sources": ["rogii-wellbore-geology-prediction"],
+  "kernel_sources": []
+}

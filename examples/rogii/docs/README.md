@@ -17,6 +17,8 @@ Documentation for the six preprocessing-variant ML pipelines on the [Rogii Wellb
 | [PAPERBENCH.md](PAPERBENCH.md) | frontier-evals / PaperBench integration |
 | [ARTIFACTS.md](ARTIFACTS.md) | JSON/CSV outputs per phase |
 | [PAPERS.md](PAPERS.md) | Base-paper PDF library and downloads |
+| [KAGGLE_NOTEBOOK.md](KAGGLE_NOTEBOOK.md) | Unified Kaggle kernel, synthetic RMSE smoke, push/run |
+| [PAPER_ALIGNMENT.md](PAPER_ALIGNMENT.md) | Variant ↔ base-paper implementation alignment |
 
 ## Quick start
 

@@ -1,0 +1,97 @@
+{
+  "cv_rmse": 37.62937525078481,
+  "cv_rmse_feet": 37.62937525078481,
+  "cumulative_rmse_feet": 112.88812575235443,
+  "fold_rmses": [
+    52.933596113977146,
+    24.51115237671833,
+    35.443377261658945
+  ],
+  "n_folds": 3,
+  "cv_scheme": "groupkfold",
+  "group_key": "well_id",
+  "id_column": "id",
+  "target_column": "tvt",
+  "backend": "sklearn.hist_gradient_boosting",
+  "use_log1p": false,
+  "n_train_rows": 19221,
+  "n_test_rows": 19221,
+  "n_submission_rows": 14151,
+  "n_wells_train": 3,
+  "n_wells_test": 3,
+  "data_dir": "/lustre/work/sweeden/rogii/data",
+  "holdout_rmse_synthetic": 18.043179715646332,
+  "rmse_threshold_feet": 12.0,
+  "baseline_cv_rmse_feet": 37.62937525078481,
+  "baseline_cumulative_rmse_feet": 112.88812575235443,
+  "episodic_triggered": true,
+  "episodic": {
+    "oof_rmse_feet": 36.688269075689334,
+    "cumulative_rmse_feet": 89.33828507678865,
+    "fold_rmses": [
+      54.2377809907939,
+      18.43385496154678,
+      16.666649124447964
+    ],
+    "cv_scheme": "groupkfold(n_splits=3)",
+    "group_key": "well_id",
+    "target_transform": {
+      "use_log1p": false,
+      "target_mean": 11690.876949075255,
+      "target_std": 95.11101007098453
+    },
+    "submission_path": "/tmp/rogii_kaggle_worktree_out/submit_test/submission_episodic.csv",
+    "checkpoints": [
+      {
+        "fold": 0,
+        "checkpoint": "fold_0_ep_1.pt",
+        "val_rmse": 54.2377809907939
+      },
+      {
+        "fold": 1,
+        "checkpoint": "fold_1_ep_1.pt",
+        "val_rmse": 18.43385496154678
+      },
+      {
+        "fold": 2,
+        "checkpoint": "fold_2_ep_1.pt",
+        "val_rmse": 16.666649124447964
+      }
+    ],
+    "elapsed_seconds": 34.61712861061096
+  },
+  "ensemble_manifest": "/tmp/rogii_kaggle_worktree_out/submit_test/checkpoints/episode_manifest.json",
+  "blend": {
+    "blend_weights": {
+      "tabular_baseline": 0.49366835302958983,
+      "episodic_tcn": 0.5063316469704102
+    },
+    "baseline_rmse_feet": 37.62937525078481,
+    "episodic_rmse_feet": 36.688269075689334
+  },
+  "submission_validation": {
+    "ok": true,
+    "checks": [
+      {
+        "name": "row_count",
+        "status": "pass"
+      },
+      {
+        "name": "columns",
+        "status": "pass"
+      },
+      {
+        "name": "no_nans",
+        "status": "pass"
+      }
+    ]
+  },
+  "kaggle_submit": {
+    "submitted": false,
+    "reason": "400 Client Error: Bad Request for url: https://www.kaggle.com/api/v1/competitions/submissions/submit/rogii-wellbore-geology-prediction",
+    "command": "kaggle competitions submit -c rogii-wellbore-geology-prediction -f /tmp/rogii_kaggle_worktree_out/submit_test/submission.csv -m rogii-trace-unified cv=37.629 epi=yes -q"
+  },
+  "final_cv_rmse_feet": 37.62937525078481,
+  "final_cumulative_rmse_feet": 112.88812575235443,
+  "final_submission": "/tmp/rogii_kaggle_worktree_out/submit_test/submission.csv"
+}

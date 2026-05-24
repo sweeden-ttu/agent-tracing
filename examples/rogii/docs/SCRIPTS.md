@@ -83,10 +83,21 @@ Produced by `paperbench.scripts.generate_rogii_pipelines`:
 | `paperbench/scripts/write_experiment_descriptors.py` | Write `experiment_descriptor.json` + mirrors |
 | `paperbench/scripts/implement_agent_tracing.py` | `--validate-traces` Chomsky gate |
 
+## Kaggle unified baseline
+
+| Path | Purpose |
+|------|---------|
+| `kaggle/rogii-unified-baseline/run_baseline.py` | Multi-well baseline + metrics JSON |
+| `kaggle/rogii-unified-baseline/sync_bundle.sh` | Refresh bundled `pipeline/` from `rogii` |
+| `kaggle/rogii-unified-baseline/kernel-metadata.json` | `kaggle kernels push` metadata |
+
+See [KAGGLE_NOTEBOOK.md](KAGGLE_NOTEBOOK.md).
+
 ## Tests
 
 ```bash
 python -m pytest examples/rogii/tests/test_variant_hooks.py -q
+python -m pytest examples/rogii/tests/test_synthetic_competition_data.py -q
 cd /lustre/work/sweeden/frontier-evals/project/paperbench
 uv run pytest tests/unit/trace_pipeline/test_frontier_config.py tests/unit/trace_pipeline/test_paper_registry.py -q
 ```
