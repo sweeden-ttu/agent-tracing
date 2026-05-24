@@ -81,6 +81,7 @@ def _numeric_feature_cols(
             and c in train_df.columns
             and c in test_df.columns
             and pd.api.types.is_numeric_dtype(train_df[c])
+            and pd.api.types.is_numeric_dtype(test_df[c])
         ):
             cols.append(c)
     if "MD" in train_df.columns and "MD" in test_df.columns and "MD" not in cols:

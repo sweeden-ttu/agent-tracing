@@ -1,6 +1,0 @@
-{
-  "data_dir": "/lustre/work/sweeden/rogii/data",
-  "train_csv": "/lustre/work/sweeden/rogii/data/_train_000d7d20_horizontal_well.csv",
-  "test_csv": "/lustre/work/sweeden/rogii/data/_test_000d7d20_horizontal_well.csv",
-  "sample_submission_csv": "/lustre/work/sweeden/rogii/data/sample_submission.csv"
-}
