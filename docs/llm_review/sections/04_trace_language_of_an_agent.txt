@@ -372,8 +372,8 @@ examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.c
 longer sequence (36 non-empty entries) than any column of
 examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0) (which contains at most
 fourteen).  The lengthening is the operational footprint of the
-recursive enumeration: the start language emitted twelve seed
-agents; the binding to the Type-3 verifier forced enumeration of
+recursive enumeration: the start language fixed twenty seed swim
+lanes; the binding to the Type-3 verifier forced enumeration of
 arbitrarily long check-train-validate cycles; the result was a
 strictly more complex trace, materialised on disk by the
 recursive Type-0 step.

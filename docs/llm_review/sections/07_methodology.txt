@@ -178,8 +178,8 @@ What the algorithm produces
 
 When Algorithm alg:enum is run on the
 Rogii Wellbore Geology Prediction input, the operation alphabet
- extends to.  The thirteenth column of
-the resulting CSV is the slurm_episodic_trainer column: a
+ extends to.  The twenty-first swim-lane column of
+the resulting CSV is slurm_episodic_trainer: a
 strictly new sub-agent whose alphabet contains symbols absent
 from  (e.g.,
 trainstackedensemble(LGBM+XGB+HistGB+linearmeta),

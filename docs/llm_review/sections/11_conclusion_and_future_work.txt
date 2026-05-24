@@ -61,10 +61,10 @@ produce the submission, is published at
 https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction.
 
 The realised trace is the empirical witness to the theory.  Its
-thirteenth column, slurm_episodic_trainer, is the emergent
+twenty-first swim lane, slurm_episodic_trainer, is the emergent
 agent that the binding forced into existence: the start language
-had twelve sub-agents and no trainer; the realised language has
-thirteen sub-agents and a 36-step training trace.  The expansion
+had twenty sub-agent swim lanes and no episodic trainer; the realised
+language has twenty-one swim lanes and a 36-step training trace.  The expansion
 is the operational form of the Type-0 recursive enumeration; the
 laptop's finite tape is the operational form of the Type-1 bound
 that brings the enumeration to a halt.

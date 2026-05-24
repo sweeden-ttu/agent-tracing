@@ -147,6 +147,9 @@ For running experiments on HPCC cluster to generate results for the paper:
 #SBATCH --error=/lustre/work/sweeden/rogii/logs/%x.e%j
 
 # Environment setup
+RUN_DIR=/lustre/work/sweeden/rogii
+cd "${RUN_DIR}"
+
 module purge
 source "${RUN_DIR}/hpcc/slurm_module_init.sh"
 init_slurm_modules
@@ -158,8 +161,6 @@ source "${RUN_DIR}/hpcc/_variant_conda_env.sh"
 matador_activate_variant_env
 
 # Experiment execution
-RUN_DIR=/lustre/work/sweeden/rogii
-cd "${RUN_DIR}"
 VARIANT=baseline_column_transformer bash hpcc/review_slurm_before_submit.sh hpcc/run_ablation_variant.slurm baseline_column_transformer
 VARIANT=baseline_column_transformer sbatch hpcc/run_ablation_variant.slurm
 # Full train (after ablation bootstrap completes):

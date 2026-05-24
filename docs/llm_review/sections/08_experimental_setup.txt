@@ -115,10 +115,10 @@ strictly exceeds the LBA bound that any of the start-language
 columns would predict.  Refutation: the realised trace is no
 longer than the start-language columns.
 
-P3 (Emergent thirteenth agent).
-The realised trace contains operation symbols that are not in, and these symbols cluster into a thirteenth column
-(slurm_episodic_trainer) absent from
-examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0).  Refutation: no new
+P3 (Emergent twenty-first swim lane).
+The realised trace contains operation symbols that are not in, and these symbols cluster into a twenty-first swim-lane column
+(slurm_episodic_trainer) absent from the start language L_0 in
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (twenty seed swim lanes plus nine resource-envelope columns).  Refutation: no new
 column appears, or the new symbols do not cluster into a coherent
 sub-agent.
 
@@ -146,8 +146,8 @@ examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.c
 --- the start language L_0 (twenty sub-agent swim lanes plus nine
 resource-envelope columns).
 The same path after recursive enumeration --- the realised trace L_K
-(thirteen operational swim lanes in the baseline binding; slurm_episodic_trainer
-emergent).
+(twenty-one operational swim lanes: twenty seed lanes plus emergent
+slurm_episodic_trainer).
 This paper's LaTeX/PDF source and refs.bib bibliography in the
 agent-tracing repository (branch trace/base).
 itemize

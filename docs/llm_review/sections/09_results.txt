@@ -37,10 +37,12 @@ The workspace expansion is therefore consistent with a Type-0 phenomenon
 rather than a Type-1 misclassification.  P2 is supported as a scaffold
 observation; stress tests across seeds are future work.
 
-P3: emergence of the thirteenth sub-agent
+P3: emergence of the twenty-first swim lane
 
-The realised CSV contains thirteen header columns; the start
-CSV contains twelve.  The new column slurm_episodic_trainer
+The realised CSV L_K contains thirty header columns (twenty-one
+swim lanes plus nine resource-envelope columns); the start CSV L_0
+contains twenty-nine (twenty swim lanes plus nine envelopes).  The new
+swim-lane column slurm_episodic_trainer
 contains 36 distinct operation symbols, none of which appear in.  The new symbols cluster around three thematic
 groups:
 itemize

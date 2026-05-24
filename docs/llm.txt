@@ -1103,8 +1103,8 @@ examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.c
 longer sequence (36 non-empty entries) than any column of
 examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0) (which contains at most
 fourteen).  The lengthening is the operational footprint of the
-recursive enumeration: the start language emitted twelve seed
-agents; the binding to the Type-3 verifier forced enumeration of
+recursive enumeration: the start language fixed twenty seed swim
+lanes; the binding to the Type-3 verifier forced enumeration of
 arbitrarily long check-train-validate cycles; the result was a
 strictly more complex trace, materialised on disk by the
 recursive Type-0 step.
@@ -1747,8 +1747,8 @@ What the algorithm produces
 
 When Algorithm alg:enum is run on the
 Rogii Wellbore Geology Prediction input, the operation alphabet
- extends to.  The thirteenth column of
-the resulting CSV is the slurm_episodic_trainer column: a
+ extends to.  The twenty-first swim-lane column of
+the resulting CSV is slurm_episodic_trainer: a
 strictly new sub-agent whose alphabet contains symbols absent
 from  (e.g.,
 trainstackedensemble(LGBM+XGB+HistGB+linearmeta),
@@ -1924,10 +1924,10 @@ strictly exceeds the LBA bound that any of the start-language
 columns would predict.  Refutation: the realised trace is no
 longer than the start-language columns.
 
-P3 (Emergent thirteenth agent).
-The realised trace contains operation symbols that are not in, and these symbols cluster into a thirteenth column
-(slurm_episodic_trainer) absent from
-examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0).  Refutation: no new
+P3 (Emergent twenty-first swim lane).
+The realised trace contains operation symbols that are not in, and these symbols cluster into a twenty-first swim-lane column
+(slurm_episodic_trainer) absent from the start language L_0 in
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (twenty seed swim lanes plus nine resource-envelope columns).  Refutation: no new
 column appears, or the new symbols do not cluster into a coherent
 sub-agent.
 
@@ -1955,8 +1955,8 @@ examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.c
 --- the start language L_0 (twenty sub-agent swim lanes plus nine
 resource-envelope columns).
 The same path after recursive enumeration --- the realised trace L_K
-(thirteen operational swim lanes in the baseline binding; slurm_episodic_trainer
-emergent).
+(twenty-one operational swim lanes: twenty seed lanes plus emergent
+slurm_episodic_trainer).
 This paper's LaTeX/PDF source and refs.bib bibliography in the
 agent-tracing repository (branch trace/base).
 itemize
@@ -2002,10 +2002,12 @@ The workspace expansion is therefore consistent with a Type-0 phenomenon
 rather than a Type-1 misclassification.  P2 is supported as a scaffold
 observation; stress tests across seeds are future work.
 
-P3: emergence of the thirteenth sub-agent
+P3: emergence of the twenty-first swim lane
 
-The realised CSV contains thirteen header columns; the start
-CSV contains twelve.  The new column slurm_episodic_trainer
+The realised CSV L_K contains thirty header columns (twenty-one
+swim lanes plus nine resource-envelope columns); the start CSV L_0
+contains twenty-nine (twenty swim lanes plus nine envelopes).  The new
+swim-lane column slurm_episodic_trainer
 contains 36 distinct operation symbols, none of which appear in.  The new symbols cluster around three thematic
 groups:
 itemize
@@ -2395,10 +2397,10 @@ produce the submission, is published at
 https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction.
 
 The realised trace is the empirical witness to the theory.  Its
-thirteenth column, slurm_episodic_trainer, is the emergent
+twenty-first swim lane, slurm_episodic_trainer, is the emergent
 agent that the binding forced into existence: the start language
-had twelve sub-agents and no trainer; the realised language has
-thirteen sub-agents and a 36-step training trace.  The expansion
+had twenty sub-agent swim lanes and no episodic trainer; the realised
+language has twenty-one swim lanes and a 36-step training trace.  The expansion
 is the operational form of the Type-0 recursive enumeration; the
 laptop's finite tape is the operational form of the Type-1 bound
 that brings the enumeration to a halt.
