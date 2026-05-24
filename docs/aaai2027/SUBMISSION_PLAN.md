@@ -38,7 +38,7 @@ VARIANT=baseline_column_transformer bash hpcc/review_slurm_before_submit.sh hpcc
 VARIANT=baseline_column_transformer sbatch hpcc/run_ablation_variant.slurm
 ```
 
-Mid-trace resume: follow `/lustre/work/sweeden/agent-tracing/.cursor/rules/trace-language-mid-resume-slurm-gate.mdc` — prior `sbatch` steps must be `COMPLETED` and `ablation_runs/baseline_column_transformer/` artifacts must match the resume row in `trace_language.csv`.
+Mid-trace resume: follow `.cursor/rules/trace-language-mid-resume-slurm-gate.mdc` in this worktree (`/lustre/work/sweeden/agent-tracing-trace-baseline/.cursor/rules/trace-language-mid-resume-slurm-gate.mdc`) — prior `sbatch` steps must be `COMPLETED` and `ablation_runs/baseline_column_transformer/` artifacts must match the resume row in `trace_language.csv`.
 
 
 ## 1. Paper Overview
@@ -134,38 +134,53 @@ For running experiments on HPCC cluster to generate results for the paper:
 - Required packages: numpy, pandas, scikit-learn, xgboost, lightgbm, tensorflow, torch, kaggle, mlflow
 - Ollama with granite4:3b for LLM backbone
 
-### SLURM Job Template:
+### SLURM: login-node submit (one job per variant)
+
+Run **from the login node** after `squeue` shows no active job for this variant. Do not call `sbatch` from inside a running batch script.
+
+```bash
+cd /lustre/work/sweeden/rogii
+squeue -u "$USER" -o "%.18i %.30j %.8T %.10M %R" | grep -E 'trace_|rogii_|ablation|tcn' || true
+
+VARIANT=baseline_column_transformer bash hpcc/review_slurm_before_submit.sh hpcc/run_ablation_variant.slurm baseline_column_transformer
+VARIANT=baseline_column_transformer sbatch hpcc/run_ablation_variant.slurm
+
+# After ablation bootstrap completes (separate submit; still one job at a time):
+# VARIANT=baseline_column_transformer sbatch hpcc/train_tcn_episodic.slurm
+```
+
+### SLURM batch script (compute node — excerpt)
+
+Canonical script: `hpcc/run_ablation_variant.slurm`. The batch body runs pipeline commands only (no nested `sbatch`):
+
 ```bash
 #!/bin/bash
-#SBATCH --job-name=rogii_baseline_column_tran
+#SBATCH --job-name=rogii_ablation
 #SBATCH --partition=matador
 #SBATCH --cpus-per-task=8
-#SBATCH --mem-per-cpu=6000
+#SBATCH --mem=64G
 #SBATCH --gres=gpu:1
 #SBATCH --time=04:00:00
 #SBATCH --output=/lustre/work/sweeden/rogii/logs/%x.o%j
 #SBATCH --error=/lustre/work/sweeden/rogii/logs/%x.e%j
 
-# Environment setup
 RUN_DIR=/lustre/work/sweeden/rogii
 cd "${RUN_DIR}"
+VARIANT="${VARIANT:?set VARIANT=baseline_column_transformer}"
 
-module purge
 source "${RUN_DIR}/hpcc/slurm_module_init.sh"
 init_slurm_modules
 source "${RUN_DIR}/hpcc/load_matador_modules.sh"
 load_matador_modules
-
-VARIANT=baseline_column_transformer
 source "${RUN_DIR}/hpcc/_variant_conda_env.sh"
 matador_activate_variant_env
+source "${RUN_DIR}/hpcc/_matador_ollama_env.sh"
+matador_start_ollama_for_job
+matador_export_ollama_base_url
 
-# Experiment execution
-VARIANT=baseline_column_transformer bash hpcc/review_slurm_before_submit.sh hpcc/run_ablation_variant.slurm baseline_column_transformer
-VARIANT=baseline_column_transformer sbatch hpcc/run_ablation_variant.slurm
-# Full train (after ablation bootstrap completes):
-# sbatch hpcc/train_tcn_episodic.slurm
-# Artifacts: ablation_runs/baseline_column_transformer/  artifacts/checkpoints/  submission.csv
+# LONG_RUNNING_START — ablation + orchestrator (see full script for orchestrator path)
+python scripts/run_ablation_suite.py --variant "${VARIANT}" --init --max-runs 1 -q
+# Artifacts: ablation_runs/baseline_column_transformer/  then artifacts/checkpoints/  submission.csv
 ```
 
 ### Directory Structure on HPCC:
