@@ -79,5 +79,6 @@
         ]
       }
     ]
-  }
+  },
+  "paper_file": "../../papers/robust_scale_log1p/pedregosa2011_sklearn_robust_substitute.pdf"
 }
