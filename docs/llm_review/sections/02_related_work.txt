@@ -1,8 +1,6 @@
-# Section 02: Related Work
+# Related Work
 
-Source: llm.txt lines 312–503
-
----
+Source: llm.txt lines 354–561
 
 Related Work
 
@@ -170,8 +168,8 @@ input distribution.  Blum blum1967machine fixes the
 machine-independent measure in which we report the verified
 trace language's complexity.
 
-The supervised-learning component of the Spaceship Titanic
-solution is justified by the deep-learning manifesto of LeCun,
+The supervised-learning component of the Rogii Wellbore Geology
+Prediction pipeline is justified by the deep-learning manifesto of LeCun,
 Bengio, and Hinton hinton2015deep; the causal discipline
 that prevents the verifier from being fooled by spurious
 correlations is justified by Pearl pearl2009causality.
@@ -182,6 +180,19 @@ element of its trace.  Newell and Simon newell1976physical
 state the physical-symbol-system hypothesis under which the
 agent's tool calls are the elementary symbols.  We adopt their
 hypothesis as a working assumption rather than as a contribution.
+
+Agent evaluation and process-supervision benchmarks.
+Contemporary agent evaluation spans tool-use and coding benchmarks
+(SWE-bench, AgentBench, Inspect AI, MLAgentBench) and competition-style
+MLE pipelines (Rogii Wellbore Geology Prediction, MLE-bench).  These
+systems measure task success, pass@k, and leaderboard placement rather
+than trace-language class.  Our contribution is orthogonal: we specify
+*how* to bind a Type-0 producer with a Type-3 consumer so that emitted
+traces are auditable, not which backbone wins a single leaderboard.
+Where Koohestani et al. classify memory architecture, we prescribe a
+producer-consumer construction; where agent benchmarks report scores,
+we report whether the realised trace language matches the predicted
+Chomsky signature under pre-registered probes P1--P4.
 
 Synthesis
 
@@ -194,4 +205,8 @@ must consume an agent of class  in order for the system
 as a whole to remain decidable.  The empirical instantiation in
 Sections sec:expsetup-sec:results is reported as
 data, not as theory, and stands or falls on its own
-reproducibility artefacts.
+reproducibility artefacts.  The final Kaggle submission CSV is
+withheld to avoid benchmark contamination; we report leaderboard rank
+and RMSE when verified, or mark them TBD until slurm_full_pipeline
+completes (Section sec:expsetup).
+

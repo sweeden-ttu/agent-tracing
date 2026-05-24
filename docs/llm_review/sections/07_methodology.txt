@@ -1,8 +1,6 @@
-# Section 07: Methodology
+# Methodology
 
-Source: llm.txt lines 1346–1585
-
----
+Source: llm.txt lines 1556–1795
 
 Methodology: The Goal-Driven/Data-Driven Architecture
 
@@ -19,7 +17,7 @@ The two principal agents
 Goal-Driven generator.
  is a Type-0 agent realised concretely as a
 large-language-model loop over the union of the operation
-alphabets in tracelanguageoriginal.csv.  Its
+alphabets in examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0).  Its
 configuration space is the LLM's context window plus a finite
 set of bookkeeping flags; its step relation
  samples a continuation, parses the
@@ -34,12 +32,12 @@ start-up:
 itemize
 the start-language alphabet
  (the operations columns of
-tracelanguageoriginal.csv);
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0));
 the empty workspace directory /compdir/;
 the boilerplate Kaggle CLI configuration.
 itemize
  is not given the goal label
-(Transported), the public/private leaderboard
+(tvt), the public/private leaderboard
 specification, or any prior solution.  Its trace language is, in
 principle, the entirety of, restricted only by what
 's LLM core happens to enumerate.
@@ -49,10 +47,10 @@ Data-Driven verifier.
 Section sec:indexed and Proposition prop:verifier-dfa.
 Its keyword set  is the union of the operation symbols in the
 unittestrunner and toolsindex columns of
-tracelanguageoriginal.csv, extended only by the
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0), extended only by the
 mechanical inclusion of the column-name and dtype tests
 generated from the
-Spaceship Titanic train.csv schema.
+Rogii Wellbore Geology Prediction train.csv schema.
  has no LLM component; it is a deterministic linear-time
 checker.  Its decision function is
 
@@ -115,7 +113,7 @@ definition
 theorem[Derived sub-agents]
 Let  be the operation alphabet of the
 planneragent column of
-tracelanguagekaggle.csv.  Then
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K).  Then
 
 L(planneragent) =
 __planner(L(GV)
@@ -179,9 +177,9 @@ finite time.
 What the algorithm produces
 
 When Algorithm alg:enum is run on the
-Spaceship Titanic input, the operation alphabet
+Rogii Wellbore Geology Prediction input, the operation alphabet
  extends to.  The thirteenth column of
-the resulting CSV is the kaggletrainer column: a
+the resulting CSV is the slurm_episodic_trainer column: a
 strictly new sub-agent whose alphabet contains symbols absent
 from  (e.g.,
 trainstackedensemble(LGBM+XGB+HistGB+linearmeta),
@@ -199,7 +197,7 @@ _V-accepting
 
 and the verified trace
 is exactly the column-wise concatenation of the recorded entries
-in tracelanguagekaggle.csv.
+in examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K).
 
 Hoare-triple obligation per step
 
@@ -243,3 +241,4 @@ clarke1981ctl,clarke1999modelchecking.
 
 This concludes the formal description of the architecture.  We
 turn next to the empirical instantiation.
+

@@ -1,14 +1,12 @@
-# Section 05: Chomsky Classification of Agents
+# Chomsky Classification of Agents
 
-Source: llm.txt lines 926–1153
-
----
+Source: llm.txt lines 1119–1346
 
 Chomsky Classification of Agents
 
 We now classify trace languages by Chomsky type and exhibit, for
 each type, the canonical agent shape from the empirical
-Spaceship Titanic system.  The classification is the
+Rogii Wellbore Geology Prediction system.  The classification is the
 literal one of Section sec:preliminaries; there is no
 new mathematics here, only the application of an old hierarchy to
 a new object.  The novelty, if any, is the identification of
@@ -134,10 +132,10 @@ exists a Turing machine  with  and
  is not context-sensitive.
 definition
 
-The Type-0 agents are mlebenchsolver, the
+The Type-0 agents are model_trainer, the
 developeragent (in its full unbounded mode of arbitrary
-LLM code-generation), and the kaggletrainer.  The
-kaggletrainer column is the canonical witness: it
+LLM code-generation), and the slurm_episodic_trainer.  The
+slurm_episodic_trainer column is the canonical witness: it
 contains a strictly unbounded enumeration of training operations
 bootstrapindices, fitmodelonsubset,
 scoretrainandval, accumulateoofpredictions,
@@ -157,7 +155,7 @@ Summary table
 
 table[ht]
 Chomsky classification of the empirical sub-agents in
-tracelanguagekaggle.csv.
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K).
 tabularlll
 Sub-agent & Class & Recogniser
  toolsindex        & Type-3 & FA / DFA
@@ -175,13 +173,13 @@ revieweragent     & Type-2 & PDA
  taskorchestrator  & Type-1 & LBA
 
 kernelpipeline    & Type-1 & LBA
- researchagent     & Type-0 & TM
+ eda_profiler     & Type-0 & TM
 
 developeragent    & Type-0 & TM
 
-mlebenchsolver    & Type-0 & TM
+model_trainer    & Type-0 & TM
 
-kaggletrainer     & Type-0 & TM (emergent)
+slurm_episodic_trainer     & Type-0 & TM (emergent)
  tabular
 table
 
@@ -231,3 +229,4 @@ quote
 
 This is the operational meaning of "a single Goal-Driven agent
 tamed by the Data-Driven verifier results in success."
+

@@ -1,8 +1,6 @@
-# Section 06: Indexed Grammars and Aho-Corasick Verifier
+# Indexed Grammars and Aho-Corasick Verifier
 
-Source: llm.txt lines 1154–1345
-
----
+Source: llm.txt lines 1347–1555
 
 Indexed Grammars and the Aho-Corasick Verifier
 
@@ -112,8 +110,25 @@ that appear in the unit-test catalogue and tools-index manifest,
 and the verifier  is the agent whose configuration
 space is the state set of.  Concretely  is read off
 the columns toolsindex and unittestrunner
-of tracelanguagekaggle.csv; we list it in
-Appendix A.
+of examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K); the full keyword catalogue and DFA
+statistics are listed in Appendix A (below).
+
+Worked Type-3 micro-automaton (submission_validator lane).
+The submission_validator swim lane is our smallest exhibited DFA.
+Alphabet Sigma_V = {check_submission_schema, validate_id_column,
+validate_tvt_column, validate_row_count, validate_no_nans,
+emit_submission_ready}.  States Q = {q0, q_schema, q_cols, q_rows,
+q_accept, q_reject}.  Start q0; accept q_accept.  Transitions:
+q0 --check_submission_schema--> q_schema;
+q_schema --validate_id_column--> q_cols;
+q_cols --validate_tvt_column--> q_rows;
+q_rows --validate_row_count--> q_rows;
+q_rows --validate_no_nans--> q_accept;
+q_rows --emit_submission_ready--> q_accept;
+any mismatch --> q_reject (sink).  This six-state machine accepts
+exactly the regular language of submission-format checks enforced
+before Kaggle upload; it is a concrete Type-3 recogniser, not a
+post-hoc narrative label.
 
 proposition[Verifier as DFA]
 The Data-Driven verifier  is realisable as a
@@ -127,7 +142,9 @@ Construct the Aho-Corasick DFA  over the keyword set
 extracted from the two columns above; declare its accepting
 states to be those visited iff at least one keyword from each
 required category (e.g., testsubmissionvalidity,
-testcolumnnamessubmission) is matched.  The size
+testcolumnnamessubmission) is matched.  Categories are disjoint by
+construction (schema vs submission vs dtype); overlap would be a
+specification bug caught by the tools-index manifest.  The size
 bound  is the standard size of an Aho-Corasick DFA,
 and the linear-time membership decision is the standard property
 of a DFA aho1975corasick,rabin1959finite.proof
@@ -167,23 +184,21 @@ Let  be the operation alphabet of  and
 toolsindex and unittestrunner columns.
  is the corresponding
 Aho-Corasick DFA.
-Run the Goal-Driven generator  over the
-Spaceship Titanic input, intersecting every emitted
-prefix with  and rejecting prefixes that
-exit the language of.
-During execution,  proposes new operation
-symbols not in  (e.g., the
-wirespaceshipfeatureengineer() symbol). Each
-new symbol is admitted to  iff its emission satisfies
- when treated as a keyword extension; the
-verifier's keyword set is correspondingly extended to
-only for the duration of this enumeration.
-The accumulated trace is written to disk as
-tracelanguagekaggle.csv.  Its alphabet
-properly extends; its column count grows from twelve to
-thirteen by the addition of the kaggletrainer column,
-which is the column of operations that were never in
- but became necessary under the verifier's pressure.
+Run the Goal-Driven generator over the Rogii Wellbore Geology
+Prediction train wells, intersecting every emitted prefix with
+K_V and rejecting prefixes that exit the language of V.
+During execution, G proposes new operation symbols not in Sigma_0
+(e.g., the build_column_transformer_pipeline() symbol).  Each new
+symbol is admitted to Sigma_G iff its emission satisfies V when
+treated as a keyword extension; the verifier's keyword set is
+correspondingly extended to K_V' only for the duration of this
+enumeration.
+The accumulated trace is written to disk under
+examples/rogii/traces/preprocessing/{variant}/trace_language.csv.
+Its alphabet properly extends Sigma_0; Slurm and Ollama localhost
+tokens cluster in the emergent slurm_episodic_trainer swim lane---
+operations that were never in the minimal seed language but became
+necessary under the Type-3 consumer's Matador resource envelope.
 enumerate
 
 The procedure is, in the operational sense, a Type-0 recursive
@@ -195,3 +210,4 @@ Robinson robinson1949definability,davis1961decision the
 recursion has no general termination guarantee; in our bounded
 laptop the recursion is forced to halt by the LBA bound described
 in the next section.
+

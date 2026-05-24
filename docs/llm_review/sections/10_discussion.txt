@@ -1,8 +1,6 @@
-# Section 10: Discussion
+# Discussion
 
-Source: llm.txt lines 1883–2091
-
----
+Source: llm.txt lines 2120–2324
 
 Discussion
 
@@ -67,13 +65,12 @@ ceiling.
 enumerate
 The start language is therefore the inductive hypothesis of the
 recursive enumeration; without it, the recursion has no base.
-The empirical CSV tracelanguageoriginal.csv is the
+The empirical CSV examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (start language L_0) is the
 artefact form of the inductive hypothesis.  The realised CSV
-tracelanguagekaggle.csv is the conclusion of one
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv (enumerated trace L_K) is the conclusion of one
 inductive step.  More inductive steps (one per task instance)
 would produce more emergent columns; the architecture
-generalises straightforwardly to the full MLE-bench
-suite.
+generalises straightforwardly to the six preprocessing-variant ablation program under examples/rogii/.
 
 Producer-consumer, and the Type-3 producer subtlety
 
@@ -136,39 +133,37 @@ They are not a metaphor; they are the keyword set, the DFA, and the LTL formula.
 Threats to validity
 
 Construct validity.
-The trace-language identity criterion (Section sec:trace)
-is a strong claim: an agent is nothing but its trace
-language.  The criterion is well-defined - two agents are
-identified iff  - but it
-does discard information about, e.g., the LLM's chain-of-thought
-or the planner's intermediate JSON.  We accept the discard
-because the discarded objects are not directly verifiable; only
-the trace is, and only the trace is what we admit as evidence.
+The trace-language identity criterion (Section sec:trace) is a
+methodological choice for auditable evaluation: we identify agents
+for evidence purposes iff their trace languages coincide on a task.
+The criterion is well-defined but discards chain-of-thought, planner
+JSON, latency, and cost.  We treat trace equivalence as an
+evaluation interface, not an ontological claim about "what an agent
+is" in the wild.
 
 Internal validity.
 The Goal-Driven producer's LLM core is non-deterministic.  Two
 re-runs of Algorithm alg:enum on the same input produce
 slightly different traces.  The class signature
 (Table tab:class-signature) is robust across re-runs in
-our pilot experiments, but the leaderboard placement varies by
-10-20 ranks across re-runs.  We report a single placement
-() and acknowledge the residual variance.  The
-reproducibility kit at
+our pilot experiments, but leaderboard placement varies by an
+estimated 10--20 ranks across non-deterministic LLM samples (exact
+interval TBD with multi-seed Slurm runs).  We will report a single
+verified placement with P4 or mark TBD until slurm_full_pipeline
+finishes.  The reproducibility kit at
 
-https://www.kaggle.com/sweeden-ttu/competitions/spaceship-titanic
+https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction
 
 allows external re-runs at fixed random seeds.
 
 External validity.
 The architecture has been instantiated on one task
-(Spaceship Titanic).  We expect the trace-language
-account to generalise to other Kaggle-style tabular tasks
-(House Prices, Titanic,
-Digit Recognizer), because the start language and
-consumer are task-agnostic.  We do not claim generalisation
-outside the tabular regime; agents that operate on images, text,
-or open-ended code may require an expanded start language and a
-correspondingly expanded keyword set.
+(Rogii Wellbore Geology Prediction).  We conjecture---but have not
+demonstrated---that the trace-language account may transfer to other
+Kaggle-style geoscience and tabular regression tasks, because the start
+language and consumer are largely task-agnostic.  We do not claim
+generalisation outside the tabular regime; agents on images, text, or
+open-ended code may require an expanded start language and keyword set.
 
 Coverage of the producer-consumer escape.
 The discussion in Section sec:type3-producer relies on
@@ -181,12 +176,11 @@ architecture provides no warranty.
 Implications for the field
 
 Two implications follow.  First, the formal-language framing of
-agents need not be metaphorical.  When done at the level of
-narrowness of this paper, it produces concrete bounds on
-verification cost (Theorem thm:closure,
-Corollary cor:budget) and operational architectures (one
-Type-0 producer, one Type-3 consumer) that are competitive with
-the contemporary state of the art.
+agents need not be metaphorical when stated at the methodological
+narrowness of this paper: it yields concrete bounds on verification
+cost (Theorem thm:closure, Corollary cor:budget) and an operational
+architecture (Type-0 producer, composite Type-3 consumer) that we
+evaluate on one competition, with broader claims deferred to future work.
 
 Second, the multiplication of agent "roles" in contemporary
 literature - planner, executor, critic, verifier, summariser
@@ -212,3 +206,4 @@ present claim, which is that a narrow theory of trace
 languages, derived from Turing's automata theory and bound by an
 Aho-Corasick consumer, suffices to produce a top-tertile
 leaderboard result on a contemporary ML-engineering benchmark.
+

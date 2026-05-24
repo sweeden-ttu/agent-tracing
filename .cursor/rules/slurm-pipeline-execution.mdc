@@ -43,3 +43,7 @@ When adding pipeline rows to `trace_language.csv`, training and full-pipeline st
 ## Ollama / agent jobs
 
 Before **`sbatch`** on any script that runs LLM agents or Ollama, follow **`.cursor/rules/slurm-ollama-consumer-review.mdc`**: triage last logs, TTU Ollama setup, interactive preflight via `/etc/slurm/scripts/interactive`, then `bash hpcc/review_slurm_before_submit.sh`.
+
+## Mid-trace resume
+
+When continuing from a **middle row** of `trace_language.csv` (not from the start), follow **`.cursor/rules/trace-language-mid-resume-slurm-gate.mdc`**: confirm prior `sbatch` steps show `COMPLETED` in `sacct`, and that checkpoint / ablation / submission artifacts from those jobs are the inputs for the next step.

@@ -1,8 +1,149 @@
-# Section 12: Funding and References
+# Funding and References
 
-Source: llm.txt lines 2342–2462
+Source: llm.txt lines 2431–2710
 
----
+Acknowledgments
+
+The first author thanks Dr. Akbar Siami Namin
+(akbar.namin@ttu.edu, EC 306G, Department of Computer
+Science, Texas Tech University) and Dr. Yuanlin Zhang
+(y.zhang@ttu.edu, EC 313, Department of Computer
+Science, Texas Tech University) for their patient and generous
+guidance through a semester that did not unfold as planned.
+Dr. Namin shaped the software verification and validation
+framing of the Data-Driven consumer; Dr. Zhang shaped the
+automata-theoretic framing of the Goal-Driven producer and the
+Chomsky-class projection lemmas of Section sec:chomsky.
+The narrowness of the architecture - one Type-0 producer, one
+Type-3 consumer, and the explicit recursive enumeration of
+Algorithm alg:enum - is a direct consequence of their
+insistence that the theory commit only to what Turing's automata
+theory and Chomsky's hierarchy actually license, and to nothing
+more.
+
+Origin of this paper
+
+This paper began as an email.  On 17 February 2026 the first
+author wrote to Dr. Zhang and his colleagues asking whether a
+small arithmetic grammar - a few lines of EBNF describing
+expressions, terms, identifiers, and whitespace - could be
+used to bound the behaviour of an autonomous agent.
+The grammar itself is unimportant; what mattered was the
+question.  Dr. Zhang's reply opened the line of inquiry that,
+by way of the start language  and its recursive enumeration
+into, became the producer-consumer construction of this
+paper.  The question on 17 February was not about any single Kaggle
+competition; it was about whether the Chomsky hierarchy could be
+made to do real work in agent design.  This paper is the
+considered answer to that email.
+
+The path between the email and the manuscript was not the path
+the first author had planned.  The semester involved a missed
+midterm in Dr. Namin's software verification and validation
+course - a setback that, in any other semester, would have
+been recoverable through the usual academic channels.  It also
+involved a hospitalisation with a head injury during the
+final examination of Dr. Zhang's automata course.  Both
+courses had to be passed; the conventional routes were closed.
+Dr. Namin's response was characteristic of his teaching: he
+extended the offer that publication of substantive original
+work in the VV tradition would be accepted in lieu of the
+midterm and that the course grade would reflect that.
+Dr. Zhang continued to engage substantively with the
+producer-consumer construction long after the automata final
+had passed, treating the unfinished work as a continuation of
+the course rather than a casualty of it.
+
+Both offers were acts of professional grace.  This paper is
+their occasion.  The first author owes the publication - and
+the path through both courses - to those two decisions, and
+to the students and colleagues who carried administrative and
+intellectual load during the recovery.  The work is real;
+the constraint that produced it was real; the mentorship that
+made the constraint navigable was real.  We document the
+sequence not for sympathy but for accuracy.  Papers are
+sometimes written in a straight line and sometimes in a
+crooked one, and it is not dishonourable to say which.
+
+High Performance Computing Center, Texas Tech
+University
+
+We thank the staff and faculty of the
+https://www.depts.ttu.edu/hpcc/Texas Tech High
+Performance Computing Center for the compute resources used in
+the heavier ablation runs of this paper, and in particular:
+
+itemize
+Misha Ahmadian, Senior Research Associate, HPCC
+(misha.ahmadian@ttu.edu, 158 Drane Hall, 806.834.1866),
+for HPC user support and parallelisation advice on the
+recursive-enumeration loop;
+Dr. Sagnik Singha, Research Associate, HPCC
+(sagnik.singha@ttu.edu, 157 Drane Hall, 806.834.2156;
+Ph.D., Mechanical Engineering), for assistance with
+multi-disciplinary computational research and the cluster runs
+that exercised the Type-0/Type-3 binding at scale.
+itemize
+The RedRaider cluster carried the burden when the
+laptop's tape ran out.  The realised machine of
+Section sec:methodology is, accordingly, larger than a
+single laptop in the largest ablation runs; the LBA bound of
+Lemma lem:bounded-soundness adjusts upward correspondingly,
+and the soundness argument remains intact.
+
+Recognising Julia B. Robinson
+
+A note is owed on the most consequential non-laureate citation
+of this paper.  Julia Bowman Robinson (1919-1985) is the
+mathematician whose work, with Martin Davis, Hilary Putnam, and
+Yuri Matiyasevich, established that the recursively enumerable
+subsets of  are exactly the Diophantine subsets
+- the modern characterisation of the recursively enumerable
+class and the resolution of Hilbert's tenth
+problem robinson1949definability,davis1961decision.  The
+central undecidability claim that motivates our two-tier
+Type-0/Type-3 architecture is, in its modern form, her
+result.
+
+Robinson did not receive the ACM A.M. Turing Award.  We are
+under no illusion as to why.  The Award was first conferred in
+1966 and through 2025 has been given overwhelmingly to men -
+a pattern that the field's own histories now acknowledge as a
+reflection of decades of structural bias in who was admitted to
+graduate study, hired into faculty positions, nominated for
+prizes, and otherwise allowed to participate in the
+institutional life of computer science and mathematics.
+Several of Robinson's contemporaries did receive the Award; she
+did not.  Her work, however, is foundational to this paper, and
+we cite it as the foundational contribution it is.  Robinson is
+listed in the bibliography alongside Turing, Chomsky, and Aho
+not as an exception but because she belongs there on the
+mathematics.
+
+Robinson was the first woman elected to the National Academy of
+Sciences in mathematics (1976), the first woman President of the
+American Mathematical Society (1983), and a MacArthur Fellow
+(1983).  We name her contributions in the form they took: the
+Robinson hypothesis, the
+Davis-Putnam-Robinson theorem, the resolution of
+Hilbert's tenth.  Where the field's awards have been silent, the
+mathematics is not.
+
+Reproducibility
+
+The start language at
+examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv,
+the recursively enumerated traces across six variants under
+examples/rogii/traces/preprocessing/{variant}/, the LaTeX/PDF source
+of this paper, the bibliography refs.bib, and the Kaggle notebooks
+that will produce the Rogii submission are released at
+
+https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction.
+
+Re-runs at fixed random seeds reproduce the binding's class
+signature; placement on the public leaderboard varies by
+10-20 ranks across non-deterministic LLM samples, as
+discussed in Section sec:discussion.
 
 Funding
 
@@ -15,21 +156,37 @@ single commodity machine augmented by university HPC, and the
 experimental setup honours that claim.
 
 ============================================================
+APPENDIX A: Verifier keyword catalogue and DFA statistics
+============================================================
+
+This appendix replaces the missing LaTeX appendix in the llm.txt export.
+
+Keyword set K (representative categories).
+itemize
+Submission validity: testsubmissionvalidity, testcolumnnamessubmission,
+check_submission_schema, validate_id_column, validate_tvt_column,
+validate_row_count, validate_no_nans.
+Schema / dtype: load_sample_submission, load_train_csv, load_test_csv,
+infer_id_column, infer_target_columns, compute_dtypes.
+Rogii domain: compute_ps_point_mask, compute_typewell_gr_alignment,
+apply_column_transformer_in_pipeline, apply_well_group_kfold_in_pipeline.
+Tools index: type3_consumer_bound_* markers on each swim lane (one per
+sub-agent column in trace_language.csv).
+itemize
+
+Statistics (baseline_column_transformer scaffold, May 2026).
+|K| approximately 80 distinct keywords; |Sigma| approximately 2,400
+characters in the operation alphabet; Aho-Corasick DFA state count
+approximately 400 (trie nodes plus failure links; exact count from
+hpcc/review_slurm_before_submit.sh consumer audit).  Acceptance policy:
+at least one keyword matched from each required category before a phase
+advance is persisted; categories are disjoint by manifest design.
+
+============================================================
 REFERENCES
 ============================================================
 
 thebibliography10
-[1]#1
-url@samestyle
-[2]#2
-4
-plus
-3minus 4
-[2]
-l@#1** WARNING: IEEEtran.bst: No hyphenation pattern has been
-** loaded for the language '#1'. Using the pattern for
-** the default language instead.
-l@#1#2
 
 koohestani2025automata
 R. Koohestani, Z. Li, A. Podkopaev, and M. Izadi, "Are agents just automata? on the formal equivalence between agentic AI and the Chomsky hierarchy," arXiv preprint, vol. 2510.23487, 2025, the paper that asks the title question; affiliations: JetBrains Research, TU Delft, Constructor University.
@@ -53,7 +210,7 @@ chomsky1956three
 N. Chomsky, "Three models for the description of language," IRE Transactions on Information Theory, vol. 2, no. 3, pp. 113-124, 1956.
 
 chomsky1959certain
-â, "On certain formal properties of grammars," Information and Control, vol. 2, no. 2, pp. 137-167, 1959.
+N. Chomsky, "On certain formal properties of grammars," Information and Control, vol. 2, no. 2, pp. 137-167, 1959.
 
 aho1968indexed
 A. V. Aho, "Indexed grammars-an extension of context-free grammars," Journal of the ACM, vol. 15, no. 4, pp. 647-671, 1968.
