@@ -1,0 +1,8 @@
+{
+  "sample_submission_path": "/lustre/work/sweeden/rogii/data/sample_submission.csv",
+  "id_column": "id",
+  "target_columns": [
+    "tvt"
+  ],
+  "n_targets": 1
+}

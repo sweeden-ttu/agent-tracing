@@ -1,0 +1,153 @@
+
+Currently Loaded Modules:
+  1) gcc/13.2.0   2) cuda/12.9.0   3) python/3.12.5
+KeyError('active_prefix_name')
+Traceback (most recent call last):
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/exception_handler.py", line 30, in __call__
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/cli/main.py", line 52, in main_subshell
+    parser = generate_parser(add_help=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/cli/conda_argparse.py", line 148, in generate_parser
+    configure_parser_create(sub_parsers)
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/cli/main_create.py", line 69, in configure_parser
+    solver_mode_options, _, channel_options = add_parser_create_install_update(p)
+                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/cli/helpers.py", line 118, in add_parser_create_install_update
+    add_parser_environment_specifier(p)
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/cli/helpers.py", line 618, in add_parser_environment_specifier
+    p.add_argument(
+  File "/home/sweeden/.cf/lib/python3.12/argparse.py", line 1496, in add_argument
+    self._get_formatter()._format_args(action, None)
+  File "/home/sweeden/.cf/lib/python3.12/argparse.py", line 603, in _format_args
+    get_metavar = self._metavar_formatter(action, default_metavar)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sweeden/.cf/lib/python3.12/argparse.py", line 590, in _metavar_formatter
+    elif action.choices is not None:
+         ^^^^^^^^^^^^^^
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/cli/helpers.py", line 35, in choices
+    self._cached_choices = self.choices_func()
+                           ^^^^^^^^^^^^^^^^^^^
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/plugins/manager.py", line 594, in get_environment_specifiers
+    h for h in self.get_hook_results("environment_specifiers")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/plugins/manager.py", line 349, in get_hook_results
+    plugins = [plugin for plugins in hook(**kwargs) for plugin in plugins]
+                                     ^^^^^^^^^^^^^^
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/pluggy/_hooks.py", line 265, in __call__
+    return self._hookexec(self.name, self.get_hookimpls(), kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/plugins/manager.py", line 248, in _hookexec
+    return super()._hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/pluggy/_manager.py", line 80, in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/pluggy/_callers.py", line 60, in _multicall
+    return outcome.get_result()
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/pluggy/_result.py", line 60, in get_result
+    raise ex[1].with_traceback(ex[2])
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/pluggy/_callers.py", line 39, in _multicall
+    res = hook_impl.function(*args)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/plugins/manager.py", line 97, in function
+    if self.impl.hookwrapper or self.impl.wrapper:
+                                ^^^^^^^^^^^^^^^^^
+AttributeError: 'HookImpl' object has no attribute 'wrapper'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/exception_handler.py", line 193, in print_unexpected_error_report
+    get_main_info_str(error_report["conda_info"])
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/cli/main_info.py", line 395, in get_main_info_str
+    display_info = get_main_info_display(info_dict)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/cli/main_info.py", line 385, in get_main_info_display
+    return {key: value for key, value in builder()}
+                                         ^^^^^^^^^
+  File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/cli/main_info.py", line 344, in builder
+    if info_dict["active_prefix_name"]:
+       ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+KeyError: 'active_prefix_name'
+
+# >>>>>>>>>>>>>>>>>>>>>> ERROR REPORT <<<<<<<<<<<<<<<<<<<<<<
+
+    Traceback (most recent call last):
+      File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/exception_handler.py", line 30, in __call__
+        return func(*args, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^
+      File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/cli/main.py", line 52, in main_subshell
+        parser = generate_parser(add_help=True)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/cli/conda_argparse.py", line 148, in generate_parser
+        configure_parser_create(sub_parsers)
+      File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/cli/main_create.py", line 69, in configure_parser
+        solver_mode_options, _, channel_options = add_parser_create_install_update(p)
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/cli/helpers.py", line 118, in add_parser_create_install_update
+        add_parser_environment_specifier(p)
+      File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/cli/helpers.py", line 618, in add_parser_environment_specifier
+        p.add_argument(
+      File "/home/sweeden/.cf/lib/python3.12/argparse.py", line 1496, in add_argument
+        self._get_formatter()._format_args(action, None)
+      File "/home/sweeden/.cf/lib/python3.12/argparse.py", line 603, in _format_args
+        get_metavar = self._metavar_formatter(action, default_metavar)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/sweeden/.cf/lib/python3.12/argparse.py", line 590, in _metavar_formatter
+        elif action.choices is not None:
+             ^^^^^^^^^^^^^^
+      File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/cli/helpers.py", line 35, in choices
+        self._cached_choices = self.choices_func()
+                               ^^^^^^^^^^^^^^^^^^^
+      File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/plugins/manager.py", line 594, in get_environment_specifiers
+        h for h in self.get_hook_results("environment_specifiers")
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/plugins/manager.py", line 349, in get_hook_results
+        plugins = [plugin for plugins in hook(**kwargs) for plugin in plugins]
+                                         ^^^^^^^^^^^^^^
+      File "/home/sweeden/.cf/lib/python3.12/site-packages/pluggy/_hooks.py", line 265, in __call__
+        return self._hookexec(self.name, self.get_hookimpls(), kwargs, firstresult)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/plugins/manager.py", line 248, in _hookexec
+        return super()._hookexec(hook_name, methods, kwargs, firstresult)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/sweeden/.cf/lib/python3.12/site-packages/pluggy/_manager.py", line 80, in _hookexec
+        return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/sweeden/.cf/lib/python3.12/site-packages/pluggy/_callers.py", line 60, in _multicall
+        return outcome.get_result()
+               ^^^^^^^^^^^^^^^^^^^^
+      File "/home/sweeden/.cf/lib/python3.12/site-packages/pluggy/_result.py", line 60, in get_result
+        raise ex[1].with_traceback(ex[2])
+      File "/home/sweeden/.cf/lib/python3.12/site-packages/pluggy/_callers.py", line 39, in _multicall
+        res = hook_impl.function(*args)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/sweeden/.cf/lib/python3.12/site-packages/conda/plugins/manager.py", line 97, in function
+        if self.impl.hookwrapper or self.impl.wrapper:
+                                    ^^^^^^^^^^^^^^^^^
+    AttributeError: 'HookImpl' object has no attribute 'wrapper'
+
+`$ /home/sweeden/.cf/bin/conda env list`
+
+  environment variables:
+conda info could not be constructed.
+KeyError('active_prefix_name')
+
+An unexpected error has occurred. Conda has prepared the above report.
+If you suspect this error is being caused by a malfunctioning plugin,
+consider using the --no-plugins option to turn off plugins.
+
+Example: conda --no-plugins install <package>
+
+Alternatively, you can set the CONDA_NO_PLUGINS environment variable on
+the command line to run the command without plugins enabled.
+
+Example: CONDA_NO_PLUGINS=true conda install <package>
+
+error    libmamba Could not solve for environment specs
+    The following package could not be installed
+    └─ pytorch-cuda =12.1 * does not exist (perhaps a typo or a missing channel).
+critical libmamba Could not solve for environment specs

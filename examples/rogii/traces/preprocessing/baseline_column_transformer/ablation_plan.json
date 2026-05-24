@@ -3,90 +3,151 @@
   "branch": "trace/baseline-column-transformer",
   "github_pr": "17",
   "approach": "ColumnTransformer + LightGBM baseline",
+  "competition_target": {
+    "column": "tvt",
+    "description": "True Vertical Thickness prediction per test id",
+    "metric": "rmse_post_ps"
+  },
   "base_papers": [
     {
       "id": "ke2017_lightgbm",
       "citation": "Ke et al. (2017) LightGBM",
-      "role": "model"
+      "role": "model",
+      "repo_pdf": "papers/baseline_column_transformer/ke2017_lightgbm.pdf",
+      "pipeline_phases": ["04_model_training", "05_evaluation"],
+      "primary_agents": ["model_trainer", "model_ensembler", "predictor", "oof_evaluator"]
     },
     {
       "id": "pedregosa2011_sklearn",
       "citation": "Pedregosa et al. (2011) scikit-learn ColumnTransformer",
-      "role": "preprocessing"
+      "role": "preprocessing",
+      "repo_pdf": "papers/baseline_column_transformer/pedregosa2011_sklearn.pdf",
+      "pipeline_phases": ["01_data_analysis", "03_feature_engineering"],
+      "primary_agents": ["schema-sentinel", "preprocessor", "cv_orchestrator", "well_group_detector"]
     }
   ],
+  "implementation": {
+    "canonical_runner": "/lustre/work/sweeden/rogii/train_predict.py",
+    "rogii_root": "/lustre/work/sweeden/rogii",
+    "trace_row_index": "trace_row_index.csv",
+    "trace_row_index_rows": 226,
+    "readme": "README.md",
+    "conda_env": "kc-rogii-wellbore-geology-prediction"
+  },
   "ablation_factors": [
     {
       "id": "target_log1p",
       "factor": "target_transform",
-      "levels": [
-        "none",
-        "log1p"
-      ]
+      "levels": ["none", "log1p"],
+      "paper": "ke2017_lightgbm",
+      "phase": "01_data_analysis",
+      "agent": "target_diagnostician",
+      "trace_token": "recommend_log1p",
+      "trace_row": 58,
+      "train_predict_py": "recommend_log1p (pipeline.target_diagnostician); main applies np.log1p / np.expm1 on TVT",
+      "hypothesis": "log1p stabilises skewed strictly-positive TVT labels for histogram GBDT"
     },
     {
       "id": "numeric_scaler",
       "factor": "preprocessor",
-      "levels": [
-        "standard",
-        "robust"
-      ]
+      "levels": ["standard", "robust"],
+      "paper": "pedregosa2011_sklearn",
+      "phase": "03_feature_engineering",
+      "agent": "preprocessor",
+      "trace_token": "build_numeric_pipeline",
+      "trace_row": 68,
+      "train_predict_py": "build_feature_matrix (baseline: median impute only; StandardScaler vs RobustScaler ablation planned)",
+      "hypothesis": "RobustScaler vs StandardScaler on numeric well-log block affects LGBM RMSE",
+      "trace_gap": "standard/robust levels not yet separate trace tokens"
     },
     {
       "id": "rolling_window",
       "factor": "feature_window",
-      "levels": [
-        "32",
-        "64",
-        "128"
-      ]
+      "levels": ["32", "64", "128"],
+      "paper": "ke2017_lightgbm",
+      "phase": "03_feature_engineering",
+      "agent": "feature_engineer",
+      "trace_token": "compute_rolling_features",
+      "trace_row": 62,
+      "train_predict_py": "— (rolling features not in baseline train_predict.py)",
+      "hypothesis": "MD-window rolling stats add heterogeneous numeric signal for leaf-wise GBDT",
+      "trace_gap": "window size levels not yet tokenised in swim lanes"
     }
   ],
   "factorial_grid_size": 12,
   "factorial_grid_sample": [
-    {
-      "target_log1p": "none",
-      "numeric_scaler": "standard",
-      "rolling_window": "32"
-    },
-    {
-      "target_log1p": "none",
-      "numeric_scaler": "standard",
-      "rolling_window": "64"
-    },
-    {
-      "target_log1p": "none",
-      "numeric_scaler": "standard",
-      "rolling_window": "128"
-    },
-    {
-      "target_log1p": "none",
-      "numeric_scaler": "robust",
-      "rolling_window": "32"
-    },
-    {
-      "target_log1p": "none",
-      "numeric_scaler": "robust",
-      "rolling_window": "64"
-    },
-    {
-      "target_log1p": "none",
-      "numeric_scaler": "robust",
-      "rolling_window": "128"
-    },
-    {
-      "target_log1p": "log1p",
-      "numeric_scaler": "standard",
-      "rolling_window": "32"
-    },
-    {
-      "target_log1p": "log1p",
-      "numeric_scaler": "standard",
-      "rolling_window": "64"
-    }
+    {"target_log1p": "none", "numeric_scaler": "standard", "rolling_window": "32"},
+    {"target_log1p": "none", "numeric_scaler": "standard", "rolling_window": "64"},
+    {"target_log1p": "none", "numeric_scaler": "standard", "rolling_window": "128"},
+    {"target_log1p": "none", "numeric_scaler": "robust", "rolling_window": "32"},
+    {"target_log1p": "none", "numeric_scaler": "robust", "rolling_window": "64"},
+    {"target_log1p": "none", "numeric_scaler": "robust", "rolling_window": "128"},
+    {"target_log1p": "log1p", "numeric_scaler": "standard", "rolling_window": "32"},
+    {"target_log1p": "log1p", "numeric_scaler": "standard", "rolling_window": "64"}
   ],
   "primary_metric": "rmse_post_ps",
   "smre": "mean_rmse_plus_std_across_folds",
   "episodic_training": true,
-  "slurm_single_job_per_branch": true
+  "slurm_single_job_per_branch": true,
+  "pipeline_phases": [
+    {
+      "id": "01_data_analysis",
+      "agents": ["data_downloader", "schema-sentinel", "eda_profiler", "well_group_detector", "target_diagnostician"],
+      "papers": ["pedregosa2011_sklearn"]
+    },
+    {
+      "id": "02_statistical_framework",
+      "agents": ["experiment-design-architect", "architecture-decision-recorder", "dependency-graph-orchestrator", "seed-control-officer"],
+      "papers": ["ke2017_lightgbm", "pedregosa2011_sklearn"]
+    },
+    {
+      "id": "03_feature_engineering",
+      "agents": ["feature_engineer", "preprocessor", "cv_orchestrator"],
+      "papers": ["pedregosa2011_sklearn"]
+    },
+    {
+      "id": "04_model_training",
+      "agents": ["model_trainer", "model_ensembler", "predictor"],
+      "papers": ["ke2017_lightgbm"]
+    },
+    {
+      "id": "05_evaluation",
+      "agents": ["oof_evaluator", "error_analyzer"],
+      "papers": ["ke2017_lightgbm"]
+    },
+    {
+      "id": "06_submission",
+      "agents": ["submission_formatter", "submission_validator", "kaggle_submitter"],
+      "papers": []
+    }
+  ],
+  "paper_trace_implementation": {
+    "ke2017_lightgbm": [
+      {"trace_row": 138, "agent": "model_trainer", "token": "set_objective_regression", "train_predict_py": "make_estimator"},
+      {"trace_row": 139, "agent": "model_trainer", "token": "set_metric_rmse", "train_predict_py": "make_estimator; rmse"},
+      {"trace_row": 142, "agent": "model_trainer", "token": "log_best_iteration", "train_predict_py": "cross_val_and_predict"},
+      {"trace_row": 144, "agent": "model_ensembler", "token": "train_with_seed_42", "train_predict_py": "make_estimator.random_state=42; cross_val_and_predict"},
+      {"trace_row": 148, "agent": "predictor", "token": "collect_oof_predictions", "train_predict_py": "cross_val_and_predict"},
+      {"trace_row": 149, "agent": "oof_evaluator", "token": "compute_rmse_per_fold", "train_predict_py": "cross_val_and_predict; rmse"},
+      {"trace_row": 151, "agent": "oof_evaluator", "token": "compute_mean_oof_rmse", "train_predict_py": "cross_val_and_predict"},
+      {"trace_row": 163, "agent": "predictor", "token": "inverse_log1p", "train_predict_py": "cross_val_and_predict; main (np.expm1)"}
+    ],
+    "pedregosa2011_sklearn": [
+      {"trace_row": 34, "agent": "schema-sentinel", "token": "register_schema", "train_predict_py": "infer_columns"},
+      {"trace_row": 40, "agent": "schema-sentinel", "token": "infer_target_columns", "train_predict_py": "infer_columns"},
+      {"trace_row": 66, "agent": "preprocessor", "token": "replace_sentinels_with_nan", "train_predict_py": "replace_sentinels_with_nan"},
+      {"trace_row": 68, "agent": "preprocessor", "token": "build_numeric_pipeline", "train_predict_py": "categorize_columns; build_feature_matrix"},
+      {"trace_row": 69, "agent": "preprocessor", "token": "build_lowcard_pipeline", "train_predict_py": "categorize_columns; build_feature_matrix"},
+      {"trace_row": 70, "agent": "preprocessor", "token": "build_highcard_pipeline", "train_predict_py": "categorize_columns; build_feature_matrix"},
+      {"trace_row": 71, "agent": "preprocessor", "token": "assemble_column_transformer", "train_predict_py": "build_feature_matrix"},
+      {"trace_row": 72, "agent": "well_group_detector", "token": "provide_groups", "train_predict_py": "well_group_detector.provide_groups"},
+      {"trace_row": 73, "agent": "cv_orchestrator", "token": "choose_cv_scheme", "train_predict_py": "_effective_cv"},
+      {"trace_row": 76, "agent": "cv_orchestrator", "token": "emit_fold_indices", "train_predict_py": "cross_val_and_predict"}
+    ]
+  },
+  "known_gaps": [
+    "numeric_scaler and rolling_window ablation levels not first-class trace tokens",
+    "train_with_seed_69/2024 in trace; train_predict.py uses seed 42 only",
+    "train_tcn.slurm is TCN, not LightGBM"
+  ]
 }

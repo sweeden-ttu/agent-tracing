@@ -1,0 +1,12 @@
+{
+  "variant": "typewell_gr_alignment",
+  "phase": "03_feature_engineering",
+  "completed_at": "2026-05-24T09:49:19Z",
+  "prior_phase": "02_statistical_framework",
+  "outputs": {
+    "feature_config": "artifacts/03_feature_engineering/feature_config.json",
+    "cv_config": "artifacts/03_feature_engineering/cv_config.json",
+    "fold_indices": "artifacts/03_feature_engineering/fold_indices.json"
+  },
+  "trace_steps_executed": 14
+}

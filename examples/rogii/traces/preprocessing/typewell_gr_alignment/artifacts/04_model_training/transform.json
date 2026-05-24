@@ -1,0 +1,40 @@
+{
+  "variant": "typewell_gr_alignment",
+  "use_log1p": false,
+  "is_positive": true,
+  "target_column": "tvt",
+  "id_column": "id",
+  "numeric_scaler": "median",
+  "eval_mask": "full_well",
+  "variant_extra_cols": [
+    "gr_typewell_diff",
+    "gr_typewell_absdiff",
+    "gr_typewell_zscore",
+    "typewell_gr_at_path",
+    "estimated_tvt",
+    "typewell_gr_at_tvt",
+    "gr_tvt_residual",
+    "dtw_path_cost"
+  ],
+  "cv_rmse": 0.6707725245919105,
+  "fold_rmses": [
+    0.23830306647444968,
+    0.7851730846806099,
+    0.8100153908939586,
+    0.7989190216027813,
+    0.721452059307753
+  ],
+  "cv_scheme": "groupkfold",
+  "n_folds": 5,
+  "group_key": "gr_typewell_diff",
+  "n_train_rows": 5278,
+  "max_rows_applied": null,
+  "backend": "lightgbm",
+  "feature_config": "artifacts/03_feature_engineering/feature_config.json",
+  "paths": {
+    "data_dir": "/lustre/work/sweeden/rogii/data",
+    "train_csv": "/lustre/work/sweeden/rogii/data/_train_000d7d20_horizontal_well.csv",
+    "test_csv": "/lustre/work/sweeden/rogii/data/_test_000d7d20_horizontal_well.csv",
+    "sample_submission_csv": "/lustre/work/sweeden/rogii/data/sample_submission.csv"
+  }
+}

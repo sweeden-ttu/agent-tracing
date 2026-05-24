@@ -1,0 +1,46 @@
+=== trace phase job ===
+variant:      baseline_column_transformer
+trace_phase:  06_submission
+partition:    matador
+node:         gpu-20-8
+variant_dir:  /lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/baseline_column_transformer
+conda_prefix: /lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+=== module load (gcc / cuda / python) ===
+CONDA_PREFIX=/lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+Python 3.11.15
+trace env deps OK
+=== preboot: verify prior-phase handoff ===
+PREBOOT OK: baseline_column_transformer / 06_submission
+=== GPU check (matador) ===
+SLURM_JOB_PARTITION=matador
+SLURM_GPUS_ON_NODE=1
+GPU 0: Tesla V100-PCIE-32GB (UUID: GPU-d5bd732f-d8b2-389d-4d84-7cc36d8b5e85)
+torch 2.8.0+cu128 cuda True
+=== execute phase ===
+=== run_phase 06_submission variant=baseline_column_transformer ===
+{
+  "variant": "baseline_column_transformer",
+  "phase": "06_submission",
+  "completed_at": "2026-05-24T10:25:12Z",
+  "prior_phase": "05_evaluation",
+  "outputs": {
+    "submission_csv": "artifacts/06_submission/submission.csv",
+    "validation_report": "artifacts/06_submission/validation_report.json"
+  },
+  "trace_steps_executed": 11,
+  "n_rows": 14151,
+  "columns": [
+    "id",
+    "tvt"
+  ]
+}
+=== post-run: verify phase manifest outputs ===
+POST-RUN OK: 06_submission outputs: ['submission_csv', 'validation_report']
+=== done 06_submission @ 2026-05-24T05:25:13-05:00 ===
+total 476
+drwxr-xr-x 2 sweeden users   4096 May 24 01:57 .
+drwxr-xr-x 8 sweeden users   4096 May 24 02:36 ..
+-rw-r--r-- 1 sweeden users    290 May 24 01:57 PHASE_CONTRACT.json
+-rw-r--r-- 1 sweeden users    398 May 24 05:25 phase_manifest.json
+-rw-r--r-- 1 sweeden users 466222 May 24 05:25 submission.csv
+-rw-r--r-- 1 sweeden users    303 May 24 05:25 validation_report.json

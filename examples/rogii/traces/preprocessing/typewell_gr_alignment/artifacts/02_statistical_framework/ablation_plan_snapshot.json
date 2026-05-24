@@ -1,0 +1,77 @@
+{
+  "variant": "typewell_gr_alignment",
+  "approach": "GR/typewell alignment features",
+  "ablation_factors": [
+    {
+      "id": "gr_alignment",
+      "factor": "typewell_align",
+      "levels": [
+        "off",
+        "on"
+      ]
+    },
+    {
+      "id": "gr_interp",
+      "factor": "interpolator",
+      "levels": [
+        "linear",
+        "pchip"
+      ]
+    },
+    {
+      "id": "baseline_gr_rmse",
+      "factor": "physics_baseline",
+      "levels": [
+        "report",
+        "skip"
+      ]
+    }
+  ],
+  "factorial_grid_size": 8,
+  "factorial_grid_sample": [
+    {
+      "gr_alignment": "off",
+      "gr_interp": "linear",
+      "baseline_gr_rmse": "report"
+    },
+    {
+      "gr_alignment": "off",
+      "gr_interp": "linear",
+      "baseline_gr_rmse": "skip"
+    },
+    {
+      "gr_alignment": "off",
+      "gr_interp": "pchip",
+      "baseline_gr_rmse": "report"
+    },
+    {
+      "gr_alignment": "off",
+      "gr_interp": "pchip",
+      "baseline_gr_rmse": "skip"
+    },
+    {
+      "gr_alignment": "on",
+      "gr_interp": "linear",
+      "baseline_gr_rmse": "report"
+    },
+    {
+      "gr_alignment": "on",
+      "gr_interp": "linear",
+      "baseline_gr_rmse": "skip"
+    },
+    {
+      "gr_alignment": "on",
+      "gr_interp": "pchip",
+      "baseline_gr_rmse": "report"
+    },
+    {
+      "gr_alignment": "on",
+      "gr_interp": "pchip",
+      "baseline_gr_rmse": "skip"
+    }
+  ],
+  "primary_metric": "rmse_post_ps",
+  "smre": "mean_rmse_plus_std_across_folds",
+  "episodic_training": true,
+  "slurm_single_job_per_branch": true
+}

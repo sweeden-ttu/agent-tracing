@@ -1,0 +1,20 @@
+# Minimal Slurm runtime for trace phase_runner (no pytorch/qt).
+# Create once on login node:
+#   source ~/miniforge3/etc/profile.d/conda.sh
+#   CONDA_NO_PLUGINS=true mamba env create -f examples/rogii/hpcc/environment-trace-slurm.yml -y
+name: rogii-trace-slurm
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.11
+  - pip
+  - pandas
+  - numpy
+  - scikit-learn
+  - lightgbm
+  - scipy
+  - matplotlib
+  - pyarrow
+  - pyyaml
+  - tqdm

@@ -1,0 +1,65 @@
+{
+  "n_runs": 12,
+  "grid": [
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "standard",
+      "rolling_window": "32"
+    },
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "standard",
+      "rolling_window": "64"
+    },
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "standard",
+      "rolling_window": "128"
+    },
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "robust",
+      "rolling_window": "32"
+    },
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "robust",
+      "rolling_window": "64"
+    },
+    {
+      "target_log1p": "none",
+      "numeric_scaler": "robust",
+      "rolling_window": "128"
+    },
+    {
+      "target_log1p": "log1p",
+      "numeric_scaler": "standard",
+      "rolling_window": "32"
+    },
+    {
+      "target_log1p": "log1p",
+      "numeric_scaler": "standard",
+      "rolling_window": "64"
+    },
+    {
+      "target_log1p": "log1p",
+      "numeric_scaler": "standard",
+      "rolling_window": "128"
+    },
+    {
+      "target_log1p": "log1p",
+      "numeric_scaler": "robust",
+      "rolling_window": "32"
+    },
+    {
+      "target_log1p": "log1p",
+      "numeric_scaler": "robust",
+      "rolling_window": "64"
+    },
+    {
+      "target_log1p": "log1p",
+      "numeric_scaler": "robust",
+      "rolling_window": "128"
+    }
+  ]
+}

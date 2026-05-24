@@ -1,0 +1,7 @@
+{
+  "scheme": "kfold",
+  "n_splits": 5,
+  "group_key": null,
+  "id_column": "id",
+  "target_column": "tvt"
+}

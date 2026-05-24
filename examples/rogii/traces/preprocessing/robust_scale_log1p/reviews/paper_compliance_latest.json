@@ -1,0 +1,44 @@
+{
+  "timestamp": "20260524T094825Z",
+  "manifest": {
+    "title": "Robust Statistics: The Approach Based on Influence Functions",
+    "authors": "Hampel, Ronchetti, Rousseuw, Stahel",
+    "year": 1986,
+    "claims": [
+      "Robust location/scale estimators reduce outlier sensitivity vs ordinary standardization.",
+      "log1p target transform stabilizes skewed well-log regression residuals.",
+      "Inverse transform at predict time is an ablatable factor coupling train and inference stacks."
+    ],
+    "paper_path": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/robust_scale_log1p/../../papers/robust_scale_log1p/pedregosa2011_sklearn_robust_substitute.pdf",
+    "paper_exists": false
+  },
+  "audit": {
+    "variant": "robust_scale_log1p",
+    "trace_file": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/robust_scale_log1p/trace_language.csv",
+    "gaps": [
+      {
+        "claim": "Robust scaling / M-estimators",
+        "required_tokens": [
+          "build_robust_scaler_pipeline",
+          "fit_robust_scaler",
+          "replace_sentinels_with_nan"
+        ],
+        "missing_tokens": [
+          "fit_robust_scaler"
+        ],
+        "satisfied": false
+      },
+      {
+        "claim": "log1p target + inverse at predict",
+        "required_tokens": [
+          "recommend_log1p",
+          "fit_log1p_transform_params",
+          "inverse_log1p"
+        ],
+        "missing_tokens": [],
+        "satisfied": true
+      }
+    ],
+    "all_satisfied": false
+  }
+}

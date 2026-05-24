@@ -1,0 +1,45 @@
+{
+  "n_runs": 8,
+  "grid": [
+    {
+      "ps_mask": "full_well",
+      "ps_detector": "auto",
+      "leakage_audit": "strict"
+    },
+    {
+      "ps_mask": "full_well",
+      "ps_detector": "auto",
+      "leakage_audit": "lenient"
+    },
+    {
+      "ps_mask": "full_well",
+      "ps_detector": "manual_offset",
+      "leakage_audit": "strict"
+    },
+    {
+      "ps_mask": "full_well",
+      "ps_detector": "manual_offset",
+      "leakage_audit": "lenient"
+    },
+    {
+      "ps_mask": "post_ps_only",
+      "ps_detector": "auto",
+      "leakage_audit": "strict"
+    },
+    {
+      "ps_mask": "post_ps_only",
+      "ps_detector": "auto",
+      "leakage_audit": "lenient"
+    },
+    {
+      "ps_mask": "post_ps_only",
+      "ps_detector": "manual_offset",
+      "leakage_audit": "strict"
+    },
+    {
+      "ps_mask": "post_ps_only",
+      "ps_detector": "manual_offset",
+      "leakage_audit": "lenient"
+    }
+  ]
+}

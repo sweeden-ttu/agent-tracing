@@ -1,0 +1,43 @@
+=== trace phase job ===
+variant:      typewell_gr_alignment
+trace_phase:  05_evaluation
+partition:    matador
+node:         gpu-20-8
+variant_dir:  /lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/typewell_gr_alignment
+conda_prefix: /lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+=== module load (gcc / cuda / python) ===
+CONDA_PREFIX=/lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+Python 3.11.15
+trace env deps OK
+=== preboot: verify prior-phase handoff ===
+PREBOOT OK: typewell_gr_alignment / 05_evaluation
+=== GPU check (matador) ===
+SLURM_JOB_PARTITION=matador
+SLURM_GPUS_ON_NODE=1
+GPU 0: Tesla V100-PCIE-32GB (UUID: GPU-d5bd732f-d8b2-389d-4d84-7cc36d8b5e85)
+torch 2.8.0+cu128 cuda True
+=== execute phase ===
+=== run_phase 05_evaluation variant=typewell_gr_alignment ===
+{
+  "variant": "typewell_gr_alignment",
+  "phase": "05_evaluation",
+  "completed_at": "2026-05-24T09:49:47Z",
+  "prior_phase": "04_model_training",
+  "outputs": {
+    "metrics": "artifacts/05_evaluation/metrics.json",
+    "residuals": "artifacts/05_evaluation/residuals.csv"
+  },
+  "trace_steps_executed": 12,
+  "oof_rmse": 0.6099970519524932
+}
+=== post-run: verify phase manifest outputs ===
+POST-RUN OK: 05_evaluation outputs: ['metrics', 'residuals']
+=== done 05_evaluation @ 2026-05-24T04:49:47-05:00 ===
+total 280
+drwxr-xr-x 2 sweeden users   4096 May 24 03:25 .
+drwxr-xr-x 8 sweeden users   4096 May 24 01:57 ..
+-rw-r--r-- 1 sweeden users    367 May 24 01:57 PHASE_CONTRACT.json
+-rw-r--r-- 1 sweeden users    473 May 24 04:49 metrics.json
+-rw-r--r-- 1 sweeden users    345 May 24 04:49 phase_manifest.json
+-rw-r--r-- 1 sweeden users 259649 May 24 04:49 residuals.csv
+-rw-r--r-- 1 sweeden users    230 May 24 04:49 residuals_by_depth.json

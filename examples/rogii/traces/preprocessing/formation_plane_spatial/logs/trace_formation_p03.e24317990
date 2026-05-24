@@ -1,0 +1,34 @@
+
+Currently Loaded Modules:
+  1) gcc/13.2.0   2) cuda/12.9.0   3) python/3.12.5
+Traceback (most recent call last):
+  File "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/hpcc/run_trace_phase.py", line 55, in <module>
+    raise SystemExit(main())
+                     ^^^^^^
+  File "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/hpcc/run_trace_phase.py", line 49, in main
+    manifest = run_phase(args.phase, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/_shared/phase_runner_core.py", line 798, in run_phase
+    return PHASE_RUNNERS[phase](**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/_shared/phase_runner_core.py", line 466, in run_03_feature_engineering
+    train_df, test_df, extra_cols = HOOKS.augment_train_test(train_df, test_df, data_dir=data_dir)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/_shared/variant_hooks.py", line 93, in augment_train_test
+    tr, te, form_extra = add_formation_spatial_features(tr, te, k=self.formation_knn_k)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre/work/sweeden/rogii/pipeline/formation_spatial.py", line 121, in add_formation_spatial_features
+    tr, te, knn_extra, _ = fit_formation_plane_knn(tr, te, k=k)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/lustre/work/sweeden/rogii/pipeline/formation_spatial.py", line 87, in fit_formation_plane_knn
+    te["formation_thickness_sum"] = te[form_cols].sum(axis=1).replace(0, np.nan).fillna(0.0)
+                                    ~~^^^^^^^^^^^
+  File "/home/sweeden/.local/lib/python3.11/site-packages/pandas/core/frame.py", line 4119, in __getitem__
+    indexer = self.columns._get_indexer_strict(key, "columns")[1]
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/sweeden/.local/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 6212, in _get_indexer_strict
+    self._raise_if_missing(keyarr, indexer, axis_name)
+  File "/home/sweeden/.local/lib/python3.11/site-packages/pandas/core/indexes/base.py", line 6261, in _raise_if_missing
+    raise KeyError(f"None of [{key}] are in the [{axis_name}]")
+KeyError: "None of [Index(['ANCC', 'ASTNU', 'ASTNL', 'EGFDU', 'EGFDL', 'BUDA'], dtype='object')] are in the [columns]"
+srun: error: gpu-21-10: task 0: Exited with exit code 1
