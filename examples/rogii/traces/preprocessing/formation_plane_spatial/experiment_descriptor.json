@@ -40,7 +40,7 @@
   },
   "agent_implementation": {
     "trace_language_csv": "traces/preprocessing/formation_plane_spatial/trace_language.csv",
-    "trace_language_csv_absolute": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/formation_plane_spatial/trace_language.csv",
+    "trace_language_csv_absolute": "/lustre/work/sweeden/agent-tracing-trace-baseline/traces/preprocessing/formation_plane_spatial/trace_language.csv",
     "resource_envelope_rows": "2-21",
     "governance_bootstrap_rows": "22-26",
     "chomsky_audit": "sec/4 evaluation audit protocol (Type-3 consumer bounds)",
@@ -52,34 +52,7 @@
     "ablation_plan": "ablation_plan.json",
     "subdivision_manifest": "subdivision_manifest.json",
     "primary_metric": "rmse_post_ps",
-    "smre": "mean_rmse_plus_std_across_folds",
-    "ablation_factors": [
-      {
-        "id": "knn_k",
-        "factor": "formation_knn",
-        "levels": [
-          "3",
-          "5",
-          "11"
-        ]
-      },
-      {
-        "id": "geometry_feats",
-        "factor": "drilling_geometry",
-        "levels": [
-          "off",
-          "on"
-        ]
-      },
-      {
-        "id": "plane_fit",
-        "factor": "formation_plane",
-        "levels": [
-          "off",
-          "on"
-        ]
-      }
-    ]
+    "smre": "mean_rmse_plus_std_across_folds"
   },
-  "paper_file": "../../../papers/formation_plane_spatial/cover1967_knn.pdf"
+  "paper_file": "../../../examples/rogii/papers/formation_plane_spatial/cover1967_knn.pdf"
 }

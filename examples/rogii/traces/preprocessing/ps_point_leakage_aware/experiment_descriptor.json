@@ -33,7 +33,7 @@
   },
   "agent_implementation": {
     "trace_language_csv": "traces/preprocessing/ps_point_leakage_aware/trace_language.csv",
-    "trace_language_csv_absolute": "/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/ps_point_leakage_aware/trace_language.csv",
+    "trace_language_csv_absolute": "/lustre/work/sweeden/agent-tracing-trace-baseline/traces/preprocessing/ps_point_leakage_aware/trace_language.csv",
     "resource_envelope_rows": "2-21",
     "governance_bootstrap_rows": "22-26",
     "chomsky_audit": "sec/4 evaluation audit protocol (Type-3 consumer bounds)",
@@ -45,32 +45,7 @@
     "ablation_plan": "ablation_plan.json",
     "subdivision_manifest": "subdivision_manifest.json",
     "primary_metric": "rmse_post_ps",
-    "smre": "mean_rmse_plus_std_across_folds",
-    "ablation_factors": [
-      {
-        "id": "ps_mask",
-        "factor": "eval_mask",
-        "levels": [
-          "full_well",
-          "post_ps_only"
-        ]
-      },
-      {
-        "id": "ps_detector",
-        "factor": "ps_detection",
-        "levels": [
-          "auto",
-          "manual_offset"
-        ]
-      },
-      {
-        "id": "leakage_audit",
-        "factor": "tvt_input_audit",
-        "levels": [
-          "strict",
-          "lenient"
-        ]
-      }
-    ]
-  }
+    "smre": "mean_rmse_plus_std_across_folds"
+  },
+  "paper_file": "../../../examples/rogii/papers/ps_point_leakage_aware/kaufman2012_leakage.pdf"
 }
