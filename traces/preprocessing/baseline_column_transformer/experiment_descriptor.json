@@ -96,7 +96,7 @@
   ],
   "agent_implementation": {
     "trace_language_csv": "traces/preprocessing/baseline_column_transformer/trace_language.csv",
-    "trace_language_csv_absolute": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/baseline_column_transformer/trace_language.csv",
+    "trace_language_csv_absolute": "/lustre/work/sweeden/agent-tracing-trace-baseline/traces/preprocessing/baseline_column_transformer/trace_language.csv",
     "resource_envelope_rows": "2-21",
     "governance_bootstrap_rows": "22-26",
     "chomsky_audit": "sec/4 evaluation audit protocol (Type-3 consumer bounds)",
@@ -108,57 +108,7 @@
     "ablation_plan": "ablation_plan.json",
     "subdivision_manifest": "subdivision_manifest.json",
     "primary_metric": "rmse_post_ps",
-    "smre": "mean_rmse_plus_std_across_folds",
-    "ablation_factors": [
-      {
-        "id": "target_log1p",
-        "factor": "target_transform",
-        "levels": [
-          "none",
-          "log1p"
-        ],
-        "paper": "ke2017_lightgbm",
-        "phase": "01_data_analysis",
-        "agent": "target_diagnostician",
-        "trace_token": "recommend_log1p",
-        "trace_row": 58,
-        "train_predict_py": "recommend_log1p (pipeline.target_diagnostician); main applies np.log1p / np.expm1 on TVT",
-        "hypothesis": "log1p stabilises skewed strictly-positive TVT labels for histogram GBDT"
-      },
-      {
-        "id": "numeric_scaler",
-        "factor": "preprocessor",
-        "levels": [
-          "standard",
-          "robust"
-        ],
-        "paper": "pedregosa2011_sklearn",
-        "phase": "03_feature_engineering",
-        "agent": "preprocessor",
-        "trace_token": "build_numeric_pipeline",
-        "trace_row": 68,
-        "train_predict_py": "build_feature_matrix (baseline: median impute only; StandardScaler vs RobustScaler ablation planned)",
-        "hypothesis": "RobustScaler vs StandardScaler on numeric well-log block affects LGBM RMSE",
-        "trace_gap": "standard/robust levels not yet separate trace tokens"
-      },
-      {
-        "id": "rolling_window",
-        "factor": "feature_window",
-        "levels": [
-          "32",
-          "64",
-          "128"
-        ],
-        "paper": "ke2017_lightgbm",
-        "phase": "03_feature_engineering",
-        "agent": "feature_engineer",
-        "trace_token": "compute_rolling_features",
-        "trace_row": 62,
-        "train_predict_py": "\u2014 (rolling features not in baseline train_predict.py)",
-        "hypothesis": "MD-window rolling stats add heterogeneous numeric signal for leaf-wise GBDT",
-        "trace_gap": "window size levels not yet tokenised in swim lanes"
-      }
-    ]
+    "smre": "mean_rmse_plus_std_across_folds"
   },
-  "paper_file": "../../../papers/baseline_column_transformer/ke2017_lightgbm.pdf"
+  "paper_file": "../../../examples/rogii/papers/baseline_column_transformer/ke2017_lightgbm.pdf"
 }

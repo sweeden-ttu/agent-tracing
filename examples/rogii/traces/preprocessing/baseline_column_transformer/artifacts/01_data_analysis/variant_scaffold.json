@@ -1,0 +1,4 @@
+{
+  "variant_slug": "baseline_column_transformer",
+  "approach": "ColumnTransformer + LightGBM baseline"
+}

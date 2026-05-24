@@ -9,6 +9,8 @@
   ],
   "mean_fold_rmse": 0.6129358585687535,
   "std_fold_rmse": 0.20538575728198105,
+  "variant": "baseline_column_transformer",
+  "eval_mask": "full_well",
   "oof_rmse_recomputed": 0.6463777638976427,
   "residual_mean": -0.002645870941091166,
   "residual_std": 0.6463723485950493,

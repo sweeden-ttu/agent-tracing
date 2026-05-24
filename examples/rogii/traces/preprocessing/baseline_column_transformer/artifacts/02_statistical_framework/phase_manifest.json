@@ -1,7 +1,7 @@
 {
   "variant": "baseline_column_transformer",
   "phase": "02_statistical_framework",
-  "completed_at": "2026-05-24T08:19:40Z",
+  "completed_at": "2026-05-24T10:24:16Z",
   "prior_phase": "01_data_analysis",
   "outputs": {
     "statistical_framework": "artifacts/02_statistical_framework/statistical_framework.json",

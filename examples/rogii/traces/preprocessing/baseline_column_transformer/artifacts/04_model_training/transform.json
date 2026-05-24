@@ -1,8 +1,12 @@
 {
+  "variant": "baseline_column_transformer",
   "use_log1p": false,
   "is_positive": true,
   "target_column": "tvt",
   "id_column": "id",
+  "numeric_scaler": "median",
+  "eval_mask": "full_well",
+  "variant_extra_cols": [],
   "cv_rmse": 0.6129358585687535,
   "fold_rmses": [
     0.5691583081659909,

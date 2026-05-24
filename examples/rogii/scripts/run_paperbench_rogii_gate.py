@@ -46,7 +46,7 @@ def main() -> int:
     parser.add_argument("--validate-traces", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--dry-run-all", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--execute-orchestrator", metavar="VARIANT")
-    parser.add_argument("--skip-pytest", action="store_true")
+    parser.add_argument("--generate-pipelines", action="store_true", help="Run frontier.yaml pipeline generator first")
     args = parser.parse_args()
 
     if not FRONTIER_PAPERBENCH.is_dir():
@@ -74,6 +74,13 @@ def main() -> int:
                 "--rogii-root",
                 str(TRACE_BASELINE),
             ],
+            cwd=FRONTIER_PAPERBENCH,
+            env=env,
+        )
+
+    if args.generate_pipelines:
+        _run(
+            [sys.executable, "-m", "paperbench.scripts.generate_rogii_pipelines", "--all", "--no-sync-meta"],
             cwd=FRONTIER_PAPERBENCH,
             env=env,
         )

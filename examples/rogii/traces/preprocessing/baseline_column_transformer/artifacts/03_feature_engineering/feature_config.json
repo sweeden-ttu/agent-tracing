@@ -1,4 +1,5 @@
 {
+  "variant": "baseline_column_transformer",
   "feature_cols": [
     "MD",
     "X",
@@ -17,6 +18,8 @@
   ],
   "low_card_cols": [],
   "high_card_cols": [],
+  "variant_extra_cols": [],
+  "numeric_scaler": "median",
   "n_train_rows": 5278,
   "n_test_rows": 5278
 }
