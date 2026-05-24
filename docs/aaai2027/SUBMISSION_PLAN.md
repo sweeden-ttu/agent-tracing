@@ -8,6 +8,39 @@
 **Notification Date:** December 2026  
 **Conference Dates:** February 2027  
 
+## 0. This ablation / branch (variant worktree)
+
+| Field | Path or value |
+|-------|----------------|
+| **Worktree (this checkout)** | `/lustre/work/sweeden/agent-tracing-trace-formation` |
+| **Unified repo (canonical traces)** | `/lustre/work/sweeden/agent-tracing` |
+| **Git branch** | `trace/formation-plane-spatial` |
+| **GitHub PR** | [#22](https://github.com/sweeden-ttu/agent-tracing/pull/22) · Issue [#15](https://github.com/sweeden-ttu/agent-tracing/issues/15) |
+| **Variant slug** | `formation_plane_spatial` |
+| **Approach** | Drilling geometry + formation KNN |
+| **Base paper(s)** | Cover & Hart 1967 k-NN (formation-plane spatial features) |
+| **Trace language CSV (canonical)** | `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/formation_plane_spatial/trace_language.csv` |
+| **Trace bundle (this worktree)** | `/lustre/work/sweeden/agent-tracing-trace-formation/examples/rogii/traces/preprocessing/formation_plane_spatial/` |
+| **Experiment descriptor** | `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/formation_plane_spatial/experiment_descriptor.json` |
+| **Ablation plan** | `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/formation_plane_spatial/ablation_plan.json` |
+| **Conda env (`environment.yml`)** | `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/formation_plane_spatial/environment.yml` (env name = `formation_plane_spatial`) |
+| **HPCC ablation runs** | `/lustre/work/sweeden/rogii/ablation_runs/formation_plane_spatial/` |
+| **HPCC pipeline / Slurm** | `/lustre/work/sweeden/rogii/hpcc/` (`run_ablation_variant.slurm`, `train_tcn_episodic.slurm`, `train_tcn.slurm`) |
+| **Kaggle competition** | [rogii-wellbore-geology-prediction](https://www.kaggle.com/competitions/rogii-wellbore-geology-prediction) |
+| **Trace-theory paper sections** | sec/3 Type-0 envelope |
+| **Merge order** | See `/lustre/work/sweeden/agent-tracing/examples/rogii/MERGE_PATH.md` (baseline merges first) |
+
+Submit Slurm jobs for **this variant only** (one active job per branch):
+
+```bash
+cd /lustre/work/sweeden/rogii
+VARIANT=formation_plane_spatial bash hpcc/review_slurm_before_submit.sh hpcc/run_ablation_variant.slurm formation_plane_spatial
+VARIANT=formation_plane_spatial sbatch hpcc/run_ablation_variant.slurm
+```
+
+Mid-trace resume: follow `/lustre/work/sweeden/agent-tracing/.cursor/rules/trace-language-mid-resume-slurm-gate.mdc` — prior `sbatch` steps must be `COMPLETED` and `ablation_runs/formation_plane_spatial/` artifacts must match the resume row in `trace_language.csv`.
+
+
 ## 1. Paper Overview
 
 This submission presents a novel theoretical framework for agent verification and validation based on trace languages and the Chomsky hierarchy. The core contribution is establishing that agent behaviors can be formally specified as trace languages, enabling automated verification through Chomsky hierarchy classification.
@@ -22,17 +55,17 @@ This submission presents a novel theoretical framework for agent verification an
 ## 2. Timeline for Completion (Now Until September 2026)
 
 ### Phase 1: Foundation Completion (May - June 2026)
-- [x] Complete trace language framework implementation in ~/agent-tracing/
+- [x] Complete trace language framework for `formation_plane_spatial` in `/lustre/work/sweeden/agent-tracing-trace-formation` (branch `trace/formation-plane-spatial`)
 - [x] Add research paper to PaperBench dataset as "a-trace-language-theory-of-agents"
 - [x] Implement Chomsky classifier, validator, recorder, and rubric components
-- [x] Create initial trace language specifications for baseline agents
+- [x] Create trace language specification: `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/formation_plane_spatial/trace_language.csv`
 
 ### Phase 2: Empirical Validation (July - August 2026)
-- [ ] Run baseline experiments on ROGII competition without trace language specification
-- [ ] Run enhanced experiments with trace language specification
+- [ ] Run Rogii ablation baseline cells for `formation_plane_spatial` via `/lustre/work/sweeden/rogii/hpcc/run_ablation_variant.slurm`
+- [ ] Run full Slurm pipeline (`train_tcn_episodic.slurm` → checkpoints → submit) per `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/formation_plane_spatial/trace_language.csv`
 - [ ] Measure improvements in security, task breakdown, and competition performance
 - [ ] Validate recursively enumerable properties of quality rubric
-- [ ] Test on multiple MLE-bench competitions for generalizability
+- [ ] Compare `formation_plane_spatial` RMSE (post-PS) against other five variants under `examples/rogii/ablation_tracking_status.csv`
 
 ### Phase 3: Paper Writing and Refinement (September 2026)
 - [ ] Write full paper following AAAI format guidelines
@@ -74,7 +107,8 @@ Based on typical AAAI requirements (verify exact requirements from aaai.org/conf
 
 ### Connection to PaperBench:
 Our trace language framework has been integrated into the PaperBench dataset as a new research topic:
-- **Location**: ~/frontier-evals/project/paperbench/data/papers/a-trace-language-theory-of-agents/
+- **Location**: `/lustre/work/sweeden/frontier-evals/project/paperbench/data/papers/agent-tracing/` (PaperBench bundle)
+- **Variant trace orchestrator**: `paperbench.trace_pipeline.orchestrator --variant formation_plane_spatial`
 - **Components**:
   - config.yaml: Paper identification and title
   - addendum.md: Brief description of contributions
@@ -82,8 +116,8 @@ Our trace language framework has been integrated into the PaperBench dataset as 
   - rubric.json: Trace language verification requirements with hierarchical subtasks
 
 ### Experimental Validation Plan:
-1. **Baseline Configuration**: Run frontier-evals agents on ROGII competition without trace language constraints
-2. **Trace Language Configuration**: Same agents with trace language specification and validation
+1. **Variant trace CSV**: Execute swim lanes in `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/formation_plane_spatial/trace_language.csv` under Type-3 consumer bounds
+2. **Ablation factorial**: Grid from `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/formation_plane_spatial/ablation_plan.json`; manifests in `/lustre/work/sweeden/rogii/ablation_runs/formation_plane_spatial/`
 3. **Comparison Metrics**:
    - Competition performance (RMSE for ROGII)
    - Trace language validation pass/fail rates
@@ -103,38 +137,42 @@ For running experiments on HPCC cluster to generate results for the paper:
 ### SLURM Job Template:
 ```bash
 #!/bin/bash
-#SBATCH --job-name=trace_lang_aaai
+#SBATCH --job-name=rogii_formation_plane_spat
 #SBATCH --partition=matador
 #SBATCH --cpus-per-task=8
 #SBATCH --mem-per-cpu=6000
 #SBATCH --gres=gpu:1
 #SBATCH --time=04:00:00
-#SBATCH --output=/lustre/research/sweeden/agent-tracing/logs/%j.out
-#SBATCH --error=/lustre/research/sweeden/agent-tracing/logs/%j.err
+#SBATCH --output=/lustre/work/sweeden/rogii/logs/%x.o%j
+#SBATCH --error=/lustre/work/sweeden/rogii/logs/%x.e%j
 
 # Environment setup
 module purge
-module load gcc/12.2.0
-module load python/3.10.4
-module load cuda/12.3.2
+source "${RUN_DIR}/hpcc/slurm_module_init.sh"
+init_slurm_modules
+source "${RUN_DIR}/hpcc/load_matador_modules.sh"
+load_matador_modules
 
-source /lustre/work/sweeden/miniforge3/etc/profile.d/conda.sh
-conda activate trace_lang_env
+VARIANT=formation_plane_spatial
+source "${RUN_DIR}/hpcc/_variant_conda_env.sh"
+matador_activate_variant_env
 
 # Experiment execution
-cd /lustre/work/sweeden/agent-tracing
-python experiments/run_aaai_evaluation.py \
-    --competition rogii-wellbore-geology-prediction \
-    --trace-config /lustre/work/sweeden/agent-tracing/data/trace_language_rogii.csv \
-    --output-dir /lustre/research/sweeden/agent-tracing/results/aaai_run_${SLURM_JOB_ID} \
-    --baseline-run  # For baseline comparison
-    # --trace-language-run  # For enhanced comparison
+RUN_DIR=/lustre/work/sweeden/rogii
+cd "${RUN_DIR}"
+VARIANT=formation_plane_spatial bash hpcc/review_slurm_before_submit.sh hpcc/run_ablation_variant.slurm formation_plane_spatial
+VARIANT=formation_plane_spatial sbatch hpcc/run_ablation_variant.slurm
+# Full train (after ablation bootstrap completes):
+# sbatch hpcc/train_tcn_episodic.slurm
+# Artifacts: ablation_runs/formation_plane_spatial/  artifacts/checkpoints/  submission.csv
 ```
 
 ### Directory Structure on HPCC:
-- Working code: `/lustre/work/sweeden/agent-tracing/`
-- Temporary data: `/lustre/scratch/sweeden/agent-tracing/` (Kaggle datasets, etc.)
-- Results and logs: `/lustre/research/sweeden/agent-tracing/`
+- **Theory + trace CSVs (canonical):** `/lustre/work/sweeden/agent-tracing/`
+- **This variant worktree:** `/lustre/work/sweeden/agent-tracing-trace-formation/`
+- **Trace bundle:** `/lustre/work/sweeden/agent-tracing/examples/rogii/traces/preprocessing/formation_plane_spatial/`
+- **HPCC pipeline + data:** `/lustre/work/sweeden/rogii/` (`data/`, `artifacts/`, `logs/`)
+- **Ablation manifests:** `/lustre/work/sweeden/rogii/ablation_runs/formation_plane_spatial/`
 
 ## 6. Supplementary Materials for Submission
 
@@ -166,7 +204,7 @@ Our work connects to and extends several areas:
 - First to apply Chomsky hierarchy classification to agent trace languages
 - Novel trace language specification format for agent behaviors
 - Recursively enumerable quality rubric with semi-decidable properties
-- Integration with established benchmarks (PaperBench, MLE-bench)
+- Integration with Rogii Kaggle benchmark and PaperBench agent-tracing bundle
 - Practical verification framework with executable components
 
 ## 8. Broader Impacts
