@@ -47,14 +47,18 @@ export SLURM_JOB_NAME="trace_${TRACE_VARIANT%%_*}_${PHASE_TAG}"
 
 # Per-phase walltime/memory are set via sbatch flags in submit_trace_pipeline.sh.
 
-set -euo pipefail
 source "${AGENT_TRACING_ROOT}/examples/rogii/hpcc/_trace_phase_common.sh"
 
-echo "=== GPU check ==="
+echo "=== GPU check (matador) ==="
+echo "SLURM_JOB_PARTITION=${SLURM_JOB_PARTITION:-?}"
+echo "SLURM_GPUS_ON_NODE=${SLURM_GPUS_ON_NODE:-?}"
 nvidia-smi -L 2>/dev/null || echo "(no nvidia-smi)"
 python - <<'PY'
-import torch
-print("torch", torch.__version__, "cuda", torch.cuda.is_available())
+try:
+    import torch
+    print("torch", torch.__version__, "cuda", torch.cuda.is_available())
+except ImportError:
+    print("torch not installed (OK for LightGBM trace phases)")
 PY
 
 RUN_ARGS=(

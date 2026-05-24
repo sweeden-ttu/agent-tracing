@@ -1,0 +1,50 @@
+=== trace phase job ===
+variant:      baseline_column_transformer
+trace_phase:  02_statistical_framework
+partition:    matador
+node:         gpu-20-8
+variant_dir:  /lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/baseline_column_transformer
+conda_prefix: /lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+=== module load (gcc / cuda / python) ===
+CONDA_PREFIX=/lustre/work/sweeden/sweeden/envs/rogii-trace-slurm
+Python 3.11.15
+trace env deps OK
+=== preboot: verify prior-phase handoff ===
+PREBOOT OK: baseline_column_transformer / 02_statistical_framework
+=== GPU check (matador) ===
+SLURM_JOB_PARTITION=matador
+SLURM_GPUS_ON_NODE=1
+GPU 0: Tesla V100-PCIE-32GB (UUID: GPU-d5bd732f-d8b2-389d-4d84-7cc36d8b5e85)
+torch 2.8.0+cu128 cuda True
+=== execute phase ===
+=== run_phase 02_statistical_framework variant=baseline_column_transformer ===
+{
+  "variant": "baseline_column_transformer",
+  "phase": "02_statistical_framework",
+  "completed_at": "2026-05-24T08:19:40Z",
+  "prior_phase": "01_data_analysis",
+  "outputs": {
+    "statistical_framework": "artifacts/02_statistical_framework/statistical_framework.json",
+    "ablation_grid": "artifacts/02_statistical_framework/ablation_grid.json",
+    "training_plan": "artifacts/02_statistical_framework/training_plan.json",
+    "paper_citations": "artifacts/02_statistical_framework/paper_citations.json",
+    "initial_adr": "artifacts/02_statistical_framework/initial_adr.md"
+  },
+  "trace_steps_executed": 46
+}
+=== post-run: verify phase manifest outputs ===
+POST-RUN OK: 02_statistical_framework outputs: ['statistical_framework', 'ablation_grid', 'training_plan', 'paper_citations', 'initial_adr']
+=== done 02_statistical_framework @ 2026-05-24T03:19:41-05:00 ===
+total 17
+drwxr-xr-x 2 sweeden users  4096 May 24 02:36 .
+drwxr-xr-x 8 sweeden users  4096 May 24 02:36 ..
+-rw-r--r-- 1 sweeden users   570 May 24 01:57 PHASE_CONTRACT.json
+-rw-r--r-- 1 sweeden users  1329 May 24 03:19 ablation_grid.json
+-rw-r--r-- 1 sweeden users  9226 May 24 03:19 ablation_plan_snapshot.json
+-rw-r--r-- 1 sweeden users 13539 May 24 03:19 experiment_descriptor_snapshot.json
+-rw-r--r-- 1 sweeden users   291 May 24 03:19 initial_adr.md
+-rw-r--r-- 1 sweeden users  8457 May 24 03:19 mle_plan_snapshot.json
+-rw-r--r-- 1 sweeden users  1590 May 24 03:19 paper_citations.json
+-rw-r--r-- 1 sweeden users   618 May 24 03:19 phase_manifest.json
+-rw-r--r-- 1 sweeden users   467 May 24 03:19 statistical_framework.json
+-rw-r--r-- 1 sweeden users  1476 May 24 03:19 training_plan.json

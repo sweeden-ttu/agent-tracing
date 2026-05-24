@@ -1,14 +1,14 @@
 {
   "variant": "baseline_column_transformer",
   "phase": "04_model_training",
-  "completed_at": "2026-05-24T06:11:00Z",
+  "completed_at": "2026-05-24T08:20:10Z",
   "prior_phase": "03_feature_engineering",
   "outputs": {
-    "transform": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/baseline_column_transformer/artifacts/04_model_training/transform.json",
-    "test_preds_per_fold": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/baseline_column_transformer/artifacts/04_model_training/test_preds_per_fold.npy",
-    "oof_predictions": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/baseline_column_transformer/artifacts/04_model_training/oof_predictions.npy",
-    "training_metrics": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/baseline_column_transformer/artifacts/04_model_training/training_metrics.json"
+    "transform": "artifacts/04_model_training/transform.json",
+    "test_preds_per_fold": "artifacts/04_model_training/test_preds_per_fold.npy",
+    "oof_predictions": "artifacts/04_model_training/oof_predictions.npy",
+    "training_metrics": "artifacts/04_model_training/training_metrics.json"
   },
   "trace_steps_executed": 18,
-  "cv_rmse": 0.7171393946486982
+  "cv_rmse": 0.6129358585687535
 }

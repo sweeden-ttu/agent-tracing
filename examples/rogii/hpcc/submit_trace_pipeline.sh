@@ -104,9 +104,11 @@ for ((i=start_idx; i<${#PHASES[@]}; i++)); do
   cmd=(
     sbatch
     --parsable
+    -p matador
+    --gpus-per-node=1
     -J "${job_name}"
     "${dep[@]}"
-    --export=ALL,VARIANT="${VARIANT}",TRACE_VARIANT="${TRACE_VARIANT}",TRACE_PHASE="${phase}",AGENT_TRACING_ROOT="${AGENT_TRACING_ROOT}",ROGII_ROOT="${ROGII_ROOT}"
+    --export=ALL,VARIANT="${VARIANT}",TRACE_VARIANT="${TRACE_VARIANT}",TRACE_PHASE="${phase}",AGENT_TRACING_ROOT="${AGENT_TRACING_ROOT}",ROGII_ROOT="${ROGII_ROOT}",TRACE_CONDA_PREFIX="/lustre/work/sweeden/sweeden/envs/rogii-trace-slurm",SLURM_PARTITION=matador
     "${extra[@]}"
     "${SLURM_SCRIPT}"
   )

@@ -1,0 +1,16 @@
+{
+  "variant": "baseline_column_transformer",
+  "phase": "06_submission",
+  "completed_at": "2026-05-24T08:25:40Z",
+  "prior_phase": "05_evaluation",
+  "outputs": {
+    "submission_csv": "artifacts/06_submission/submission.csv",
+    "validation_report": "artifacts/06_submission/validation_report.json"
+  },
+  "trace_steps_executed": 11,
+  "n_rows": 14151,
+  "columns": [
+    "id",
+    "tvt"
+  ]
+}

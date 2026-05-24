@@ -1,11 +1,11 @@
 {
   "variant": "baseline_column_transformer",
   "phase": "06_submission",
-  "completed_at": "2026-05-24T06:11:00Z",
+  "completed_at": "2026-05-24T08:20:36Z",
   "prior_phase": "05_evaluation",
   "outputs": {
-    "submission_csv": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/baseline_column_transformer/artifacts/06_submission/submission.csv",
-    "validation_report": "/lustre/work/sweeden/agent-tracing-trace-baseline/examples/rogii/traces/preprocessing/baseline_column_transformer/artifacts/06_submission/validation_report.json"
+    "submission_csv": "artifacts/06_submission/submission.csv",
+    "validation_report": "artifacts/06_submission/validation_report.json"
   },
   "trace_steps_executed": 11,
   "n_rows": 14151,

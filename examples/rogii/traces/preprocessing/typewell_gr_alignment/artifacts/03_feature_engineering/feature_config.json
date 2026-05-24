@@ -1,0 +1,22 @@
+{
+  "feature_cols": [
+    "MD",
+    "X",
+    "Y",
+    "Z",
+    "GR",
+    "TVT_input"
+  ],
+  "numeric_cols": [
+    "MD",
+    "X",
+    "Y",
+    "Z",
+    "GR",
+    "TVT_input"
+  ],
+  "low_card_cols": [],
+  "high_card_cols": [],
+  "n_train_rows": 5278,
+  "n_test_rows": 5278
+}
