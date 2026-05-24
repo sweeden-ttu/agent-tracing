@@ -1,0 +1,14 @@
+{
+  "base_paper_title": "Leakage in Data Mining: Formulation, Detection, and Avoidance",
+  "claims": [
+    "Train-test leakage inflates offline metrics; evaluation masks must match deployment horizon.",
+    "Post-perforation-start (PS) RMSE is the competition-relevant subset\u2014full-well eval is optimistic.",
+    "Strict vs lenient TVT input audits are ablatable governance gates (Type-3 consumers)."
+  ],
+  "ablation_sections": [
+    "\u00a73 leakage taxonomy",
+    "\u00a75 detection strategies"
+  ],
+  "trace_csv": "traces/preprocessing/ps_point_leakage_aware/trace_language.csv",
+  "hypothesis": "PS-point detection + post-PS RMSE mask improves competition RMSE (post-PS) vs shared baseline under nested GroupKFold, as motivated by Kaufman, Rosset, Perlich, Stitelman (2012)."
+}

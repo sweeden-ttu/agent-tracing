@@ -1,0 +1,31 @@
+{
+  "variant": "ps_point_leakage_aware",
+  "use_log1p": false,
+  "is_positive": true,
+  "target_column": "tvt",
+  "id_column": "id",
+  "numeric_scaler": "median",
+  "eval_mask": "post_ps_only",
+  "variant_extra_cols": [],
+  "cv_rmse": 0.05313124288719366,
+  "fold_rmses": [
+    0.0547339951501683,
+    0.04892233693110513,
+    0.062215500527711,
+    0.0544542837664278,
+    0.0453300980605561
+  ],
+  "cv_scheme": "kfold",
+  "n_folds": 5,
+  "group_key": null,
+  "n_train_rows": 5278,
+  "max_rows_applied": null,
+  "backend": "lightgbm",
+  "feature_config": "artifacts/03_feature_engineering/feature_config.json",
+  "paths": {
+    "data_dir": "/lustre/work/sweeden/rogii/data",
+    "train_csv": "/lustre/work/sweeden/rogii/data/_train_000d7d20_horizontal_well.csv",
+    "test_csv": "/lustre/work/sweeden/rogii/data/_test_000d7d20_horizontal_well.csv",
+    "sample_submission_csv": "/lustre/work/sweeden/rogii/data/sample_submission.csv"
+  }
+}
