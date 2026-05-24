@@ -20,6 +20,7 @@ from pipeline.synthetic_competition_data import (  # noqa: E402
     generate_synthetic_bundle,
     parse_submission_specs,
     prediction_zone_info,
+    write_submission_samples,
 )
 
 
@@ -29,6 +30,19 @@ DATA_DIR = ROGII_ROOT / "data"
 @pytest.fixture(scope="module")
 def sample_submission() -> pd.DataFrame:
     return pd.read_csv(DATA_DIR / "sample_submission.csv")
+
+
+def test_write_submission_samples_all_nan_tvt_input(tmp_path: Path) -> None:
+    """Rows with NaN TVT_input must not call iloc[-1] on an empty Series."""
+    train_frames = {
+        "well0": pd.DataFrame({"TVT_input": [float("nan"), float("nan")]}),
+    }
+    sample_sub = pd.DataFrame({"id": ["well0_0", "well0_1"]})
+    out = write_submission_samples(
+        tmp_path, sample_sub, train_frames, id_col="id", target_col="tvt"
+    )
+    sub = pd.read_csv(out)
+    assert list(sub["tvt"]) == [0.0, 0.0]
 
 
 def test_parse_submission_specs_three_wells(sample_submission: pd.DataFrame) -> None:
